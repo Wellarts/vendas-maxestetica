@@ -32,6 +32,15 @@ class Cliente extends Model
     {
         return $this->belongsTo(Cidade::class);
     }
+    public function venda()
+    {
+        return $this->hasMany(Venda::class);
+    }
+
+    public function vendasPdv()
+    {
+        return $this->hasMany(VendaPDV::class);
+    }
 
     public function contasReceber()
     {

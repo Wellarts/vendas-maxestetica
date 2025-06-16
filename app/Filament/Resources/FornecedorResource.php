@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Forms\Components\CpfCnpj;
 use Filament\Forms\Components\Grid;
 use Filament\Support\RawJs;
+use Filament\Notifications\Notification;
 
 class FornecedorResource extends Resource
 {
@@ -127,10 +128,21 @@ class FornecedorResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->modalHeading('Fornecedores'),
-                Tables\Actions\DeleteAction::make(),
+               Tables\Actions\DeleteAction::make()
+                    ->before(function (\Filament\Tables\Actions\DeleteAction $action, Fornecedor $record) {
+                        if ($record->compra()->exists() || $record->contasPagar()->exists()) {                            
+                            Notification::make()
+                                ->title('Ação cancelada')
+                                ->body('Este fornecedor não pode ser excluído porque está vinculado a uma ou mais compras.')
+                                ->danger()
+                                ->send();
+                        $action->cancel();
+                          
+                        }
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+               // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

@@ -19,6 +19,7 @@ use App\Forms\Components\CpfCnpj;
 use Filament\Forms\Components\Grid;
 use Filament\Support\RawJs;
 use Filament\Tables\Actions\Action;
+use Filament\Notifications\Notification;
 
 class ClienteResource extends Resource
 {
@@ -130,12 +131,22 @@ class ClienteResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (\Filament\Tables\Actions\DeleteAction $action, Cliente $record) {
+                        if ($record->venda()->exists() || $record->vendasPdv()->exists() || $record->contasReceber()->exists()) {                            
+                            Notification::make()
+                                ->title('Ação cancelada')
+                                ->body('Este cliente não pode ser excluído porque está vinculado a uma ou mais vendas.')
+                                ->danger()
+                                ->send();
+                        $action->cancel();
+                          
+                        }
+                    }),
 
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+               // Tables\Actions\DeleteBulkAction::make(),
             ]);
     }
 

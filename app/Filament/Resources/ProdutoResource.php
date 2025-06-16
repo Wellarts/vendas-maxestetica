@@ -8,6 +8,7 @@ use App\Filament\Resources\ProdutoResource\RelationManagers;
 use App\Filament\Resources\ProdutoResource\RelationManagers\ProdutoFornecedorRelationManager;
 use App\Models\Produto;
 use Closure;
+use Dom\Notation;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
 use Filament\Forms\Components\Fieldset;
@@ -23,6 +24,7 @@ use Filament\Tables\Columns\ImageColumn;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
+use Filament\Notifications\Notification;
 
 class ProdutoResource extends Resource
 {
@@ -190,9 +192,22 @@ class ProdutoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (\Filament\Tables\Actions\DeleteAction $action, Produto $record) {
+                        if ($record->itensVenda()->exists() || $record->pdv()->exists()) {
+                            
+                            Notification::make()
+                                ->title('Ação cancelada')
+                                ->body('Este produto não pode ser excluído porque está vinculado a uma ou mais vendas.')
+                                ->danger()
+                                ->send();
+                        $action->cancel();
+                          
+                        }
+                    }),
             ])
             ->bulkActions([
-                Tables\Actions\DeleteBulkAction::make(),
+              //  Tables\Actions\DeleteBulkAction::make(),
                 ExportBulkAction::make(),
 
 

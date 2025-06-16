@@ -12,6 +12,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
 
 class FormaPgmtoResource extends Resource
 {
@@ -56,8 +57,19 @@ class FormaPgmtoResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->modalHeading('Editar forma de pagamento'),
-                Tables\Actions\DeleteAction::make(),
+                    ->modalHeading('Editar forma de pagamento'),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (\Filament\Tables\Actions\DeleteAction $action, FormaPgmto $record) {
+                        if ($record->venda()->exists() || $record->vendasPdv()->exists()) {                            
+                            Notification::make()
+                                ->title('Ação cancelada')
+                                ->body('Esta forma de pagamento não pode ser excluído porque está vinculado a uma ou mais vendas.')
+                                ->danger()
+                                ->send();
+                        $action->cancel();
+                          
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

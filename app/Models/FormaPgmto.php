@@ -21,6 +21,11 @@ class FormaPgmto extends Model
         return $this->hasMany(Venda::class);
     }
 
+    public function vendasPdv()
+    {
+        return $this->hasMany(VendaPDV::class);
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
