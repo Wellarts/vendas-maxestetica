@@ -39,78 +39,45 @@ class ItensCompraRelationManager extends RelationManager
                 Forms\Components\Hidden::make('compra_id')
                     ->default((function ($livewire): int {
                         return $livewire->ownerRecord->id;
-                    })),
-
-                // Forms\Components\Select::make('produto_id')
-                //     ->relationship(name: 'produto', titleAttribute: 'nome')
-                //     ->searchable(['nome', 'codbar'])
-                //     //  ->options(Produto::all()->pluck('nome', 'id')->toArray())
+                    })),                
                 Forms\Components\Select::make('produto_id')
-                            ->label('Produto')
-                            ->searchable()
-                            ->getSearchResultsUsing(function (string $search) {
-                                return Produto::query()
-                                    ->where('codbar', 'like', "%{$search}%")
-                                    ->orWhere('nome', 'like', "%{$search}%")
-                                    ->limit(50)
-                                    ->get()
-                                    ->mapWithKeys(function (Produto $product) {
-                                        // Exibe código de barras e nome no select
-                                        return [$product->id => "[{$product->codbar}] {$product->nome}"];
-                                    });
-                            })
-                            ->getOptionLabelUsing(fn($value): ?string => Produto::where('id', $value)->first()?->nome)
-                            ->autofocus()
+                    ->label('Produto')                    
+                    ->relationship('produto', 'nome')
+                    ->searchable([
+                        'nome',
+                        'codbar',
+                    ])
+                    ->preload()
                     ->createOptionForm([
-                        Forms\Components\ToggleButtons::make('tipo')
-                            ->label('Tipo')
-                            ->default(1)
-                            ->columnSpanFull()
-                            ->options([
-                                '1' => 'Produto',
-                                '2' => 'Serviço',
-
-                            ])
-                            ->live()
-                            ->afterStateUpdated(function (Set $set, $state) {
-                                if ($state == 1) {
-                                    $set('lucratividade', 0);
-                                } elseif ($state == 2) {
-                                    $set('lucratividade', 100);
-                                }
-                            })
-
-                            ->grouped(),
                         Forms\Components\TextInput::make('nome')
+                            ->label('Nome')
                             ->required()
                             ->maxLength(255),
                         Forms\Components\TextInput::make('codbar')
                             ->label('Código de Barras')
-                            ->hidden(function (Get $get) {
-                                if ($get('tipo') == 1) {
-                                    return false;
-                                } elseif ($get('tipo') == 2) {
-                                    return true;
-                                }
-                            })
-                            ->required(false),
+                            ->maxLength(255),
+                        // Forms\Components\TextInput::make('valor_compra')
+                        //     ->label('Valor de Compra')
+                        //     ->numeric()
+                        //     ->required(),
                         Forms\Components\TextInput::make('lucratividade')
                             ->label('Lucratividade (%)')
-                            ->default(0)
+                            ->numeric()
+                            ->default(0),
                     ])
                     ->disabled(fn($context) => $context == 'edit')
                     ->live(debounce: 200)
                     ->native(false)
                     ->required()
-                    ->label('Produto')
-                    ->afterStateUpdated(
-                        function ($state, callable $set) {
-                            $produto = Produto::find($state);
-                            if ($produto) {
-                                $set('valor_compra', $produto->valor_compra);
-                            }
-                        }
-                    ),
+                    ->label('Produto'),
+                    // ->afterStateUpdated(
+                    //     function ($state, callable $set) {                           
+                           
+                    //         if ($state) {
+                    //             $set('valor_compra', $state);
+                    //         }
+                    //     }
+                    // ),
                 Forms\Components\TextInput::make('valor_compra')
                     ->numeric()
                     ->label('Valor Compra')
