@@ -30,7 +30,7 @@ class ItensVendaRelationManager extends RelationManager
     {
         return $form
             ->schema([
-                Grid::make('4')
+                Grid::make('3')
                     ->schema([
                         Forms\Components\Hidden::make('id'),
 
@@ -60,13 +60,18 @@ class ItensVendaRelationManager extends RelationManager
                                         $set('sub_total', (($get('qtd') * $get('valor_venda')) + (float)$get('acres_desc')));
                                         $set('estoque_atual', $produto->estoque);
                                         $set('total_custo_atual', $get('valor_custo_atual') * $get('qtd'));
+
+                                        // Exibe notificação com nome e foto do produto
+                                        Notification::make()
+                                            ->title('Produto selecionado:')
+                                            ->body('Produto: ' . $produto->nome . '<br> Estoque Atual: ' . $produto->estoque . ' <br> <img src="' . (is_array($produto->foto) ? asset('storage/' . ($produto->foto[0] ?? '')) : asset('storage/' . $produto->foto)) . '" alt="' . $produto->nome . '" style="max-width:100px;max-height:100px;">')
+                                            ->success()
+                                            ->duration(5000)
+                                            ->send();
                                     }
                                 }
                             ),
-                        Forms\Components\TextInput::make('estoque_atual')
-                            ->label('Estoque Atual')
-                            ->hidden(fn(string $context): bool => $context === 'edit')
-                            ->readOnly(),
+                        
 
                         Forms\Components\TextInput::make('qtd')
                             ->default('1')
@@ -79,22 +84,14 @@ class ItensVendaRelationManager extends RelationManager
                                 }
                             ),
                         Forms\Components\TextInput::make('valor_venda')
-                            ->label('Valor Venda')
+                            ->label('Valor Unitário')
                             ->numeric()
                             ->required()
                             ->readOnly(),
-                        Forms\Components\TextInput::make('acres_desc')
-                            ->numeric()
-                            ->label('Desconto/Acréscimo')
-                            ->live(debounce: 500)
-                            ->afterStateUpdated(function (Get $get, Set $set, $state) {
-                                $set('sub_total', (((float)$get('qtd') * (float)$get('valor_venda')) + (float)$get('acres_desc')));
-                                // $set('total_custo_atual',((float)$get('total_custo_atual') + (float)$state));
-                            }),
                         Forms\Components\TextInput::make('sub_total')
                             ->numeric()
                             ->readOnly()
-                            ->label('SubTotal'),
+                            ->label('Total'),
                         Forms\Components\Hidden::make('valor_custo_atual'),
 
                         Forms\Components\Hidden::make('total_custo_atual'),
@@ -116,10 +113,7 @@ class ItensVendaRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('qtd')
                     ->summarize(Sum::make()->label('Qtd de Produtos')),
                 Tables\Columns\TextColumn::make('valor_venda')
-                    ->money('BRL'),
-                Tables\Columns\TextColumn::make('acres_desc')
-                    ->label('Desconto/Acréscimo')
-                    ->money('BRL'),
+                    ->money('BRL'),                
                 Tables\Columns\TextColumn::make('sub_total')
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->money('BRL'),
@@ -131,13 +125,15 @@ class ItensVendaRelationManager extends RelationManager
                     ->label('Adicionar Produtos')
                     ->hidden(fn($livewire) => $livewire->ownerRecord->status_caixa == 1)
                     ->icon('heroicon-o-plus')
-                    ->after(function ($data, $record) {
+                    ->after(function ($data, $record, $livewire, Set $set) {
                         $produto = Produto::find($data['produto_id']);
                         $produto->estoque -= $data['qtd'];
                         $venda = Venda::find($data['venda_id']);
                         $venda->valor_total += $data['sub_total'];
                         $venda->save();
                         $produto->save();
+
+                        
                     }),
                 Tables\Actions\Action::make('fluxo_caixa')
                     ->label(('Lançar no Caixa'))
@@ -174,9 +170,8 @@ class ItensVendaRelationManager extends RelationManager
                     })
 
                     ->requiresConfirmation()
-                    ->modalIcon('heroicon-o-currency-dollar')
-
-            ])
+                    ->modalIcon('heroicon-o-currency-dollar'),
+                           ])
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->mutateFormDataUsing(function ($data) {
@@ -203,7 +198,7 @@ class ItensVendaRelationManager extends RelationManager
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                   // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

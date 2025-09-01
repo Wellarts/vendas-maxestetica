@@ -95,6 +95,10 @@ class ClienteResource extends Resource
                             ])
                             ->email()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('numero_conselho')
+                            ->placeholder('Ex: CRM-12345')
+                            ->label('Número do Conselho'),
+                            
                     ])
             ]);
     }

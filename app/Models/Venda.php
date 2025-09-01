@@ -18,7 +18,11 @@ class Venda extends Model
         'funcionario_id',
         'data_venda',
         'forma_pgmto_id',
-        'valor_total',
+        'tipo_acres_desc',
+        'valor_acres_desc',
+        'percent_acres_desc',
+        'valor_total_desconto',
+        'valor_total',        
         'lucro_venda',
         'obs',
         'status_caixa'

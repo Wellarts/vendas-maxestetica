@@ -26,10 +26,10 @@ class TotalVendaStatsOverview extends BaseWidget
                 ->description('Itens da Venda')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-         /*   Card::make('Total de Vendas', DB::table('vendas')->whereDay('data_venda', $dia)->sum('valor_total'))
-                ->description('Hoje')
-                ->descriptionIcon('heroicon-s-trending-up')
-                ->color('success'), */
+            Stat::make('Valor Total da Venda - Desconto', number_format(Venda::all()->where('id', $this->record->id)->sum('valor_total_desconto'),2, ",", "."))
+                ->description('Itens da Venda')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success'),
         ];
     
     }

@@ -48,25 +48,8 @@ class ProdutoResource extends Resource
                         '2xl' => 3,
                     ])
                     ->schema([
-                        Forms\Components\ToggleButtons::make('tipo')
-                            ->label('Tipo')
-                            ->default(1)
-                            ->columnSpanFull()
-                            ->options([
-                                '1' => 'Produto',
-                                '2' => 'Serviço',
-
-                            ])
-                            ->live()
-                            ->afterStateUpdated(function (Set $set, $state) {
-                                if ($state == 1) {
-                                    $set('lucratividade', 0);
-                                } elseif ($state == 2) {
-                                    $set('lucratividade', 100);
-                                }
-                            })
-
-                            ->grouped(),
+                        Forms\Components\Hidden::make('tipo')
+                            ->default(1),       
                         Forms\Components\TextInput::make('nome')
                             ->required()
                             ->maxLength(255),
@@ -123,12 +106,10 @@ class ProdutoResource extends Resource
                             }),
                         FileUpload::make('foto')
                             ->label('Fotos')
-                            ->columnSpanFull()
-                            ->panelLayout('grid')
                             ->downloadable()
-                            ->multiple()
-                            ->maxSize(4096)
-                            ->maxFiles(3)
+                            ->directory('fotos-produtos')
+                            ->maxSize(1024)
+                            ->maxFiles(1)
                             ->hidden(function (Get $get) {
                                 if ($get('tipo') == 1) {
                                     return false;
@@ -146,22 +127,6 @@ class ProdutoResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('nome')
                     ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('tipo')
-                    ->sortable()
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        '1' => 'success',
-                        '2' => 'warning',
-                    })
-                    ->formatStateUsing(function ($state) {
-                        if ($state == 1) {
-                            return 'Produto';
-                        }
-                        if ($state == 2) {
-                            return 'Serviço';
-                        }
-                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('codbar')
                     ->searchable(),

@@ -40,7 +40,7 @@ use Filament\Support\RawJs;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Columns\Summarizers\Count;
 
-class PDV extends  page implements HasForms, HasTable
+class PDV extends Page implements HasForms, HasTable
 {
 
     use InteractsWithForms, InteractsWithTable;
@@ -151,7 +151,7 @@ class PDV extends  page implements HasForms, HasTable
 
             $produto = Produto::where('id', '=', $value)->first();
             //   dd($produto);
-            if ($produto != null) {
+            if ($produto !== null) {
                 $addProduto = [
                     'produto_id' => $produto->id,
                     'venda_p_d_v_id' => $this->venda,
@@ -169,7 +169,7 @@ class PDV extends  page implements HasForms, HasTable
                 $this->qtd = '';
                 $this->produto_nome = '';
             }
-            if ($produto == '') {
+            if ($produto === null) {
                 Notification::make()
                     ->title('Produto não cadastrado')
                     ->warning()
@@ -331,23 +331,93 @@ class PDV extends  page implements HasForms, HasTable
                                 ->default(function () {
                                     $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
                                     return $valorTotal;
-                                }),
-                            TextInput::make('valor_pago')
-                                ->numeric()
-                                ->label('Valor Pago')
-                                ->autofocus()
-                                ->extraInputAttributes(['tabindex' => 1, 'style' => 'font-weight: bolder; font-size: 2rem; color: #32CD32;'])
-                                ->live(debounce: 300)
-                                ->afterStateUpdated(function (Set $set, $state, $get) {
-                                    $set('troco', ($state - $get('valor_total')));
                                 })
-                                ->autofocus(),
-                            TextInput::make('troco')
-                                ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 2rem; color: #1E90FF;'])
-                                ->readOnly()
-                                ->numeric()
-                                ->inputMode('decimal')
-                                ->label('Troco'),
+                                ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
+                                ->columnSpan(2)
+                                ->columnStart(3),
+                            Section::make('Descontos e Acréscimos')
+                                ->columns([
+                                    'xl' => 2,
+                                    '2xl' => 2,
+                                ])
+                                ->schema([
+                                Radio::make('tipo_acres_desc')
+                                    ->label('Tipo de Desconto/Acréscimo')
+                                    ->hint('Porcentagem ou Valor')
+                                    ->live()
+                                    ->options([
+                                        'Valor' => 'Valor',
+                                        'Porcentagem' => 'Porcentagem',
+                                    ])
+                                    ->required(false)
+                                    ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                        $set('percent_acres_desc', null);
+                                        $set('valor_acres_desc', null);
+                                        $set('valor_total_desconto', $get('valor_total'));
+                                    }),
+                               TextInput::make('percent_acres_desc')
+                                    ->label('Percentual')
+                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
+                                    ->numeric()
+                                    ->hint('Para desconto use um valor negativo Ex. -10')
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                    ->suffix('%')
+                                    ->required(false)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $valorTotal = (float) $get('valor_total');
+                                        $percentual = (float) $state;
+                                        $tipo = $get('tipo_acres_desc');
+                                        $valorAcresDesc = (float) $get('valor_acres_desc');
+                                        $novoValor = $valorTotal;
+                                        if ($tipo === 'Porcentagem' && $percentual != 0) {
+                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                            $novoValor = $valorTotal + $valorAcresDesc;
+                                        }
+                                        $set('valor_total_desconto', $novoValor);
+                                    }),
+                                TextInput::make('valor_acres_desc')
+                                    ->label('Valor Desconto/Acréscimo')
+                                    ->hint('Para desconto use um valor negativo Ex. -10')
+                                    // ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Valor')
+                                    ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
+                                    ->numeric()
+                                    ->prefix('R$')
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                    ->required(false)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $valorTotal = (float) $get('valor_total');
+                                        $tipo = $get('tipo_acres_desc');
+                                        $percentual = (float) $get('percent_acres_desc');
+                                        $valorAcresDesc = (float) $state;
+                                        $novoValor = $valorTotal;
+                                        if ($tipo === 'Porcentagem' && $percentual > 0) {
+                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                            $novoValor = $valorTotal + $valorAcresDesc;
+                                        }
+                                        $set('valor_total_desconto', $novoValor);
+                                    }),
+                            ]),
+                            
+                            // TextInput::make('valor_pago')
+                            //     ->numeric()
+                            //     ->label('Valor Pago')
+                            //     ->autofocus()
+                            //     ->extraInputAttributes(['tabindex' => 1, 'style' => 'font-weight: bolder; font-size: 2rem; color: #32CD32;'])
+                            //     ->live(debounce: 300)
+                            //     ->afterStateUpdated(function (Set $set, $state, $get) {
+                            //         $set('troco', ($state - $get('valor_total')));
+                            //     })
+                            //     ->autofocus(),
+                            // TextInput::make('troco')
+                            //     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 2rem; color: #1E90FF;'])
+                            //     ->readOnly()
+                            //     ->numeric()
+                            //     ->inputMode('decimal')
+                            //     ->label('Troco'),
                             Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
                                 ->live()
@@ -359,9 +429,18 @@ class PDV extends  page implements HasForms, HasTable
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2')
-
-
+                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2'),
+                            TextInput::make('valor_total_desconto')
+                                ->numeric()
+                                ->label('Valor Total c/ Desconto/Acréscimo')
+                                ->readOnly()
+                                ->default(function () {
+                                    $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
+                                    return $valorTotal;
+                                })
+                                ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
+                                ->columnSpan(2)
+                                ->columnStart(3),
                         ])
 
                 ])
@@ -379,7 +458,7 @@ class PDV extends  page implements HasForms, HasTable
                     if ($data['financeiro'] == 1) {
 
                         $addFluxoCaixa = [
-                            'valor' => ($data['valor_total']),
+                            'valor' => ($data['valor_total_desconto']),
                             'tipo'  => 'CREDITO',
                             'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
                         ];
@@ -390,14 +469,14 @@ class PDV extends  page implements HasForms, HasTable
                         FluxoCaixa::create($addFluxoCaixa);
                         return route('filament.admin.pages.p-d-v');
                     } else {
-                        $valor_parcela = ($record->valor_total / $data['parcelas']);
+                        $valor_parcela = ($record->valor_total_desconto / $data['parcelas']);
                         $vencimentos = Carbon::now();
                         for ($cont = 0; $cont < $data['parcelas']; $cont++) {
                             $dataVencimentos = $vencimentos->addDays(30);
                             $parcelas = [
                                 'vendapdv_id' => $this->venda,
                                 'cliente_id' => $data['cliente_id'],
-                                'valor_total' => $data['valor_total'],
+                                'valor_total' => $data['valor_total_desconto'],
                                 'parcelas' => $data['parcelas'],
                                 'ordem_parcela' => $cont + 1,
                                 'data_vencimento' => $dataVencimentos,

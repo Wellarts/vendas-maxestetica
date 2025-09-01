@@ -88,9 +88,11 @@ class ContasReceberRelationManager extends RelationManager
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
                             ->label('Valor Total')
-                            ->default((function ($livewire): float {
-                                return $livewire->ownerRecord->valor_total;
-                            }))
+                            ->default(function ($livewire): float {
+                                return !empty($livewire->ownerRecord->tipo_acres_desc)
+                                    ? $livewire->ownerRecord->valor_total_desconto
+                                    : $livewire->ownerRecord->valor_total;
+                            })
                             ->readOnly()
                             ->required(),
 
@@ -98,16 +100,20 @@ class ContasReceberRelationManager extends RelationManager
                         Forms\Components\TextInput::make('valor_parcela')
                             ->numeric()
                             ->label('Valor da Parcela')
-                            ->default((function ($livewire): float {
-                                return $livewire->ownerRecord->valor_total;
-                            }))
+                            ->default(function ($livewire): float {
+                                return !empty($livewire->ownerRecord->tipo_acres_desc)
+                                    ? $livewire->ownerRecord->valor_total_desconto
+                                    : $livewire->ownerRecord->valor_total;
+                            })
                             ->required()
                             ->readOnly(),
                         Forms\Components\TextInput::make('valor_recebido')
                             ->numeric()
-                            ->default((function ($livewire): float {
-                                return $livewire->ownerRecord->valor_total;
-                            })),
+                            ->default(function ($livewire): float {
+                                return !empty($livewire->ownerRecord->tipo_acres_desc)
+                                    ? $livewire->ownerRecord->valor_total_desconto
+                                    : $livewire->ownerRecord->valor_total;
+                            }),
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
                                 'xl' => 3,
@@ -159,7 +165,7 @@ class ContasReceberRelationManager extends RelationManager
                     ->badge()
                     ->color('danger')
                     ->sortable()
-                    ->date(),
+                    ->date('d/m/Y'),
 
                 Tables\Columns\TextColumn::make('valor_parcela')
                     ->summarize(Sum::make()->money('BRL')->label('Total Parcelas'))
@@ -175,7 +181,7 @@ class ContasReceberRelationManager extends RelationManager
                     ->label('Data do Recebimento')
                     ->badge()
                     ->color('success')
-                    ->date(),
+                    ->date('d/m/Y'),
                 Tables\Columns\TextColumn::make('valor_recebido')
                     ->summarize(Sum::make()->money('BRL')->label('Total Pago'))
                     ->label('Recebido')
@@ -198,14 +204,14 @@ class ContasReceberRelationManager extends RelationManager
                     ->after(
                         function ($data, $record, $livewire) {
                             if ($record->parcelas > 1) {
-                                $valor_parcela = ($record->valor_total / $record->parcelas);
+                                $valor_parcela = (!empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $record->valor_total) / $record->parcelas;
                                 $vencimentos = Carbon::create($record->data_vencimento);
                                 for ($cont = 1; $cont < $data['parcelas']; $cont++) {
                                     $dataVencimentos = $vencimentos->addDays(30);
                                     $parcelas = [
                                         'venda_id' => $record->venda_id,
                                         'cliente_id' => $data['cliente_id'],
-                                        'valor_total' => $data['valor_total'],
+                                        'valor_total' => !empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $data['valor_total'],
                                         'parcelas' => $data['parcelas'],
                                         'ordem_parcela' => $cont + 1,
                                         'data_vencimento' => $dataVencimentos,
@@ -218,7 +224,7 @@ class ContasReceberRelationManager extends RelationManager
                                 }
                             } else {
                                 $addFluxoCaixa = [
-                                    'valor' => ($record->valor_total),
+                                    'valor' => !empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $record->valor_total,
                                     'tipo'  => 'CREDITO',
                                     'obs'   => 'Recebido da venda nº: ' . $record->venda_id . '',
                                 ];

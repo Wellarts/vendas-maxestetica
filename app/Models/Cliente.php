@@ -20,6 +20,7 @@ class Cliente extends Model
             'cidade_id',
             'telefone',
             'email',
+            'numero_conselho'
             
     ];
 
