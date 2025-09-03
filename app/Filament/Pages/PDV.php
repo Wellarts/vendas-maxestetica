@@ -191,18 +191,18 @@ class PDV extends Page implements HasForms, HasTable
                 ->alignCenter()
                 ->label('Valor Unitário')
                 ->money('BRL'),
-            TextInputColumn::make('acres_desc')
-                ->alignCenter()
-                ->label('Acres/Desc')
-                ->updateStateUsing(function (Model $record, $state) {
-                    // Aceita vírgula como separador decimal
-                    $valor = str_replace(',', '.', $state);
-                    $valor = floatval($valor);
-                    $record->sub_total = (((float)$record->qtd * $record->valor_venda) + $valor);
-                    $record->acres_desc = $valor;
-                    $record->save();
-                })
-                ->label('Acres/Desc'),
+            // TextInputColumn::make('acres_desc')
+            //     ->alignCenter()
+            //     ->label('Acres/Desc')
+            //     ->updateStateUsing(function (Model $record, $state) {
+            //         // Aceita vírgula como separador decimal
+            //         $valor = str_replace(',', '.', $state);
+            //         $valor = floatval($valor);
+            //         $record->sub_total = (((float)$record->qtd * $record->valor_venda) + $valor);
+            //         $record->acres_desc = $valor;
+            //         $record->save();
+            //     })
+            //     ->label('Acres/Desc'),
             TextColumn::make('sub_total')
                 ->alignCenter()
                 ->label('Sub-Total')
@@ -483,9 +483,9 @@ class PDV extends Page implements HasForms, HasTable
                                 ->send();
                                
     } // <-- Adicione esta chave de fechamento aqui
-    return route('filament.admin.pages.p-d-v');
+    return route('filament.admin.resources.venda-p-d-vs.index');
 }
-return route('filament.admin.pages.p-d-v');
+return route('filament.admin.resources.venda-p-d-vs.index');
                     
 
                     

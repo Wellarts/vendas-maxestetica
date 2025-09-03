@@ -63,7 +63,7 @@
 
     <div class="header">
         <img src="{{ asset('img/logo.png') }}" alt="Logo">
-        <h1>Delicaty Acessórios</h1>
+        <h1>Delicaty Acessóriosslllllllll</h1>
         <p>Instagram: @delicatyacessorios - (87)99931-7326</p>
     </div>
 

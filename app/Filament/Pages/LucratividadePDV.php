@@ -47,10 +47,10 @@ class LucratividadePDV extends Page implements HasTable
     {
 
         $vendas = VendaPDV::all();
-
+       
         foreach ($vendas as $venda) {
                 $custo_venda = $venda->itensVenda()->sum('total_custo_atual');
-                $venda->lucro_venda = ($venda->valor_total - $custo_venda);
+                $venda->lucro_venda = ($venda->valor_total_desconto - $custo_venda);
                 $venda->save();
 
         }
@@ -65,6 +65,7 @@ class LucratividadePDV extends Page implements HasTable
             ->columns([
                 TextColumn::make('id')
                     ->alignCenter()
+                    ->searchable()
                     ->label('Venda'),
                 TextColumn::make('cliente.nome')
                     ->sortable()
@@ -86,6 +87,13 @@ class LucratividadePDV extends Page implements HasTable
                     ->label('Valor da Venda')
                     ->money('BRL')
                     ->color('warning'),
+                TextColumn::make('valor_total_desconto')
+                    ->summarize(Sum::make()->money('BRL')->label('Total'))
+                    ->badge()
+                    ->alignCenter()
+                    ->label('Venda com Desconto')
+                    ->money('BRL')
+                    ->color('warning'),
                 TextColumn::make('lucro_venda')
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->badge()
@@ -95,7 +103,7 @@ class LucratividadePDV extends Page implements HasTable
                     ->color('success')
                     ->getStateUsing(function (VendaPDV $record): float {
                         $custoProdutos = $record->itensVenda()->sum('total_custo_atual');
-                        return ($record->valor_total - $custoProdutos);
+                        return ($record->valor_total_desconto - $custoProdutos);
                     })
 
 

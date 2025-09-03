@@ -195,10 +195,22 @@ class VendaPDVResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('data_venda', 'desc')
+            ->defaultSort('created_at', 'desc')
             ->columns([
+                Tables\Columns\TextColumn::make('tipo_registro')
+                    ->label('Tipo')
+                    ->badge()
+                    ->colors([
+                        'success' => 'venda',
+                        'warning' => 'orcamento',
+                    ])
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'venda' => 'Venda',
+                        'orcamento' => 'Orçamento',
+                    })
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('id')
-                    ->label('Venda')
+                    ->label('Código')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('cliente.nome')
@@ -211,13 +223,11 @@ class VendaPDVResource extends Resource
                 Tables\Columns\TextColumn::make('valor_total')
                     ->label('Valor Total')
                     ->money('BRL'),
-                Tables\Columns\TextColumn::make('tipo_registro')
-                    ->label('Tipo')
-                    ->badge()
-                    ->colors([
-                        'success' => 'venda',
-                        'warning' => 'orcamento',
-                    ]),
+                Tables\Columns\TextColumn::make('valor_total_desconto')
+                    ->label('Valor Total c/ Desconto')
+                    ->alignCenter()
+                    ->money('BRL'),
+                
                 Tables\Columns\TextColumn::make('created_at')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime(),
