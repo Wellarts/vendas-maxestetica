@@ -41,42 +41,153 @@ class VendaPDVResource extends Resource
     {
         return $form
             ->schema([
-                Section::make()
+                Section::make('Dados da Venda')
                     ->columns([
                         'xl' => 3,
                         '2xl' => 3,
                     ])
                     ->schema([
+                        Forms\Components\TextInput::make('id')
+                            ->label('ID')
+                            ->disabled(),
+                        Forms\Components\Radio::make('tipo_registro')
+                            ->label('Tipo de Registro')
+                            ->options([
+                                'venda' => 'Venda',
+                                'orcamento' => 'Orçamento',
+                            ])
+                            ->default('venda')
+                            ->disabled()
+                            ->required(),
                         Forms\Components\Select::make('cliente_id')
                             ->label('Cliente')
                             ->native(false)
                             ->searchable()
-                            ->options(Cliente::all()->pluck('nome', 'id')->toArray())
+                            ->relationship('cliente', 'nome')
                             ->required(),
                         Forms\Components\Select::make('funcionario_id')
-                            ->label('Funcionário')
+                            ->label('Vendedor')
                             ->native(false)
                             ->searchable()
-                            ->options(Funcionario::all()->pluck('nome', 'id')->toArray())
+                            ->relationship('funcionario', 'nome')
                             ->required(),
+                        Forms\Components\DatePicker::make('data_venda')
+                           ->required(),
                         Forms\Components\Select::make('forma_pgmto_id')
                             ->label('Forma de Pagamento')
                             ->native(false)
                             ->searchable()
-                            ->options(FormaPgmto::all()->pluck('nome', 'id')->toArray())
+                            ->relationship('formaPgmto', 'nome')
                             ->required(),
-                        Forms\Components\DatePicker::make('data_venda')
-                            ->default(now())
-                            ->required(),
+
+                        Section::make('Descontos e Acréscimos')
+                            ->columns([
+                                'xl' => 2,
+                                '2xl' => 2,
+                            ])
+                            ->schema([
+                                Forms\Components\Radio::make('tipo_acres_desc')
+                                    ->label('Tipo de Desconto/Acréscimo')
+                                    ->hint('Porcentagem ou Valor')
+                                    ->live()
+                                    ->options([
+                                        'Valor' => 'Valor',
+                                        'Porcentagem' => 'Porcentagem',
+                                    ])
+                                    ->required(false)
+                                    ->afterStateUpdated(function ($state, callable $set, \Filament\Forms\Get $get) {
+                                        $set('percent_acres_desc', null);
+                                        $set('valor_acres_desc', null);
+                                        $set('valor_total_desconto', $get('valor_total'));
+                                    }),
+                                Forms\Components\TextInput::make('percent_acres_desc')
+                                    ->label('Percentual')
+                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
+                                    ->numeric()
+                                    ->hint('Para desconto use um valor negativo Ex. -10')
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                    ->suffix('%')
+                                    ->required(false)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $valorTotal = (float) $get('valor_total');
+                                        $percentual = (float) $state;
+                                        $tipo = $get('tipo_acres_desc');
+                                        $valorAcresDesc = (float) $get('valor_acres_desc');
+                                        $novoValor = $valorTotal;
+                                        if ($tipo === 'Porcentagem' && $percentual != 0) {
+                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                            $novoValor = $valorTotal + $valorAcresDesc;
+                                        }
+                                        $set('valor_total_desconto', $novoValor);
+                                    }),
+                                Forms\Components\TextInput::make('valor_acres_desc')
+                                    ->label('Valor Desconto/Acréscimo')
+                                    ->hint('Para desconto use um valor negativo Ex. -10')
+                                    ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
+                                    ->numeric()
+                                    ->prefix('R$')
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                    ->required(false)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                        $valorTotal = (float) $get('valor_total');
+                                        $tipo = $get('tipo_acres_desc');
+                                        $percentual = (float) $get('percent_acres_desc');
+                                        $valorAcresDesc = (float) $state;
+                                        $novoValor = $valorTotal;
+                                        if ($tipo === 'Porcentagem' && $percentual > 0) {
+                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                            $novoValor = $valorTotal + $valorAcresDesc;
+                                        }
+                                        $set('valor_total_desconto', $novoValor);
+                                    }),
+                                Forms\Components\Radio::make('financeiro')
+                                    ->label('Lançamento Financeiro')
+                                    ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
+                                    ->live()
+                                    ->options([
+                                        '1' => 'Direto no Caixa',
+                                        '2' => 'Conta a Receber'
+                                    ])->default('1'),
+                                Forms\Components\TextInput::make('parcelas')
+                                    ->numeric()
+                                    ->required()
+                                    ->label('Qtd de Parcelas')
+                                    ->hidden(fn(\Filament\Forms\Get $get): bool => $get('financeiro') != '2' || $get('tipo_registro') === 'orcamento'),
+                                Forms\Components\TextInput::make('valor_total_desconto')
+                                    ->numeric()
+                                    ->label('Valor Total c/ Desconto/Acréscimo')
+                                    ->readOnly()
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
+                                    ->columnSpan(2)
+                                    ->columnStart(3),
+                            ]),
+                        Forms\Components\TextInput::make('valor_total')
+                            ->label('Valor Total')
+                            ->numeric(),
+                         Forms\Components\Radio::make('financeiro')
+                                ->label('Lançamento Financeiro')
+                               // ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
+                                ->live()
+                                ->options([
+                                    '1' => 'Direto no Caixa',
+                                    '2' => 'Conta a Receber'
+                                ])->default('1'),
+                         Forms\Components\TextInput::make('parcelas')
+                                ->numeric()
+                                ->required()
+                                ->label('Qtd de Parcelas')
+                                ->visible(fn(\Filament\Forms\Get $get): bool => $get('financeiro') == 2),
+
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
                                 'xl' => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Observações'),
-                    ])->columns([
-                        'xl' => 2,
-                        '2xl' => 2,
                     ])
             ]);
     }
@@ -100,15 +211,27 @@ class VendaPDVResource extends Resource
                 Tables\Columns\TextColumn::make('valor_total')
                     ->label('Valor Total')
                     ->money('BRL'),
+                Tables\Columns\TextColumn::make('tipo_registro')
+                    ->label('Tipo')
+                    ->badge()
+                    ->colors([
+                        'success' => 'venda',
+                        'warning' => 'orcamento',
+                    ]),
                 Tables\Columns\TextColumn::make('created_at')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime(),
-
             ])
             ->filters([
+                SelectFilter::make('tipo_registro')
+                    ->label('Tipo de Registro')
+                    ->options([
+                        'orcamento' => 'Orçamento',
+                        'venda' => 'Venda',
+                    ]),
                 SelectFilter::make('cliente_id')
                     ->label('Cliente')
                     ->relationship('cliente', 'nome')
@@ -132,7 +255,6 @@ class VendaPDVResource extends Resource
                                 fn($query) => $query->whereDate('data_venda', '<=', $data['data_ate'])
                             );
                     })
-
             ])
             ->actions([
                 Tables\Actions\EditAction::make()

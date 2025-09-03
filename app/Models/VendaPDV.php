@@ -13,12 +13,19 @@ class VendaPDV extends Model
 
     protected $fillable = [
         'id',
+        'tipo_registro',
         'cliente_id',
         'itens_pdv_id',
         'funcionario_id',
         'data_venda',
         'forma_pgmto_id',
+        'tipo_acres_desc',
+        'valor_acres_desc',
+        'percent_acres_desc',
+        'valor_total_desconto',
         'valor_total',
+        'financeiro',
+        'parcelas',
         'lucro_venda',
         'obs',
 

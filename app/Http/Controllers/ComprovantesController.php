@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use App\Models\Venda;
 use App\Models\VendaPDV;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ComprovantesController extends Controller
 {
@@ -20,7 +22,7 @@ class ComprovantesController extends Controller
         
      //  return pdf::loadView('pdf.venda', compact(['vendas']))->stream();
 
-       return view('pdf.venda', compact(['vendas']));
+  return Pdf::loadView('pdf.venda', compact('vendas'))->download('comprovante.pdf');
     }
 
     public function geraPdfPDV($id)
@@ -35,6 +37,6 @@ class ComprovantesController extends Controller
         
      //  return pdf::loadView('pdf.venda', compact(['vendas']))->stream();
 
-       return view('pdf.venda', compact(['vendas']));
+  return Pdf::loadView('pdf.venda', compact('vendas'))->download('comprovante.pdf');
     }
 }

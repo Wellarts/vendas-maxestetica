@@ -81,7 +81,7 @@ class PDV extends Page implements HasForms, HasTable
     public function mount(): void
     {
         $this->form->fill();
-        $this->venda =  random_int(0000000000, 9999999999);
+        $this->venda = random_int(0000000000, 9999999999);
     }
 
     public function form(Form $form): Form
@@ -127,30 +127,20 @@ class PDV extends Page implements HasForms, HasTable
                             ->extraInputAttributes(['tabindex' => 1])
                             ->live(debounce: 900)
                             ->afterStateUpdated(function ($state, Get $get, Set $set) {
-                                //  dd($get('produto_id'));
-                                //  $produto = Produto::where('codbar','=', $state)->first();
-                                 // dd($state);
-                                //  $set('produto_nome', $produto->nome);
                                 $this->updated($state, $state);
                             }),
 
 
 
 
-                    ]),
-            ]);
+            ]),
+        ]);
     }
 
     public function updated($name, $value): void
     {
-       // dd($name);
-
         if ($name === 'produto_id') {
-
-
-
             $produto = Produto::where('id', '=', $value)->first();
-            //   dd($produto);
             if ($produto !== null) {
                 $addProduto = [
                     'produto_id' => $produto->id,
@@ -163,13 +153,11 @@ class PDV extends Page implements HasForms, HasTable
                     'valor_custo_atual' => $produto->valor_compra,
                     'total_custo_atual' => $produto->valor_compra,
                 ];
-
                 PDVs::create($addProduto);
                 $this->produto_id = '';
                 $this->qtd = '';
                 $this->produto_nome = '';
-            }
-            if ($produto === null) {
+            } else {
                 Notification::make()
                     ->title('Produto não cadastrado')
                     ->warning()
@@ -180,7 +168,6 @@ class PDV extends Page implements HasForms, HasTable
 
     protected function getTableQuery(): Builder
     {
-
         return PDVs::query()->where('venda_p_d_v_id', $this->venda);
     }
 
@@ -244,6 +231,15 @@ class PDV extends Page implements HasForms, HasTable
                                 ->label('Código da Venda')
                                 ->readOnly()
                                 ->default($this->venda),
+                            Radio::make('tipo_registro')
+                                ->label('Tipo de Registro')
+                                ->live()
+                                ->options([
+                                    'venda' => 'Venda',
+                                    'orcamento' => 'Orçamento',
+                                ])
+                                ->default('venda')
+                                ->required(),
                             Select::make('cliente_id')
                                 ->label('Cliente')
                                 ->default('1')
@@ -400,26 +396,11 @@ class PDV extends Page implements HasForms, HasTable
                                         }
                                         $set('valor_total_desconto', $novoValor);
                                     }),
-                            ]),
+                            ]),                            
                             
-                            // TextInput::make('valor_pago')
-                            //     ->numeric()
-                            //     ->label('Valor Pago')
-                            //     ->autofocus()
-                            //     ->extraInputAttributes(['tabindex' => 1, 'style' => 'font-weight: bolder; font-size: 2rem; color: #32CD32;'])
-                            //     ->live(debounce: 300)
-                            //     ->afterStateUpdated(function (Set $set, $state, $get) {
-                            //         $set('troco', ($state - $get('valor_total')));
-                            //     })
-                            //     ->autofocus(),
-                            // TextInput::make('troco')
-                            //     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 2rem; color: #1E90FF;'])
-                            //     ->readOnly()
-                            //     ->numeric()
-                            //     ->inputMode('decimal')
-                            //     ->label('Troco'),
                             Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
+                                ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
@@ -429,7 +410,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2'),
+                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento'),
                             TextInput::make('valor_total_desconto')
                                 ->numeric()
                                 ->label('Valor Total c/ Desconto/Acréscimo')
@@ -444,57 +425,74 @@ class PDV extends Page implements HasForms, HasTable
                         ])
 
                 ])
-                ->after(function () {
+                ->after(function ($data) {
 
-                    $itensPDV = PDVs::where('venda_p_d_v_id', $this->venda)->get();
+                    if ($data['tipo_registro'] === 'venda') {
+                        $itensPDV = PDVs::where('venda_p_d_v_id', $this->venda)->get();
 
-                    foreach ($itensPDV as $itens) {
-                        $updProduto = Produto::find($itens->produto_id);
-                        $updProduto->estoque -= $itens->qtd;
-                        $updProduto->save();
-                    }
-                })->successRedirectUrl(function ($data, $record) {
-                    //   dd($data);
-                    if ($data['financeiro'] == 1) {
-
-                        $addFluxoCaixa = [
-                            'valor' => ($data['valor_total_desconto']),
-                            'tipo'  => 'CREDITO',
-                            'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
-                        ];
-                        Notification::make()
-                            ->title('Valor lançado no fluxo de caixa!')
-                            ->success()
-                            ->send();
-                        FluxoCaixa::create($addFluxoCaixa);
-                        return route('filament.admin.pages.p-d-v');
-                    } else {
-                        $valor_parcela = ($record->valor_total_desconto / $data['parcelas']);
-                        $vencimentos = Carbon::now();
-                        for ($cont = 0; $cont < $data['parcelas']; $cont++) {
-                            $dataVencimentos = $vencimentos->addDays(30);
-                            $parcelas = [
-                                'vendapdv_id' => $this->venda,
-                                'cliente_id' => $data['cliente_id'],
-                                'valor_total' => $data['valor_total_desconto'],
-                                'parcelas' => $data['parcelas'],
-                                'ordem_parcela' => $cont + 1,
-                                'data_vencimento' => $dataVencimentos,
-                                'valor_recebido' => 0.00,
-                                'status' => 0,
-                                'obs' => 'Venda em PDV - Nº ' . $this->venda,
-                                'valor_parcela' => $valor_parcela,
-                            ];
-                            ContasReceber::create($parcelas);
+                        foreach ($itensPDV as $itens) {
+                            $updProduto = Produto::find($itens->produto_id);
+                            $updProduto->estoque -= $itens->qtd;
+                            $updProduto->save();
                         }
-
-                        return route('filament.admin.pages.p-d-v');
                     }
-
-                    //  return route('filament.admin.pages.p-d-v');
-
                 })
+                ->successRedirectUrl(function ($data, $record) {
+                    // Gere o comprovante redirecionando para uma rota que exibe o comprovante.
+                    // Certifique-se de criar a rota 'comprovantePDV' no seu web.php e uma página/controle para exibir o comprovante.
+                    // Exemplo de redirecionamento:
+                    
+                    if ($data['tipo_registro'] === 'venda') {
+                        if ($data['financeiro'] == 1) {
 
+                            $addFluxoCaixa = [
+                                'valor' => ($data['valor_total_desconto']),
+                                'tipo'  => 'CREDITO',
+                                'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
+                            ];
+                            Notification::make()
+                                ->title('Valor lançado no fluxo de caixa!')
+                                ->body('R$ ' . number_format($data['valor_total_desconto'], 2, ',', '.') . '')
+                                ->success()
+                                ->send();
+                            FluxoCaixa::create($addFluxoCaixa);
+                        } else {                        
+                            $valor_parcela = ($record->valor_total_desconto / $data['parcelas']);
+                            $vencimentos = Carbon::now();
+                            for ($cont = 0; $cont < $data['parcelas']; $cont++) {
+                                $dataVencimentos = $vencimentos->addDays(30);
+                                $parcelas = [
+                                    'vendapdv_id' => $this->venda,
+                                    'cliente_id' => $data['cliente_id'],
+                                    'valor_total' => $data['valor_total_desconto'],
+                                    'parcelas' => $data['parcelas'],
+                                    'ordem_parcela' => $cont + 1,
+                                    'data_vencimento' => $dataVencimentos,
+                                    'valor_recebido' => 0.00,
+                                    'status' => 0,
+                                    'obs' => 'Venda em PDV - Nº ' . $this->venda,
+                                    'valor_parcela' => $valor_parcela,
+                                ];
+                                ContasReceber::create($parcelas);
+                            }
+                            Notification::make()
+                                ->title('Valor lançado no contas a receber!')
+                                ->body('Valor de R$ ' . number_format($data['valor_total_desconto'], 2, ',', '.') . ' lançado no contas a receber para o cliente <b>' . ($record->cliente?->nome ?? '') . '</b>, em  <b>' . $data['parcelas'] . '</b> parcelas.')
+                                ->success()
+                                ->duration(20000)
+                                ->send();
+                               
+    } // <-- Adicione esta chave de fechamento aqui
+    return route('filament.admin.pages.p-d-v');
+}
+return route('filament.admin.pages.p-d-v');
+                    
+
+                    
+                
+
+                     
+                })
 
         ];
     }
@@ -502,9 +500,7 @@ class PDV extends Page implements HasForms, HasTable
     protected function getTableActions(): array
     {
         return [
-
             DeleteAction::make('Excluir'),
-
         ];
     }
 }
