@@ -19,6 +19,6 @@ class VwTotalVendasPorCliente extends Model
 
     public function cliente()
     {
-        return $this->belongsTo(Cliente::class, 'cliente_nome' , 'nome');
+        return $this->belongsTo(Cliente::class, 'cliente_nome', 'nome');
     }
 }

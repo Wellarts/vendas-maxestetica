@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\User;
 use App\Models\VendaPDV;
-use Illuminate\Auth\Access\Response;
 
 class VendasPDVPolicy
 {
@@ -29,7 +28,7 @@ class VendasPDVPolicy
      */
     public function create(User $user)
     {
-      //
+        //
     }
 
     /**

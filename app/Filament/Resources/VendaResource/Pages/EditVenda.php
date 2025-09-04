@@ -18,7 +18,7 @@ class EditVenda extends EditRecord
     {
         $venda = $this->record;
         if ($venda) {
-            $valorTotal = $venda->itensVenda()->sum('sub_total');
+            $valorTotal         = $venda->itensVenda()->sum('sub_total');
             $venda->valor_total = $valorTotal;
             $venda->save();
             $this->form->fill(['valor_total' => $valorTotal]);
@@ -39,10 +39,11 @@ class EditVenda extends EditRecord
                            ->duration(5000)
                            ->persistent()
                            ->send();
+
                        return $action->cancel();
                    }
                }),
-            
+
         ];
     }
 
@@ -70,7 +71,7 @@ class EditVenda extends EditRecord
     {
 
         return [
-           TotalVendaStatsOverview::class
+           TotalVendaStatsOverview::class,
 
         ];
     }

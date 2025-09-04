@@ -14,11 +14,8 @@ use Filament\Forms\Set;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
-use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ItensVendaRelationManager extends RelationManager
 {
@@ -42,16 +39,16 @@ class ItensVendaRelationManager extends RelationManager
                         Forms\Components\Select::make('produto_id')
                             ->relationship(name: 'produto', titleAttribute: 'nome')
                             ->searchable(['nome', 'codbar'])
-                            ->disableOptionWhen(fn($context) => $context == 'edit')
+                            ->disableOptionWhen(fn ($context) => $context == 'edit')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->live(debounce: 200)
                             ->required()
                             ->label('Produto')
                             ->afterStateUpdated(
-                                function ($state, callable $set, Get $get,) {
+                                function ($state, callable $set, Get $get) {
                                     $produto = Produto::find($state);
 
                                     if ($produto) {
@@ -71,14 +68,14 @@ class ItensVendaRelationManager extends RelationManager
                                     }
                                 }
                             ),
-                        
+
 
                         Forms\Components\TextInput::make('qtd')
                             ->default('1')
                             ->required()
                             ->live(debounce: 500)
                             ->afterStateUpdated(
-                                function ($state, callable $set, Get $get,) {
+                                function ($state, callable $set, Get $get) {
                                     $set('sub_total', (((float)$get('qtd') * (float)$get('valor_venda')) + (float)$get('acres_desc')));
                                     $set('total_custo_atual', $get('valor_custo_atual') * $get('qtd'));
                                 }
@@ -97,7 +94,7 @@ class ItensVendaRelationManager extends RelationManager
                         Forms\Components\Hidden::make('total_custo_atual'),
 
 
-                    ])
+                    ]),
 
             ]);
     }
@@ -113,7 +110,7 @@ class ItensVendaRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('qtd')
                     ->summarize(Sum::make()->label('Qtd de Produtos')),
                 Tables\Columns\TextColumn::make('valor_venda')
-                    ->money('BRL'),                
+                    ->money('BRL'),
                 Tables\Columns\TextColumn::make('sub_total')
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->money('BRL'),
@@ -123,7 +120,7 @@ class ItensVendaRelationManager extends RelationManager
                 Tables\Actions\CreateAction::make()
                     ->modalHeading('Itens da Venda')
                     ->label('Adicionar Produtos')
-                    ->hidden(fn($livewire) => $livewire->ownerRecord->status_caixa == 1)
+                    ->hidden(fn ($livewire) => $livewire->ownerRecord->status_caixa == 1)
                     ->icon('heroicon-o-plus')
                     ->after(function ($data, $record, $livewire, Set $set) {
                         $produto = Produto::find($data['produto_id']);
@@ -133,12 +130,12 @@ class ItensVendaRelationManager extends RelationManager
                         $venda->save();
                         $produto->save();
 
-                        
+
                     }),
                 Tables\Actions\Action::make('fluxo_caixa')
                     ->label(('Lançar no Caixa'))
                     ->icon('heroicon-o-currency-dollar')
-                    ->hidden(fn($livewire) => $livewire->ownerRecord->status_caixa == 1)
+                    ->hidden(fn ($livewire) => $livewire->ownerRecord->status_caixa == 1)
                     ->color('success')
                     ->action(function ($livewire) {
                         if ($livewire->ownerRecord->valor_total > 0) {
@@ -147,7 +144,7 @@ class ItensVendaRelationManager extends RelationManager
                                 'tipo'  => 'CREDITO',
                                 'obs'   => 'Recebido da venda nº: ' . $livewire->ownerRecord->id . '',
                             ];
-                            $venda = Venda::find($livewire->ownerRecord->id);
+                            $venda               = Venda::find($livewire->ownerRecord->id);
                             $venda->status_caixa = 1;
                             $venda->save();
 
@@ -157,9 +154,9 @@ class ItensVendaRelationManager extends RelationManager
                                 ->success()
                                 ->send();
                             FluxoCaixa::create($addFluxoCaixa);
+
                             return redirect()->route('filament.admin.resources.vendas.create');
-                        }
-                        else {
+                        } else {
                             Notification::make()
                                 ->title('Atenção')
                                 ->body('Valor da venda zerado. Adicione os produtos para depois lançar no caixa.')
@@ -176,19 +173,20 @@ class ItensVendaRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->mutateFormDataUsing(function ($data) {
 
-                        $produto = Produto::find($data['produto_id']);
+                        $produto      = Produto::find($data['produto_id']);
                         $idItemCompra = ItensVenda::find($data['id']);
-                        $venda = Venda::find($data['venda_id']);
+                        $venda        = Venda::find($data['venda_id']);
                         $produto->estoque -= ($data['qtd'] - $idItemCompra->qtd);
                         $venda->valor_total += ($data['sub_total'] - $idItemCompra->sub_total);
                         $venda->save();
                         $produto->save();
+
                         return $data;
                     }),
                 Tables\Actions\DeleteAction::make()
                     ->after(function ($data, $record) {
                         $produto = Produto::find($record->produto_id);
-                        $venda = Venda::find($record->venda_id);
+                        $venda   = Venda::find($record->venda_id);
                         $venda->valor_total -= $record->sub_total;
                         $produto->estoque += ($record->qtd);
                         $venda->save();

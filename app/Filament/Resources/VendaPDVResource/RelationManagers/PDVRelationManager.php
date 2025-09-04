@@ -10,8 +10,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PDVRelationManager extends RelationManager
 {
@@ -29,7 +27,7 @@ class PDVRelationManager extends RelationManager
                     ->required(),
                 Forms\Components\TextInput::make('sub_total')
                     ->numeric()
-                    ->required()
+                    ->required(),
 
 
             ]);
@@ -54,17 +52,36 @@ class PDVRelationManager extends RelationManager
                     ->label('Sub-Total'),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('produto_nome')
+                    ->form([
+                        Forms\Components\TextInput::make('produto_nome')->label('Nome do Produto'),
+                    ])
+                    ->query(function ($query, $data) {
+                        if ($data['produto_nome']) {
+                            $query->whereHas('produto', function ($q) use ($data) {
+                                $q->where('nome', 'like', '%' . $data['produto_nome'] . '%');
+                            });
+                        }
+                    }),
+                Tables\Filters\Filter::make('data_venda')
+                    ->form([
+                        Forms\Components\DatePicker::make('data_venda')->label('Data da Venda'),
+                    ])
+                    ->query(function ($query, $data) {
+                        if ($data['data_venda']) {
+                            $query->whereDate('created_at', $data['data_venda']);
+                        }
+                    }),
             ])
             ->headerActions([
-              //  Tables\Actions\CreateAction::make(),
+                // Nenhuma ação personalizada de relatório aqui
             ])
             ->actions([
               //  Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                 ->before(function ($data, $record) {
                     $produto = Produto::find($record->produto_id);
-                    $venda = VendaPDV::find($record->venda_p_d_v_id);
+                    $venda   = VendaPDV::find($record->venda_p_d_v_id);
                     $venda->valor_total -= $record->sub_total;
                     $produto->estoque += ($record->qtd);
                     $venda->save();
@@ -80,18 +97,18 @@ class PDVRelationManager extends RelationManager
                         ->before(function ($records) {
                             foreach ($records as $record) {
                                 $produto = Produto::find($record->produto_id);
-                                $venda = VendaPDV::find($record->venda_p_d_v_id);
+                                $venda   = VendaPDV::find($record->venda_p_d_v_id);
                                 $venda->valor_total -= $record->sub_total;
                                 $produto->estoque += ($record->qtd);
                                 $venda->save();
                                 $produto->save();
                             }
-                            
+
                         })
                         ->after(function () {
-                                return redirect(request()->header('Referer'));
-                          }),      
-                        
+                            return redirect(request()->header('Referer'));
+                        }),
+
                 ]),
             ]);
     }

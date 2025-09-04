@@ -2,16 +2,10 @@
 
 namespace App\Filament\Resources;
 
-use AlperenErsoy\FilamentExport\Actions\FilamentExportBulkAction;
 use App\Filament\Resources\ProdutoResource\Pages;
-use App\Filament\Resources\ProdutoResource\RelationManagers;
 use App\Filament\Resources\ProdutoResource\RelationManagers\ProdutoFornecedorRelationManager;
 use App\Models\Produto;
-use Closure;
-use Dom\Notation;
 use Filament\Forms;
-use Filament\Forms\Components\Card;
-use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Form;
@@ -21,8 +15,6 @@ use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
 use Filament\Tables\Columns\ImageColumn;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 use Filament\Notifications\Notification;
 
@@ -44,12 +36,12 @@ class ProdutoResource extends Resource
             ->schema([
                 Section::make('Cadastro')
                     ->columns([
-                        'xl' => 3,
+                        'xl'  => 3,
                         '2xl' => 3,
                     ])
                     ->schema([
                         Forms\Components\Hidden::make('tipo')
-                            ->default(1),       
+                            ->default(1),
                         Forms\Components\TextInput::make('nome')
                             ->required()
                             ->maxLength(255),
@@ -116,7 +108,7 @@ class ProdutoResource extends Resource
                                 } elseif ($get('tipo') == 2) {
                                     return true;
                                 }
-                            })
+                            }),
                     ])->columns(2),
             ]);
     }
@@ -160,14 +152,14 @@ class ProdutoResource extends Resource
                 Tables\Actions\DeleteAction::make()
                     ->before(function (\Filament\Tables\Actions\DeleteAction $action, Produto $record) {
                         if ($record->itensVenda()->exists() || $record->pdv()->exists()) {
-                            
+
                             Notification::make()
                                 ->title('Ação cancelada')
                                 ->body('Este produto não pode ser excluído porque está vinculado a uma ou mais vendas.')
                                 ->danger()
                                 ->send();
-                        $action->cancel();
-                          
+                            $action->cancel();
+
                         }
                     }),
             ])
@@ -183,16 +175,16 @@ class ProdutoResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ProdutoFornecedorRelationManager::class
+            ProdutoFornecedorRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProdutos::route('/'),
+            'index'  => Pages\ListProdutos::route('/'),
             'create' => Pages\CreateProduto::route('/create'),
-            'edit' => Pages\EditProduto::route('/{record}/edit'),
+            'edit'   => Pages\EditProduto::route('/{record}/edit'),
 
         ];
     }

@@ -9,7 +9,8 @@ use Spatie\Activitylog\LogOptions;
 
 class Compra extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
 
@@ -18,25 +19,25 @@ class Compra extends Model
             'outros_custos',
             'valor_total',
             'obs',
-            'status_caixa'
+            'status_caixa',
         ];
 
-        public function fornecedor()
+    public function fornecedor()
     {
         return $this->belongsTo(Fornecedor::class);
     }
 
-    public function itensCompra() 
+    public function itensCompra()
     {
         return $this->hasMany(ItensCompra::class);
     }
 
-    public function ProdutoFornecedor() 
+    public function ProdutoFornecedor()
     {
         return $this->hasMany(ProdutoFornecedor::class);
     }
 
-    public function contasPagar() 
+    public function contasPagar()
     {
         return $this->hasMany(contasPagar::class);
     }

@@ -7,11 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-
-
 class ItensVenda extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'produto_id',
@@ -20,7 +19,7 @@ class ItensVenda extends Model
         'acres_desc',
         'sub_total',
         'valor_custo_atual',
-        'total_custo_atual'
+        'total_custo_atual',
     ];
 
     public function venda()

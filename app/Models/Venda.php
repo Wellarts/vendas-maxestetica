@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
-use GuzzleHttp\Client;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-
 class Venda extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'cliente_id',
@@ -22,10 +21,10 @@ class Venda extends Model
         'valor_acres_desc',
         'percent_acres_desc',
         'valor_total_desconto',
-        'valor_total',        
+        'valor_total',
         'lucro_venda',
         'obs',
-        'status_caixa'
+        'status_caixa',
 
     ];
 

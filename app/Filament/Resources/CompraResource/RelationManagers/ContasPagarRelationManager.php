@@ -15,8 +15,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContasPagarRelationManager extends RelationManager
 {
@@ -33,7 +31,7 @@ class ContasPagarRelationManager extends RelationManager
                             ->required(),
                         Forms\Components\Select::make('fornecedor_id')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Fornecedor')
@@ -62,13 +60,13 @@ class ContasPagarRelationManager extends RelationManager
                                     $set('status', 0);
                                     $set('valor_pago', 0);
                                     $set('data_pagamento', null);
-                                    $set('data_vencimento',  Carbon::now()->addDays(30)->format('Y-m-d'));
+                                    $set('data_vencimento', Carbon::now()->addDays(30)->format('Y-m-d'));
                                 } else {
                                     $set('valor_parcela', $get('valor_total'));
                                     $set('status', 1);
                                     $set('valor_pago', $get('valor_total'));
                                     $set('data_pagamento', Carbon::now()->format('Y-m-d'));
-                                    $set('data_vencimento',  Carbon::now()->format('Y-m-d'));
+                                    $set('data_vencimento', Carbon::now()->format('Y-m-d'));
                                 }
                             })
                             ->required(),
@@ -78,12 +76,12 @@ class ContasPagarRelationManager extends RelationManager
                         Forms\Components\DatePicker::make('data_vencimento')
                             ->displayFormat('d/m/Y')
                             ->default(now())
-                            ->label("Data do Vencimento")
+                            ->label('Data do Vencimento')
                             ->required(),
                         Forms\Components\DatePicker::make('data_pagamento')
                             ->displayFormat('d/m/Y')
                             ->default(now())
-                            ->label("Data do Pagamento"),
+                            ->label('Data do Pagamento'),
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
                             ->label('Valor Total')
@@ -109,7 +107,7 @@ class ContasPagarRelationManager extends RelationManager
                             })),
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
-                                'xl' => 3,
+                                'xl'  => 3,
                                 '2xl' => 3,
                             ])
                             ->label('Observações'),
@@ -133,7 +131,7 @@ class ContasPagarRelationManager extends RelationManager
                                 }
                             ),
 
-                    ])
+                    ]),
 
             ]);
     }
@@ -193,20 +191,20 @@ class ContasPagarRelationManager extends RelationManager
                         function ($data, $record, $livewire) {
                             if ($record->parcelas > 1) {
                                 $valor_parcela = ($record->valor_total / $record->parcelas);
-                                $vencimentos = Carbon::create($record->data_vencimento);
+                                $vencimentos   = Carbon::create($record->data_vencimento);
                                 for ($cont = 1; $cont < $data['parcelas']; $cont++) {
                                     $dataVencimentos = $vencimentos->addDays(30);
-                                    $parcelas = [
-                                        'compra_id' => $record->compra_id,
-                                        'fornecedor_id' => $data['fornecedor_id'],
-                                        'valor_total' => $data['valor_total'],
-                                        'parcelas' => $data['parcelas'],
-                                        'ordem_parcela' => $cont + 1,
+                                    $parcelas        = [
+                                        'compra_id'       => $record->compra_id,
+                                        'fornecedor_id'   => $data['fornecedor_id'],
+                                        'valor_total'     => $data['valor_total'],
+                                        'parcelas'        => $data['parcelas'],
+                                        'ordem_parcela'   => $cont + 1,
                                         'data_vencimento' => $dataVencimentos,
-                                        'valor_pago' => 0.00,
-                                        'status' => 0,
-                                        'obs' => $data['obs'],
-                                        'valor_parcela' => $valor_parcela,
+                                        'valor_pago'      => 0.00,
+                                        'status'          => 0,
+                                        'obs'             => $data['obs'],
+                                        'valor_parcela'   => $valor_parcela,
                                     ];
                                     contasPagar::create($parcelas);
                                 }
@@ -220,7 +218,7 @@ class ContasPagarRelationManager extends RelationManager
                                 FluxoCaixa::create($addFluxoCaixa);
                             }
 
-                            $compra = Compra::find($livewire->ownerRecord->id);
+                            $compra               = Compra::find($livewire->ownerRecord->id);
                             $compra->status_caixa = 1;
                             $compra->save();
                         }
@@ -228,7 +226,7 @@ class ContasPagarRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->hidden(fn($record) => $record->status == 1)
+                    ->hidden(fn ($record) => $record->status == 1)
                     ->after(function ($data, $record) {
 
                         if ($record->status = 1) {
@@ -242,7 +240,7 @@ class ContasPagarRelationManager extends RelationManager
                         }
                     }),
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn($record) => $record->status == 1),
+                    ->hidden(fn ($record) => $record->status == 1),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

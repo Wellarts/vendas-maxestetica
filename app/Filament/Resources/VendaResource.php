@@ -3,10 +3,8 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VendaResource\Pages;
-use App\Filament\Resources\VendaResource\RelationManagers;
 use App\Filament\Resources\VendaResource\RelationManagers\ContasReceberRelationManager;
 use App\Filament\Resources\VendaResource\RelationManagers\ItensVendaRelationManager;
-use App\Models\Cliente;
 use App\Models\FormaPgmto;
 use App\Models\Funcionario;
 use App\Models\Venda;
@@ -17,22 +15,18 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Support\Enums\Alignment;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Grid;
 use Filament\Support\RawJs;
-use App\Forms\Components\CpfCnpj;
 use App\Models\Estado;
-use App\Models\Cidade;
 
 class VendaResource extends Resource
 {
     protected static ?string $model = Venda::class;
 
-    
+
     protected static ?string $navigationIcon = 'heroicon-s-shopping-cart';
 
     protected static ?string $navigationGroup = 'Saídas';
@@ -45,7 +39,7 @@ class VendaResource extends Resource
             ->schema([
                 Section::make()
                     ->columns([
-                        'xl' => 2,
+                        'xl'  => 2,
                         '2xl' => 2,
                     ])
                     ->schema([
@@ -58,13 +52,13 @@ class VendaResource extends Resource
                             ->required()
                             ->createOptionForm([
                                 Grid::make([
-                                    'xl' => 4,
+                                    'xl'  => 4,
                                     '2xl' => 4,
                                 ])
                                 ->schema([
                                     Forms\Components\TextInput::make('nome')
                                         ->columnSpan([
-                                            'xl' => 2,
+                                            'xl'  => 2,
                                             '2xl' => 2,
                                         ])
                                         ->required()
@@ -83,7 +77,7 @@ class VendaResource extends Resource
                                         ->maxLength(255),
                                     Forms\Components\Textarea::make('endereco')
                                         ->columnSpan([
-                                            'xl' => 2,
+                                            'xl'  => 2,
                                             '2xl' => 2,
                                         ])
                                         ->label('Endereço'),
@@ -104,12 +98,13 @@ class VendaResource extends Resource
                                             if (!$estado) {
                                                 return Estado::all()->pluck('nome', 'id');
                                             }
+
                                             return $estado->cidade->pluck('nome', 'id');
                                         })
                                         ->reactive(),
                                     Forms\Components\TextInput::make('email')
                                         ->columnSpan([
-                                            'xl' => 2,
+                                            'xl'  => 2,
                                             '2xl' => 2,
                                         ])
                                         ->email()
@@ -117,7 +112,7 @@ class VendaResource extends Resource
                                     Forms\Components\TextInput::make('numero_conselho')
                                         ->placeholder('Ex: CRM-12345')
                                         ->label('Número do Conselho'),
-                                ])
+                                ]),
                             ]),
             Forms\Components\Select::make('funcionario_id')
                 ->default(1)
@@ -140,7 +135,7 @@ class VendaResource extends Resource
                         Section::make('Descontos e Acréscimos')
                             ->visible(fn ($context) => $context == 'edit')
                             ->columns([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->schema([
@@ -149,7 +144,7 @@ class VendaResource extends Resource
                                     ->hint('Porcentagem ou Valor')
                                     ->live()
                                     ->options([
-                                        'Valor' => 'Valor',
+                                        'Valor'       => 'Valor',
                                         'Porcentagem' => 'Porcentagem',
                                     ])
                                     ->required(false)
@@ -168,11 +163,11 @@ class VendaResource extends Resource
                                     ->required(false)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal = (float) $get('valor_total');
-                                        $percentual = (float) $state;
-                                        $tipo = $get('tipo_acres_desc');
+                                        $valorTotal     = (float) $get('valor_total');
+                                        $percentual     = (float) $state;
+                                        $tipo           = $get('tipo_acres_desc');
                                         $valorAcresDesc = (float) $get('valor_acres_desc');
-                                        $novoValor = $valorTotal;
+                                        $novoValor      = $valorTotal;
                                         if ($tipo === 'Porcentagem' && $percentual != 0) {
                                             $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
@@ -191,11 +186,11 @@ class VendaResource extends Resource
                                     ->required(false)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal = (float) $get('valor_total');
-                                        $tipo = $get('tipo_acres_desc');
-                                        $percentual = (float) $get('percent_acres_desc');
+                                        $valorTotal     = (float) $get('valor_total');
+                                        $tipo           = $get('tipo_acres_desc');
+                                        $percentual     = (float) $get('percent_acres_desc');
                                         $valorAcresDesc = (float) $state;
-                                        $novoValor = $valorTotal;
+                                        $novoValor      = $valorTotal;
                                         if ($tipo === 'Porcentagem' && $percentual > 0) {
                                             $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
@@ -207,7 +202,7 @@ class VendaResource extends Resource
                         Section::make('Valores Totais')
                             ->visible(fn ($context) => $context == 'edit')
                             ->columns([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->schema([
@@ -221,14 +216,14 @@ class VendaResource extends Resource
                                     ->required(),
                                 Forms\Components\TextInput::make('valor_total_desconto')
                                     ->label('Valor Total com Desconto/Acréscimo')
-                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') !='')
+                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') != '')
                                     ->numeric()
                                     ->prefix('R$')
                                     ->minValue(0)
                                     ->readOnly()
                                     ->required(false)
-                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #1E90FF;'])
-                                   
+                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #1E90FF;']),
+
                             ])
                             ->footerActions([
                                 Action::make('recarregar_valores')
@@ -236,11 +231,11 @@ class VendaResource extends Resource
                                     // ->icon('heroicon-o-refresh')
                                         ->action(function ($livewire) {
                                             $livewire->form->fill([
-                                                'cliente_id' => $livewire->record->cliente_id,
-                                                'data_venda' => $livewire->record->data_venda,
-                                                'funcionario_id' => $livewire->record->funcionario_id,
-                                                'forma_pgmto_id' => $livewire->record->forma_pgmto_id,
-                                                'valor_total' => $livewire->record->valor_total,
+                                                'cliente_id'           => $livewire->record->cliente_id,
+                                                'data_venda'           => $livewire->record->data_venda,
+                                                'funcionario_id'       => $livewire->record->funcionario_id,
+                                                'forma_pgmto_id'       => $livewire->record->forma_pgmto_id,
+                                                'valor_total'          => $livewire->record->valor_total,
                                                 'valor_total_desconto' => $livewire->record->valor_total_desconto,
                                             ]);
                                             Notification::make()
@@ -254,9 +249,9 @@ class VendaResource extends Resource
                         Forms\Components\Textarea::make('obs')
                             ->columnSpanFull()
                             ->label('Observações'),
-                    ])
+                    ]),
             ]);
-        }
+    }
 
     public static function table(Table $table): Table
     {
@@ -313,9 +308,9 @@ class VendaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVendas::route('/'),
+            'index'  => Pages\ListVendas::route('/'),
             'create' => Pages\CreateVenda::route('/create'),
-            'edit' => Pages\EditVenda::route('/{record}/edit'),
+            'edit'   => Pages\EditVenda::route('/{record}/edit'),
         ];
     }
 

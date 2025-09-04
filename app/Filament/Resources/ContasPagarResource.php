@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContasPagarResource\Pages;
-use App\Filament\Resources\ContasPagarResource\RelationManagers;
 use App\Models\ContasPagar;
 use App\Models\FluxoCaixa;
 use App\Models\Fornecedor;
@@ -23,7 +22,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContasPagarResource extends Resource
 {
@@ -45,7 +43,7 @@ class ContasPagarResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('fornecedor_id')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Fornecedor')
@@ -141,7 +139,7 @@ class ContasPagarResource extends Resource
                             ->label('Valor Pago'),
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Observações'),
@@ -183,7 +181,7 @@ class ContasPagarResource extends Resource
                     ->Label('Pago?')
                     ->badge()
                     ->alignCenter()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         '0' => 'danger',
                         '1' => 'success',
                     })
@@ -195,6 +193,11 @@ class ContasPagarResource extends Resource
                             return 'Sim';
                         }
                     }),
+                Tables\Columns\TextColumn::make('compra_id')
+                    ->label('Compra Nº')
+                    ->alignCenter()
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('fornecedor.nome')
                     ->sortable()
                     ->searchable(),
@@ -236,9 +239,9 @@ class ContasPagarResource extends Resource
             ])
             ->filters([
                 Filter::make('A pagar')
-                    ->query(fn(Builder $query): Builder => $query->where('status', false))->default(true),
+                    ->query(fn (Builder $query): Builder => $query->where('status', false))->default(true),
                 Filter::make('Pagas')
-                    ->query(fn(Builder $query): Builder => $query->where('status', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('status', true)),
                 SelectFilter::make('fornecedor')->relationship('fornecedor', 'nome')->searchable(),
                 Tables\Filters\Filter::make('data_vencimento')
                     ->form([
@@ -251,17 +254,17 @@ class ContasPagarResource extends Resource
                         return $query
                             ->when(
                                 $data['vencimento_de'],
-                                fn($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
+                                fn ($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
                             )
                             ->when(
                                 $data['vencimento_ate'],
-                                fn($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
+                                fn ($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
                             );
-                    })
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->hidden(fn($record) => $record->status == 1)
+                    ->hidden(fn ($record) => $record->status == 1)
                     ->after(function ($data, $record) {
 
                         if ($record->status = 1 and $record->valor_parcela != $record->valor_pago) {
@@ -288,7 +291,7 @@ class ContasPagarResource extends Resource
                         FluxoCaixa::create($addFluxoCaixa);
                     }),
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn($record) => $record->status == 1),
+                    ->hidden(fn ($record) => $record->status == 1),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

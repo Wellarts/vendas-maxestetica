@@ -3,18 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FuncionarioResource\Pages;
-use App\Filament\Resources\FuncionarioResource\RelationManagers;
 use App\Models\Estado;
 use App\Models\Funcionario;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
-use Filament\Support\RawJs;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FuncionarioResource extends Resource
 {
@@ -34,13 +30,13 @@ class FuncionarioResource extends Resource
         return $form
             ->schema([
                 Grid::make([
-                    'xl' => 4,
+                    'xl'  => 4,
                     '2xl' => 4,
                 ])
                     ->schema([
                         Forms\Components\TextInput::make('nome')
                         ->columnSpan([
-                            'xl' => 2,
+                            'xl'  => 2,
                             '2xl' => 2,
                         ])
                             ->required()
@@ -57,7 +53,7 @@ class FuncionarioResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Textarea::make('endereco')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Endereço'),
@@ -78,18 +74,19 @@ class FuncionarioResource extends Resource
                                 if (!$estado) {
                                     return Estado::all()->pluck('nome', 'id');
                                 }
+
                                 return $estado->cidade->pluck('nome', 'id');
                             })
                             ->reactive(),
-                        
+
                         Forms\Components\TextInput::make('email')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->email()
                             ->maxLength(255),
-                    ])
+                    ]),
             ]);
     }
 
@@ -133,11 +130,11 @@ class FuncionarioResource extends Resource
                 ]),
             ]);
     }
-    
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ManageFuncionarios::route('/'),
         ];
-    }    
+    }
 }

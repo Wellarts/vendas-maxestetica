@@ -14,17 +14,18 @@ class VendaStatsOverview extends BaseWidget
         $ano = date('Y');
         $mes = date('m');
         $dia = date('d');
-       // dd($ano);
+
+        // dd($ano);
         return [
-            Stat::make('Total de Vendas', number_format(Venda::all()->sum('valor_total'),2, ",", "."))
+            Stat::make('Total de Vendas', number_format(Venda::all()->sum('valor_total'), 2, ',', '.'))
                 ->description('Todo Perído')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-            Stat::make('Total de Vendas', number_format(DB::table('vendas')->whereYear('data_venda', $ano)->whereMonth('data_venda', $mes)->sum('valor_total'),2, ",", "."))
+            Stat::make('Total de Vendas', number_format(DB::table('vendas')->whereYear('data_venda', $ano)->whereMonth('data_venda', $mes)->sum('valor_total'), 2, ',', '.'))
                 ->description('Este mês')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),
-            Stat::make('Total de Vendas', number_format(DB::table('vendas')->whereYear('data_venda', $ano)->whereMonth('data_venda', $mes)->whereDay('data_venda', $dia)->sum('valor_total'),2, ",", "."))
+            Stat::make('Total de Vendas', number_format(DB::table('vendas')->whereYear('data_venda', $ano)->whereMonth('data_venda', $mes)->whereDay('data_venda', $dia)->sum('valor_total'), 2, ',', '.'))
                 ->description('Hoje')
                 ->descriptionIcon('heroicon-m-arrow-trending-up')
                 ->color('success'),

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FornecedorResource\Pages;
-use App\Filament\Resources\FornecedorResource\RelationManagers;
 use App\Models\Estado;
 use App\Models\Fornecedor;
 use Filament\Forms;
@@ -11,9 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Forms\Components\CpfCnpj;
 use Filament\Forms\Components\Grid;
 use Filament\Support\RawJs;
 use Filament\Notifications\Notification;
@@ -35,13 +31,13 @@ class FornecedorResource extends Resource
         return $form
             ->schema([
                 Grid::make([
-                    'xl' => 4,
+                    'xl'  => 4,
                     '2xl' => 4,
                 ])
                     ->schema([
                         Forms\Components\TextInput::make('nome')
                         ->columnSpan([
-                            'xl' => 2,
+                            'xl'  => 2,
                             '2xl' => 2,
                         ])
                             ->required()
@@ -61,7 +57,7 @@ class FornecedorResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Textarea::make('endereco')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Endereço'),
@@ -82,18 +78,19 @@ class FornecedorResource extends Resource
                                 if (!$estado) {
                                     return Estado::all()->pluck('nome', 'id');
                                 }
+
                                 return $estado->cidade->pluck('nome', 'id');
                             })
                             ->reactive(),
-                        
+
                         Forms\Components\TextInput::make('email')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->email()
                             ->maxLength(255),
-                    ])
+                    ]),
             ]);
     }
 
@@ -130,14 +127,14 @@ class FornecedorResource extends Resource
                     ->modalHeading('Fornecedores'),
                Tables\Actions\DeleteAction::make()
                     ->before(function (\Filament\Tables\Actions\DeleteAction $action, Fornecedor $record) {
-                        if ($record->compra()->exists() || $record->contasPagar()->exists()) {                            
+                        if ($record->compra()->exists() || $record->contasPagar()->exists()) {
                             Notification::make()
                                 ->title('Ação cancelada')
                                 ->body('Este fornecedor não pode ser excluído porque está vinculado a uma ou mais compras.')
                                 ->danger()
                                 ->send();
-                        $action->cancel();
-                          
+                            $action->cancel();
+
                         }
                     }),
             ])

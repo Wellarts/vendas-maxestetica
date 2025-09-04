@@ -9,10 +9,11 @@ use Spatie\Activitylog\LogOptions;
 
 class Cliente extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
-       
+
             'nome',
             'cpf_cnpj',
             'endereco',
@@ -20,8 +21,8 @@ class Cliente extends Model
             'cidade_id',
             'telefone',
             'email',
-            'numero_conselho'
-            
+            'numero_conselho',
+
     ];
 
     public function Estado()

@@ -46,22 +46,22 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        Produto::class => ProdutoPolicy::class,
-        Cliente::class => ClientePolicy::class,
-        FormaPgmto::class => PgmtoPolicy::class,
-        Funcionario::class => FuncionarioPolicy::class,
-        Fornecedor::class => FornecedorPolicy::class,
-        Compra::class => CompraPolicy::class,
-        ContasPagar::class => ContasPagarPolicy::class,
+        Produto::class       => ProdutoPolicy::class,
+        Cliente::class       => ClientePolicy::class,
+        FormaPgmto::class    => PgmtoPolicy::class,
+        Funcionario::class   => FuncionarioPolicy::class,
+        Fornecedor::class    => FornecedorPolicy::class,
+        Compra::class        => CompraPolicy::class,
+        ContasPagar::class   => ContasPagarPolicy::class,
         ContasReceber::class => ContasReceberPolicy::class,
-        FluxoCaixa::class => FluxoCaixaPolicy::class,
-        Permission::class => PermissionPolicy::class,
-        Role::class => RolePolicy::class,
-        User::class => UserPolicy::class,
-        Venda::class => VendaPolicy::class,
-        Activity::class => ActivityPolicy::class,
-        PDV::class => PDVPolicy::class,
-        VendaPDV::class => VendasPDVPolicy::class,
+        FluxoCaixa::class    => FluxoCaixaPolicy::class,
+        Permission::class    => PermissionPolicy::class,
+        Role::class          => RolePolicy::class,
+        User::class          => UserPolicy::class,
+        Venda::class         => VendaPolicy::class,
+        Activity::class      => ActivityPolicy::class,
+        PDV::class           => PDVPolicy::class,
+        VendaPDV::class      => VendasPDVPolicy::class,
     ];
 
     /**

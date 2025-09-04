@@ -9,13 +9,15 @@ use Spatie\Activitylog\LogOptions;
 
 class FluxoCaixa extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
             'valor',
+            'id_lancamento',
             'tipo',
             'obs',
-           
+
     ];
 
     public function getActivitylogOptions(): LogOptions

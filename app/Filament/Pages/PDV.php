@@ -10,7 +10,6 @@ use App\Models\FormaPgmto;
 use App\Models\Funcionario;
 use App\Models\Produto;
 use App\Models\PDV as PDVs;
-use App\Models\Venda;
 use App\Models\VendaPDV;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
@@ -34,16 +33,14 @@ use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Textarea;
-use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Support\RawJs;
 use Filament\Tables\Actions\DeleteAction;
-use Filament\Tables\Columns\Summarizers\Count;
 
 class PDV extends Page implements HasForms, HasTable
 {
-
-    use InteractsWithForms, InteractsWithTable;
+    use InteractsWithForms;
+    use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-s-shopping-cart';
 
@@ -122,7 +119,7 @@ class PDV extends Page implements HasForms, HasTable
                                         return [$product->id => "[{$product->codbar}] {$product->nome}"];
                                     });
                             })
-                            ->getOptionLabelUsing(fn($value): ?string => Produto::where('id', $value)->first()?->nome)
+                            ->getOptionLabelUsing(fn ($value): ?string => Produto::where('id', $value)->first()?->nome)
                             ->autofocus()
                             ->extraInputAttributes(['tabindex' => 1])
                             ->live(debounce: 900)
@@ -142,20 +139,26 @@ class PDV extends Page implements HasForms, HasTable
         if ($name === 'produto_id') {
             $produto = Produto::where('id', '=', $value)->first();
             if ($produto !== null) {
+                Notification::make()
+                    ->title('Produto selecionado:')
+                    ->body('<b>Produto: </b> ' . $produto->nome . '<br> <b>Estoque Atual: </b> ' . $produto->estoque . ' <br> <b>Imagem: </b> <img src="' . (is_array($produto->foto) ? asset('storage/' . ($produto->foto[0] ?? '')) : asset('storage/' . $produto->foto)) . '" alt="' . $produto->nome . '" style="max-width:100px;max-height:100px;">')
+                    ->success()
+                    ->duration(5000)
+                    ->send();
                 $addProduto = [
-                    'produto_id' => $produto->id,
-                    'venda_p_d_v_id' => $this->venda,
-                    'valor_venda' => $produto->valor_venda,
-                    'pdv_id' => '',
-                    'acres_desc' => 0,
-                    'qtd' => 1,
-                    'sub_total' => $produto->valor_venda * 1,
+                    'produto_id'        => $produto->id,
+                    'venda_p_d_v_id'    => $this->venda,
+                    'valor_venda'       => $produto->valor_venda,
+                    'pdv_id'            => '',
+                    'acres_desc'        => 0,
+                    'qtd'               => 1,
+                    'sub_total'         => $produto->valor_venda * 1,
                     'valor_custo_atual' => $produto->valor_compra,
                     'total_custo_atual' => $produto->valor_compra,
                 ];
                 PDVs::create($addProduto);
-                $this->produto_id = '';
-                $this->qtd = '';
+                $this->produto_id   = '';
+                $this->qtd          = '';
                 $this->produto_nome = '';
             } else {
                 Notification::make()
@@ -180,8 +183,8 @@ class PDV extends Page implements HasForms, HasTable
                 ->alignCenter()
                 ->summarize(Sum::make()->label('Qtd Produtos'))
                 ->updateStateUsing(function (Model $record, $state) {
-                    $record->sub_total = ($state * $record->valor_venda);
-                    $record->qtd = $state;
+                    $record->sub_total         = ($state * $record->valor_venda);
+                    $record->qtd               = $state;
                     $record->total_custo_atual = ($record->valor_custo_atual * $state);
                     $record->save();
                 })
@@ -235,7 +238,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->label('Tipo de Registro')
                                 ->live()
                                 ->options([
-                                    'venda' => 'Venda',
+                                    'venda'     => 'Venda',
                                     'orcamento' => 'Orçamento',
                                 ])
                                 ->default('venda')
@@ -247,13 +250,13 @@ class PDV extends Page implements HasForms, HasTable
                                 ->relationship(name: 'cliente', titleAttribute: 'nome')
                                 ->createOptionForm([
                                     Grid::make([
-                                        'xl' => 4,
+                                        'xl'  => 4,
                                         '2xl' => 4,
                                     ])
                                         ->schema([
                                             TextInput::make('nome')
                                                 ->columnSpan([
-                                                    'xl' => 2,
+                                                    'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
                                                 ->required()
@@ -273,7 +276,7 @@ class PDV extends Page implements HasForms, HasTable
                                                 ->maxLength(255),
                                             Textarea::make('endereco')
                                                 ->columnSpan([
-                                                    'xl' => 2,
+                                                    'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
                                                 ->label('Endereço'),
@@ -294,18 +297,19 @@ class PDV extends Page implements HasForms, HasTable
                                                     if (!$estado) {
                                                         return Estado::all()->pluck('nome', 'id');
                                                     }
+
                                                     return $estado->cidade->pluck('nome', 'id');
                                                 })
                                                 ->live(debounce: 500),
 
                                             TextInput::make('email')
                                                 ->columnSpan([
-                                                    'xl' => 2,
+                                                    'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
                                                 ->email()
                                                 ->maxLength(255),
-                                        ])
+                                        ]),
                                 ]),
                             Select::make('funcionario_id')
                                 ->label('Vendedor')
@@ -326,6 +330,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->readOnly()
                                 ->default(function () {
                                     $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
+
                                     return $valorTotal;
                                 })
                                 ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
@@ -333,7 +338,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->columnStart(3),
                             Section::make('Descontos e Acréscimos')
                                 ->columns([
-                                    'xl' => 2,
+                                    'xl'  => 2,
                                     '2xl' => 2,
                                 ])
                                 ->schema([
@@ -342,7 +347,7 @@ class PDV extends Page implements HasForms, HasTable
                                     ->hint('Porcentagem ou Valor')
                                     ->live()
                                     ->options([
-                                        'Valor' => 'Valor',
+                                        'Valor'       => 'Valor',
                                         'Porcentagem' => 'Porcentagem',
                                     ])
                                     ->required(false)
@@ -361,11 +366,11 @@ class PDV extends Page implements HasForms, HasTable
                                     ->required(false)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal = (float) $get('valor_total');
-                                        $percentual = (float) $state;
-                                        $tipo = $get('tipo_acres_desc');
+                                        $valorTotal     = (float) $get('valor_total');
+                                        $percentual     = (float) $state;
+                                        $tipo           = $get('tipo_acres_desc');
                                         $valorAcresDesc = (float) $get('valor_acres_desc');
-                                        $novoValor = $valorTotal;
+                                        $novoValor      = $valorTotal;
                                         if ($tipo === 'Porcentagem' && $percentual != 0) {
                                             $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
@@ -384,11 +389,11 @@ class PDV extends Page implements HasForms, HasTable
                                     ->required(false)
                                     ->live(onBlur: true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal = (float) $get('valor_total');
-                                        $tipo = $get('tipo_acres_desc');
-                                        $percentual = (float) $get('percent_acres_desc');
+                                        $valorTotal     = (float) $get('valor_total');
+                                        $tipo           = $get('tipo_acres_desc');
+                                        $percentual     = (float) $get('percent_acres_desc');
                                         $valorAcresDesc = (float) $state;
-                                        $novoValor = $valorTotal;
+                                        $novoValor      = $valorTotal;
                                         if ($tipo === 'Porcentagem' && $percentual > 0) {
                                             $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
@@ -396,33 +401,34 @@ class PDV extends Page implements HasForms, HasTable
                                         }
                                         $set('valor_total_desconto', $novoValor);
                                     }),
-                            ]),                            
-                            
+                            ]),
+
                             Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
                                 ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
-                                    '2' => 'Conta a Receber'
+                                    '2' => 'Conta a Receber',
                                 ])->default('1'),
                             TextInput::make('parcelas')
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento'),
+                                ->hidden(fn (Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento'),
                             TextInput::make('valor_total_desconto')
                                 ->numeric()
                                 ->label('Valor Total c/ Desconto/Acréscimo')
                                 ->readOnly()
                                 ->default(function () {
                                     $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
+
                                     return $valorTotal;
                                 })
                                 ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
                                 ->columnSpan(2)
                                 ->columnStart(3),
-                        ])
+                        ]),
 
                 ])
                 ->after(function ($data) {
@@ -441,13 +447,14 @@ class PDV extends Page implements HasForms, HasTable
                     // Gere o comprovante redirecionando para uma rota que exibe o comprovante.
                     // Certifique-se de criar a rota 'comprovantePDV' no seu web.php e uma página/controle para exibir o comprovante.
                     // Exemplo de redirecionamento:
-                    
+
                     if ($data['tipo_registro'] === 'venda') {
                         if ($data['financeiro'] == 1) {
 
                             $addFluxoCaixa = [
                                 'valor' => ($data['valor_total_desconto']),
                                 'tipo'  => 'CREDITO',
+                                'id_lancamento' => $record->id,
                                 'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
                             ];
                             Notification::make()
@@ -456,22 +463,22 @@ class PDV extends Page implements HasForms, HasTable
                                 ->success()
                                 ->send();
                             FluxoCaixa::create($addFluxoCaixa);
-                        } else {                        
+                        } else {
                             $valor_parcela = ($record->valor_total_desconto / $data['parcelas']);
-                            $vencimentos = Carbon::now();
+                            $vencimentos   = Carbon::now();
                             for ($cont = 0; $cont < $data['parcelas']; $cont++) {
                                 $dataVencimentos = $vencimentos->addDays(30);
-                                $parcelas = [
-                                    'vendapdv_id' => $this->venda,
-                                    'cliente_id' => $data['cliente_id'],
-                                    'valor_total' => $data['valor_total_desconto'],
-                                    'parcelas' => $data['parcelas'],
-                                    'ordem_parcela' => $cont + 1,
+                                $parcelas        = [
+                                    'vendapdv_id'     => $this->venda,
+                                    'cliente_id'      => $data['cliente_id'],
+                                    'valor_total'     => $data['valor_total_desconto'],
+                                    'parcelas'        => $data['parcelas'],
+                                    'ordem_parcela'   => $cont + 1,
                                     'data_vencimento' => $dataVencimentos,
-                                    'valor_recebido' => 0.00,
-                                    'status' => 0,
-                                    'obs' => 'Venda em PDV - Nº ' . $this->venda,
-                                    'valor_parcela' => $valor_parcela,
+                                    'valor_recebido'  => 0.00,
+                                    'status'          => 0,
+                                    'obs'             => 'Venda em PDV - Nº ' . $this->venda,
+                                    'valor_parcela'   => $valor_parcela,
                                 ];
                                 ContasReceber::create($parcelas);
                             }
@@ -481,18 +488,20 @@ class PDV extends Page implements HasForms, HasTable
                                 ->success()
                                 ->duration(20000)
                                 ->send();
-                               
-    } // <-- Adicione esta chave de fechamento aqui
-    return route('filament.admin.resources.venda-p-d-vs.index');
-}
-return route('filament.admin.resources.venda-p-d-vs.index');
-                    
 
-                    
-                
+                        } // <-- Adicione esta chave de fechamento aqui
 
-                     
-                })
+                        return route('filament.admin.resources.venda-p-d-vs.index');
+                    }
+
+                    return route('filament.admin.resources.venda-p-d-vs.index');
+
+
+
+
+
+
+                }),
 
         ];
     }

@@ -9,7 +9,8 @@ use Spatie\Activitylog\LogOptions;
 
 class contasPagar extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'fornecedor_id',
@@ -22,8 +23,8 @@ class contasPagar extends Model
         'valor_total',
         'valor_parcela',
         'valor_pago',
-        'obs'
-        
+        'obs',
+
     ];
 
     public function compra()

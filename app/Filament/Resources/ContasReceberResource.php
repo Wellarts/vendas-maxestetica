@@ -3,16 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContasReceberResource\Pages;
-use App\Filament\Resources\ContasReceberResource\RelationManagers;
 use App\Models\Cliente;
 use App\Models\ContasReceber;
 use App\Models\FluxoCaixa;
 use Carbon\Carbon;
-use Filament\Actions\CreateAction;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\Summarizers\Count;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -24,11 +20,8 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Actions\Action;
 use Filament\Notifications\Notification;
-
-
 
 class ContasReceberResource extends Resource
 {
@@ -50,7 +43,7 @@ class ContasReceberResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('cliente_id')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Cliente')
@@ -89,7 +82,7 @@ class ContasReceberResource extends Resource
                                     return true;
                                 }
                             })
-                            
+
                             ->required(),
                         Forms\Components\TextInput::make('parcelas')
                             ->label('Qtd Parcelas')
@@ -102,7 +95,7 @@ class ContasReceberResource extends Resource
                                     return true;
                                 }
                             })
-                            ->afterStateUpdated(function($state, Set $set, Get $get){
+                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
                                 $set('valor_total', ($get('valor_parcela') * $state));
                             })
                             ->maxLength(255),
@@ -146,7 +139,7 @@ class ContasReceberResource extends Resource
                             ->label('Valor Recebido'),
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Observações'),
@@ -188,7 +181,7 @@ class ContasReceberResource extends Resource
                     ->Label('Recebido?')
                     ->badge()
                     ->alignCenter()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         '0' => 'danger',
                         '1' => 'success',
                     })
@@ -200,6 +193,11 @@ class ContasReceberResource extends Resource
                             return 'Sim';
                         }
                     }),
+                Tables\Columns\TextColumn::make('vendapdv_id')
+                    ->label('Nº Venda')
+                    ->alignCenter()
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('cliente.nome')
                     ->sortable()
                     ->searchable(),
@@ -241,9 +239,9 @@ class ContasReceberResource extends Resource
             ])
             ->filters([
                 Filter::make('A receber')
-                    ->query(fn(Builder $query): Builder => $query->where('status', false))->default(true),
+                    ->query(fn (Builder $query): Builder => $query->where('status', false))->default(true),
                 Filter::make('Recebidas')
-                    ->query(fn(Builder $query): Builder => $query->where('status', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('status', true)),
                 SelectFilter::make('cliente')->relationship('cliente', 'nome')->searchable(),
                 Tables\Filters\Filter::make('data_vencimento')
                     ->form([
@@ -256,20 +254,35 @@ class ContasReceberResource extends Resource
                         return $query
                             ->when(
                                 $data['vencimento_de'],
-                                fn($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
+                                fn ($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
                             )
                             ->when(
                                 $data['vencimento_ate'],
-                                fn($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
+                                fn ($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
                             );
-                    })
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->hidden(fn ($record) => $record->status == 1)
+                   // ->hidden(fn ($record) => $record->status == 1)
                     ->after(function ($livewire, $record) {
 
-                        if ($record->status = 1 and $record->valor_parcela != $record->valor_recebido) {
+                       
+                        // Exclui o lançamento anterior no fluxo de caixa
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+                        // Cria novo lançamento se status for true
+                        if ($record->status == true) {
+                            $addFluxoCaixa = [
+                                'valor' => ($record->valor_recebido),
+                                'tipo'  => 'CREDITO',
+                                'obs'   => 'Recebimento da conta do cliente ' . $record->cliente->nome . ' da parcela nº: ' . $record->ordem_parcela,
+                                'id_lancamento' => $record->id,
+                            ];
+                            \App\Models\FluxoCaixa::create($addFluxoCaixa);
+                        }
+                        // Verifica se o pagamento foi parcial
+
+                        if ($record->status == 1 && $record->valor_parcela != $record->valor_recebido) {
                             Notification::make()
                                 ->title('RECEBIMENTO PARCIAL')
                                 ->success()
@@ -278,23 +291,27 @@ class ContasReceberResource extends Resource
                                     Action::make('Sim')
                                         ->button()
                                          ->url(route('novaParcela', $record)),
-               
+
                                 ])
                                 ->persistent()
                                 ->send();
                         }
 
                         $addFluxoCaixa = [
+                            'id_lancamento' => $record->id,
                             'valor' => ($record->valor_recebido),
                             'tipo'  => 'CREDITO',
                             'obs'   => 'Recebido: '.$record->obs. '',
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);
-                       
+
                     }),
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn ($record) => $record->status == 1),
+                    ->after(function ($record) {
+                        // Exclui o lançamento no fluxo de caixa ao excluir a conta
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -310,5 +327,5 @@ class ContasReceberResource extends Resource
         ];
     }
 
-    
+
 }

@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\Models\PDV;
 use App\Models\VendaPDV;
-use Filament\Pages\Page;
 use Illuminate\Contracts\Support\Htmlable;
 use Filament\Facades\Filament;
 use Filament\Panel;
@@ -36,7 +35,7 @@ class Dashboard extends \Filament\Pages\Dashboard
 
     public function mount(): void
     {
-        
+
         // Notification::make()
         //     ->title('ATENÇÃO')
         //     ->persistent()
@@ -53,14 +52,14 @@ class Dashboard extends \Filament\Pages\Dashboard
         PDV::whereNotIn('venda_p_d_v_id', VendaPDV::pluck('id'))->delete();
 
         //***********NOTIFICAÇÃO DE CONTAS A RECEBER*************
-        $contasReceberVencer = ContasReceber::where('status','=','0')->get();
-       // dd($contasReceberVencer);
+        $contasReceberVencer = ContasReceber::where('status', '=', '0')->get();
+        // dd($contasReceberVencer);
         $hoje = Carbon::today();
 
         foreach ($contasReceberVencer as $cr) {
-            $hoje = Carbon::today();
+            $hoje           = Carbon::today();
             $dataVencimento = Carbon::parse($cr->data_vencimento);
-            $qtd_dias = $hoje->diffInDays($dataVencimento, false);
+            $qtd_dias       = $hoje->diffInDays($dataVencimento, false);
             if ($qtd_dias <= 3 && $qtd_dias > 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento próximo.')
@@ -94,13 +93,13 @@ class Dashboard extends \Filament\Pages\Dashboard
         }
 
         //***********NOTIFICAÇÃO DE CONTAS A PAGAR*************
-        $contasPagarVencer = ContasPagar::where('status','=','0')->get();
-        $hoje = Carbon::today();
+        $contasPagarVencer = ContasPagar::where('status', '=', '0')->get();
+        $hoje              = Carbon::today();
 
         foreach ($contasPagarVencer as $cp) {
-            $hoje = Carbon::today();
+            $hoje           = Carbon::today();
             $dataVencimento = Carbon::parse($cp->data_vencimento);
-            $qtd_dias = $hoje->diffInDays($dataVencimento, false);
+            $qtd_dias       = $hoje->diffInDays($dataVencimento, false);
             if ($qtd_dias <= 3 && $qtd_dias > 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar com vencimento próximo.')
@@ -136,9 +135,7 @@ class Dashboard extends \Filament\Pages\Dashboard
 
     public static function getNavigationLabel(): string
     {
-        return static::$navigationLabel ??
-            static::$title ??
-            __('filament-panels::pages/dashboard.title');
+        return static::$navigationLabel ?? static::$title ?? __('filament-panels::pages/dashboard.title');
     }
 
     public static function getNavigationIcon(): ?string

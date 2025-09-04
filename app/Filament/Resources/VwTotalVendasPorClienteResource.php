@@ -4,7 +4,6 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\VwTotalVendasPorClienteResource\Pages;
 use App\Models\VwTotalVendasPorCliente;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -22,17 +21,19 @@ class VwTotalVendasPorClienteResource extends Resource
 
     protected static ?int $navigationSort = 20;
 
-    
+
 
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('valor_total',
-             'desc')
+            ->defaultSort(
+                'valor_total',
+                'desc'
+            )
             ->columns([
                 Tables\Columns\TextColumn::make('cliente_nome')
                     ->label('Cliente')
-                    ->sortable()                    
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('valor_total')
                     ->label('Valor Total')
@@ -43,8 +44,8 @@ class VwTotalVendasPorClienteResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('ultima_compra')
                     ->label('Última Compra')
-                    ->color(fn ($record) => $record->ultima_compra == 'Nunca comprou' ? 'danger' : 'success')              
-                    ->sortable(),                    
+                    ->color(fn ($record) => $record->ultima_compra == 'Nunca comprou' ? 'danger' : 'success')
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

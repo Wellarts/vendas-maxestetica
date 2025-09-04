@@ -21,21 +21,21 @@ class ListVendas extends ListRecords
 
     protected function getHeaderWidgets(): array
     {
-         /** @var \App\Models\User */
+        /** @var \App\Models\User */
         //   $authUser =  auth()->user();
 
-       /* if($authUser->hasRole('Administrador'))
-         { */
-            return [  
-                VendaStatsOverview::class
+        /* if($authUser->hasRole('Administrador'))
+          { */
+        return [
+            VendaStatsOverview::class,
 
-            ];
-       /*   }
-         else
-        {
-            return [
+        ];
+        /*   }
+          else
+         {
+             return [
 
-            ];
-        } */
+             ];
+         } */
     }
 }

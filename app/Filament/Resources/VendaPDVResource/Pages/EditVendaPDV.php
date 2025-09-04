@@ -17,7 +17,28 @@ class EditVendaPDV extends EditRecord
     {
         return [
             Actions\DeleteAction::make()
-                ->disabled(fn($record) => PDV::where('venda_p_d_v_id', $record->id)->count()),
+                ->disabled(fn ($record) => PDV::where('venda_p_d_v_id', $record->id)->count())
+                ->after(function ($record) {
+                    if ($record->financeiro == 1) {
+                        // Excluir do fluxo de caixa
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Lançamento removido do fluxo de caixa!')
+                            ->body('O lançamento referente à venda nº ' . $record->id . ' foi removido do fluxo de caixa.')
+                            ->success()
+                            ->send();
+                    } else {
+                        // Excluir parcelas do contas a receber
+                        \App\Models\ContasReceber::where('vendapdv_id', $record->id)->delete();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Parcelas removidas do contas a receber!')
+                            ->body('As parcelas referentes à venda nº ' . $record->id . ' foram removidas do contas a receber.')
+                            ->success()
+                            ->send();
+                    }
+                }),
 
             Actions\Action::make('converter_venda')
                 ->label('Converter em Venda')
@@ -25,10 +46,10 @@ class EditVendaPDV extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Converter em Venda')
                 ->modalDescription('Caso tenha feito alterações no formulário é necesssário salvar para depois converter em venda. Tem certeza que deseja converter este orçamento em venda?')
-                ->visible(fn($record) => $record->tipo_registro === 'orcamento')
+                ->visible(fn ($record) => $record->tipo_registro === 'orcamento')
                 ->action(function ($record) {
                     $record->tipo_registro = 'venda';
-                    $record->data_venda = now();
+                    $record->data_venda    = now();
                     $record->save();
 
                     // Atualiza o estoque dos produtos
@@ -41,10 +62,10 @@ class EditVendaPDV extends EditRecord
                     }
 
                     // Lógica de lançamento financeiro
-                    $parcelas = $record->parcelas ?? 1;
-                    $financeiro = $record->financeiro ?? 1;
+                    $parcelas             = $record->parcelas             ?? 1;
+                    $financeiro           = $record->financeiro           ?? 1;
                     $valor_total_desconto = $record->valor_total_desconto ?? 0;
-                    $cliente_id = $record->cliente_id ?? null;
+                    $cliente_id           = $record->cliente_id           ?? null;
 
                     if ($record->tipo_registro === 'venda') {
                         if ($financeiro == 1) {
@@ -63,7 +84,7 @@ class EditVendaPDV extends EditRecord
                             \App\Models\FluxoCaixa::create($addFluxoCaixa);
                         } else {
                             $valor_parcela = $valor_total_desconto / $parcelas;
-                            $vencimentos = \Carbon\Carbon::now();
+                            $vencimentos   = \Carbon\Carbon::now();
 
                             for ($cont = 0; $cont < $parcelas; $cont++) {
                                 $dataVencimentos = $vencimentos->copy()->addDays(30 * $cont);

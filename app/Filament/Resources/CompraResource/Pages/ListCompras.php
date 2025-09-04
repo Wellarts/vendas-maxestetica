@@ -22,8 +22,8 @@ class ListCompras extends ListRecords
     protected function getHeaderWidgets(): array
     {
         return [
-            CompraStatsOverview::class
-           
+            CompraStatsOverview::class,
+
         ];
     }
 }

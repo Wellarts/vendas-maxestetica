@@ -43,7 +43,7 @@ class FornecedorPolicy
     {
         return $user->hasPermissionTo('Create Fornecedores');
     }
-    
+
 
     /**
      * Determine whether the user can update the model.

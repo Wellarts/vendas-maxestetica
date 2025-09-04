@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-
 use App\Livewire\ComprasMesChart;
 use App\Livewire\PagarHojeStatsOverview;
 use App\Livewire\ReceberHojeStatsOverview;
@@ -42,7 +41,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Amber,
             ])
-            
+
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
@@ -78,16 +77,16 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                   function (): string {
-                      return Blade::render('@laravelPWA');
-                   }
-              )
+                function (): string {
+                    return Blade::render('@laravelPWA');
+                }
+            )
             ->resources([
-                config('filament-logger.activity_resource')
+                config('filament-logger.activity_resource'),
 
             ])
             ->plugins([
-                FilamentErrorMailerPlugin::make()
+                FilamentErrorMailerPlugin::make(),
             ]);
     }
 }

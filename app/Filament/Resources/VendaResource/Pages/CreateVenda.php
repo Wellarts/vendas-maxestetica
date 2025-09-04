@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\VendaResource\Pages;
 
 use App\Filament\Resources\VendaResource;
-use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateVenda extends CreateRecord

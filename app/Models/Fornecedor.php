@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-
 class Fornecedor extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
-       
+
         'nome',
         'cpf_cnpj',
         'endereco',
@@ -21,7 +21,7 @@ class Fornecedor extends Model
         'cidade_id',
         'telefone',
         'email',
-        
+
     ];
 
     public function Estado()
@@ -34,12 +34,12 @@ class Fornecedor extends Model
         return $this->belongsTo(Cidade::class);
     }
 
-    public function compra() 
+    public function compra()
     {
         return $this->hasMany(Compra::class);
     }
 
-    public function contasPagar() 
+    public function contasPagar()
     {
         return $this->hasMany(contasPagar::class);
     }

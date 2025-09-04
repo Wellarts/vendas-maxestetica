@@ -14,12 +14,12 @@ class TotalVendasPorCliente extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Total Vendas por Cliente',
-                    'data' => \App\Models\VwTotalVendasPorCliente::query()
+                    'data'  => \App\Models\VwTotalVendasPorCliente::query()
                         ->selectRaw('cliente_nome, valor_total')
                         ->limit(10)
                         ->orderBy('valor_total', 'desc')
                         ->get()
-                        ->pluck('valor_total')                    
+                        ->pluck('valor_total')
                         ->toArray(),
                     'backgroundColor' => [
                         'rgba(255, 99, 132, 0.2)',
@@ -28,14 +28,14 @@ class TotalVendasPorCliente extends ChartWidget
                         'rgba(75, 192, 192, 0.2)',
                         'rgba(54, 162, 235, 0.2)',
                         'rgba(153, 102, 255, 0.2)',
-                        'rgba(201, 203, 207, 0.2)'
+                        'rgba(201, 203, 207, 0.2)',
                     ],
                     'borderColor' => 'rgb(68, 70, 70)',
-                ]
+                ],
             ],
             'labels' => \App\Models\VwTotalVendasPorCliente::query()
                 ->selectRaw('cliente_nome')
-                ->limit(10)                
+                ->limit(10)
                 ->get()
                 ->pluck('cliente_nome')
                 ->toArray(),

@@ -15,8 +15,6 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ContasReceberRelationManager extends RelationManager
 {
@@ -35,7 +33,7 @@ class ContasReceberRelationManager extends RelationManager
                             ->required(),
                         Forms\Components\Select::make('cliente_id')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Cliente')
@@ -65,24 +63,24 @@ class ContasReceberRelationManager extends RelationManager
                                     $set('status', 0);
                                     $set('valor_recebido', 0);
                                     $set('data_pagamento', null);
-                                    $set('data_vencimento',  Carbon::now()->addDays(30)->format('Y-m-d'));
+                                    $set('data_vencimento', Carbon::now()->addDays(30)->format('Y-m-d'));
                                 } else {
                                     $set('valor_parcela', $get('valor_total'));
                                     $set('status', 1);
                                     $set('valor_recebido', $get('valor_total'));
                                     $set('data_pagamento', Carbon::now()->format('Y-m-d'));
-                                    $set('data_vencimento',  Carbon::now()->format('Y-m-d'));
+                                    $set('data_vencimento', Carbon::now()->format('Y-m-d'));
                                 }
                             })
                             ->required(),
                         Forms\Components\DatePicker::make('data_pagamento')
                             ->default(now())
                             ->displayFormat('d/m/Y')
-                            ->label("Data do Pagamento"),
+                            ->label('Data do Pagamento'),
 
                         Forms\Components\DatePicker::make('data_vencimento')
                             ->default(now())
-                            ->label("Data do Vencimento")
+                            ->label('Data do Vencimento')
                             ->displayFormat('d/m/Y')
                             ->required(),
                         Forms\Components\TextInput::make('valor_total')
@@ -116,7 +114,7 @@ class ContasReceberRelationManager extends RelationManager
                             }),
                         Forms\Components\Textarea::make('obs')
                             ->columnSpan([
-                                'xl' => 3,
+                                'xl'  => 3,
                                 '2xl' => 3,
                             ])
                             ->label('Observações'),
@@ -138,7 +136,7 @@ class ContasReceberRelationManager extends RelationManager
                                     }
                                 }
                             ),
-                    ])
+                    ]),
 
 
             ]);
@@ -205,20 +203,20 @@ class ContasReceberRelationManager extends RelationManager
                         function ($data, $record, $livewire) {
                             if ($record->parcelas > 1) {
                                 $valor_parcela = (!empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $record->valor_total) / $record->parcelas;
-                                $vencimentos = Carbon::create($record->data_vencimento);
+                                $vencimentos   = Carbon::create($record->data_vencimento);
                                 for ($cont = 1; $cont < $data['parcelas']; $cont++) {
                                     $dataVencimentos = $vencimentos->addDays(30);
-                                    $parcelas = [
-                                        'venda_id' => $record->venda_id,
-                                        'cliente_id' => $data['cliente_id'],
-                                        'valor_total' => !empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $data['valor_total'],
-                                        'parcelas' => $data['parcelas'],
-                                        'ordem_parcela' => $cont + 1,
+                                    $parcelas        = [
+                                        'venda_id'        => $record->venda_id,
+                                        'cliente_id'      => $data['cliente_id'],
+                                        'valor_total'     => !empty($data['valor_total_desconto']) ? $data['valor_total_desconto'] : $data['valor_total'],
+                                        'parcelas'        => $data['parcelas'],
+                                        'ordem_parcela'   => $cont + 1,
                                         'data_vencimento' => $dataVencimentos,
-                                        'valor_recebido' => 0.00,
-                                        'status' => 0,
-                                        'obs' => $data['obs'],
-                                        'valor_parcela' => $valor_parcela,
+                                        'valor_recebido'  => 0.00,
+                                        'status'          => 0,
+                                        'obs'             => $data['obs'],
+                                        'valor_parcela'   => $valor_parcela,
                                     ];
                                     ContasReceber::create($parcelas);
                                 }
@@ -232,17 +230,15 @@ class ContasReceberRelationManager extends RelationManager
                                 FluxoCaixa::create($addFluxoCaixa);
                             }
 
-                            $venda = Venda::find($livewire->ownerRecord->id);
+                            $venda               = Venda::find($livewire->ownerRecord->id);
                             $venda->status_caixa = 1;
                             $venda->save();
                         }
-
-
                     ),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->hidden(fn($record) => $record->status == 1)
+                    ->hidden(fn ($record) => $record->status == 1)
                     ->after(function ($data, $record) {
 
                         if ($record->status = 1) {
@@ -256,7 +252,7 @@ class ContasReceberRelationManager extends RelationManager
                         }
                     }),
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn($record) => $record->status == 1),
+                    ->hidden(fn ($record) => $record->status == 1),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

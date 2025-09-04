@@ -13,15 +13,17 @@ class ProdutoFornecedor extends Model
         'compra_id',
         'produto_id',
         'qtd',
-        'valor'
+        'valor',
     ];
 
-    public function produto() {
+    public function produto()
+    {
 
         return $this->belongsTo(Produto::class);
     }
 
-    public function compra() {
+    public function compra()
+    {
 
         return $this->belongsTo(Compra::class);
     }

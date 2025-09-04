@@ -7,8 +7,6 @@ use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProdutoFornecedorRelationManager extends RelationManager
 {
@@ -37,7 +35,7 @@ class ProdutoFornecedorRelationManager extends RelationManager
                     ->date('d/m/y'),
                 Tables\Columns\TextColumn::make('qtd'),
                 Tables\Columns\TextColumn::make('valor')
-                    ->money('BRL')
+                    ->money('BRL'),
 
 
             ])

@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FluxoCaixaResource\Pages;
-use App\Filament\Resources\FluxoCaixaResource\RelationManagers;
 use App\Models\FluxoCaixa;
 use Filament\Forms;
 use Filament\Forms\Components\Grid;
@@ -12,8 +11,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class FluxoCaixaResource extends Resource
 {
@@ -36,7 +33,7 @@ class FluxoCaixaResource extends Resource
                         Forms\Components\Select::make('tipo')
                             ->options([
                                 'CREDITO' => 'CRÉDITO',
-                                'DEBITO' => 'DÉBITO',
+                                'DEBITO'  => 'DÉBITO',
                             ])
                             ->required(),
 
@@ -48,11 +45,11 @@ class FluxoCaixaResource extends Resource
                         Forms\Components\Textarea::make('obs')
                             ->label('Descrição')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->required(),
-                    ])
+                    ]),
 
             ]);
     }
@@ -60,7 +57,7 @@ class FluxoCaixaResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('id','desc')
+            ->defaultSort('id', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('tipo')
                     ->badge()

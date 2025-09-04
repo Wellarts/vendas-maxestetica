@@ -2,28 +2,20 @@
 
 namespace App\Filament\Resources;
 
-
 use App\Models\Estado;
 use App\Filament\Resources\ClienteResource\Pages;
-use App\Filament\Resources\ClienteResource\RelationManagers;
 use App\Models\Cliente;
 use Filament\Forms;
-use Filament\Forms\Components\TextInput\Mask;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Filament\Tables;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Forms\Components\CpfCnpj;
 use Filament\Forms\Components\Grid;
 use Filament\Support\RawJs;
-use Filament\Tables\Actions\Action;
 use Filament\Notifications\Notification;
 
 class ClienteResource extends Resource
 {
-
     protected static ?string $model = Cliente::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
@@ -37,13 +29,13 @@ class ClienteResource extends Resource
         return $form
             ->schema([
                 Grid::make([
-                    'xl' => 4,
+                    'xl'  => 4,
                     '2xl' => 4,
                 ])
                     ->schema([
                         Forms\Components\TextInput::make('nome')
                         ->columnSpan([
-                            'xl' => 2,
+                            'xl'  => 2,
                             '2xl' => 2,
                         ])
                             ->required()
@@ -63,7 +55,7 @@ class ClienteResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Textarea::make('endereco')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->label('Endereço'),
@@ -84,13 +76,14 @@ class ClienteResource extends Resource
                                 if (!$estado) {
                                     return Estado::all()->pluck('nome', 'id');
                                 }
+
                                 return $estado->cidade->pluck('nome', 'id');
                             })
                             ->reactive(),
 
                         Forms\Components\TextInput::make('email')
                             ->columnSpan([
-                                'xl' => 2,
+                                'xl'  => 2,
                                 '2xl' => 2,
                             ])
                             ->email()
@@ -98,8 +91,8 @@ class ClienteResource extends Resource
                         Forms\Components\TextInput::make('numero_conselho')
                             ->placeholder('Ex: CRM-12345')
                             ->label('Número do Conselho'),
-                            
-                    ])
+
+                    ]),
             ]);
     }
 
@@ -137,14 +130,14 @@ class ClienteResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->before(function (\Filament\Tables\Actions\DeleteAction $action, Cliente $record) {
-                        if ($record->venda()->exists() || $record->vendasPdv()->exists() || $record->contasReceber()->exists()) {                            
+                        if ($record->venda()->exists() || $record->vendasPdv()->exists() || $record->contasReceber()->exists()) {
                             Notification::make()
                                 ->title('Ação cancelada')
                                 ->body('Este cliente não pode ser excluído porque está vinculado a uma ou mais vendas.')
                                 ->danger()
                                 ->send();
-                        $action->cancel();
-                          
+                            $action->cancel();
+
                         }
                     }),
 

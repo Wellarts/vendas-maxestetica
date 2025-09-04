@@ -5,7 +5,6 @@ namespace App\Filament\Pages;
 use App\Models\ItensVenda;
 use App\Models\Venda;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Get;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
@@ -18,7 +17,6 @@ use pxlrbt\FilamentExcel\Actions\Tables\ExportBulkAction;
 
 class Lucratividade extends Page implements HasTable
 {
-
     use InteractsWithTable;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
@@ -29,27 +27,27 @@ class Lucratividade extends Page implements HasTable
 
     protected static ?int $navigationSort = 17;
 
-    
+
 
 
     public function mount()
     {
 
         $vendas = Venda::all();
-      
-        foreach ($vendas as $venda) {
-                $custo_venda = $venda->itensVenda()->sum('total_custo_atual');
-                $venda->lucro_venda = ($venda->valor_total - $custo_venda);
-                $venda->save();
-                
-        }
-    } 
 
-   
+        foreach ($vendas as $venda) {
+            $custo_venda        = $venda->itensVenda()->sum('total_custo_atual');
+            $venda->lucro_venda = ($venda->valor_total - $custo_venda);
+            $venda->save();
+
+        }
+    }
+
+
     public function table(Table $table): Table
     {
         return $table
-            ->defaultSort('id','desc')
+            ->defaultSort('id', 'desc')
             ->query(Venda::query())
           //  ->defaultGroup('data_venda','year')
             ->columns([
@@ -83,7 +81,7 @@ class Lucratividade extends Page implements HasTable
                     ->alignCenter()
                     ->label('Lucro por Venda')
                     ->money('BRL')
-                    ->color('success')
+                    ->color('success'),
                    /* ->getStateUsing(function (Venda $record) {
                         $custoProdutos = $record->itensVenda()->sum('total_custo_atual');
                        return ($record->valor_total - $custoProdutos);
@@ -111,10 +109,10 @@ class Lucratividade extends Page implements HasTable
                                 $data['venda_ate'],
                                 fn ($query) => $query->whereDate('data_venda', '<=', $data['venda_ate'])
                             );
-                    })
+                    }),
                 ])
             ->bulkActions([
-                
+
                 ExportBulkAction::make(),
             ]);
     }

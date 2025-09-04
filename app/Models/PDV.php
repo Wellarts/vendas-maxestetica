@@ -18,7 +18,7 @@ class PDV extends Model
         'acres_desc',
         'sub_total',
         'valor_custo_atual',
-        'total_custo_atual'
+        'total_custo_atual',
     ];
 
     public function Produto()
@@ -26,7 +26,8 @@ class PDV extends Model
         return $this->belongsTo(Produto::class);
     }
 
-    public function VendaPDV() {
+    public function VendaPDV()
+    {
         return $this->belongsTo(VendaPDV::class);
     }
 }

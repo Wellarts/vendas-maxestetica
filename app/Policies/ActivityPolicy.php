@@ -4,7 +4,6 @@ namespace App\Policies;
 
 //use App\Models\Activity;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 use Spatie\Activitylog\Models\Activity;
 
 class ActivityPolicy

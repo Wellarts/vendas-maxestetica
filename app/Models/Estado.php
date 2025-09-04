@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
 class Estado extends Model
 {
     use HasFactory;
@@ -16,7 +15,7 @@ class Estado extends Model
 
     ];
 
-        
+
     public function cidade()
     {
 
@@ -24,16 +23,19 @@ class Estado extends Model
 
     }
 
-    
-    public function cliente() {
+
+    public function cliente()
+    {
         return $this->hasMany(Cliente::class);
     }
 
-    public function fornecedor() {
+    public function fornecedor()
+    {
         return $this->hasMany(Fornecedor::class);
     }
 
-    public function funcionario() {
+    public function funcionario()
+    {
         return $this->hasMany(Funcionario::class);
     }
 

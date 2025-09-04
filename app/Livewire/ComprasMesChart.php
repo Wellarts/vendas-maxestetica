@@ -11,7 +11,7 @@ class ComprasMesChart extends ChartWidget
 {
     protected static ?string $heading = 'Compras Mensal';
 
-    
+
 
     protected function getData(): array
     {
@@ -27,7 +27,7 @@ class ComprasMesChart extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Compras Mensal',
-                    'data' => $data->map(fn (TrendValue $value) => $value->aggregate),
+                    'data'  => $data->map(fn (TrendValue $value) => $value->aggregate),
                 ],
             ],
             'labels' => $data->map(fn (TrendValue $value) => $value->date),

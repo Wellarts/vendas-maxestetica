@@ -3,17 +3,14 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\VwSomaQuantidadeProdutoResource\Pages;
-use App\Filament\Resources\VwSomaQuantidadeProdutoResource\RelationManagers;
 use App\Models\VwSomaQuantidadeProduto;
 use Filament\Forms;
 use Filament\Forms\Form;
-use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class VwSomaQuantidadeProdutoResource extends Resource
 {
@@ -23,7 +20,7 @@ class VwSomaQuantidadeProdutoResource extends Resource
 
     protected static ?string $navigationLabel = 'Rentabilidade';
 
-    protected static ?string $navigationGroup = 'Consultas';    
+    protected static ?string $navigationGroup = 'Consultas';
 
     protected static ?int $navigationSort = 19;
 
@@ -57,7 +54,7 @@ class VwSomaQuantidadeProdutoResource extends Resource
                 Tables\Columns\TextColumn::make('tipo')
                     ->sortable()
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         '1' => 'success',
                         '2' => 'warning',
                     })
@@ -115,9 +112,9 @@ class VwSomaQuantidadeProdutoResource extends Resource
             ])
             ->filters([
                 Filter::make('Produto')
-                    ->query(fn(Builder $query): Builder => $query->where('tipo', 1)),
+                    ->query(fn (Builder $query): Builder => $query->where('tipo', 1)),
                 Filter::make('Serviço')
-                    ->query(fn(Builder $query): Builder => $query->where('tipo', 2)),
+                    ->query(fn (Builder $query): Builder => $query->where('tipo', 2)),
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),

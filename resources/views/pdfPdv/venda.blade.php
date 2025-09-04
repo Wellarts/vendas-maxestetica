@@ -235,7 +235,6 @@
             <th>Produto</th>
             <th>Valor Unit.</th>
             <th>Qtd</th>
-            <th>Desc/Acres</th>
             <th>Subtotal</th>
           </tr>
         </thead>
@@ -245,7 +244,6 @@
               <td>{{$item->Produto->nome ?? '-'}}</td>
               <td>R$ {{ number_format($item->valor_venda, 2, ',', '.') }}</td>
               <td>{{$item->qtd}}</td>
-              <td>R$ {{ number_format($item->acres_desc, 2, ',', '.') }}</td>
               <td>R$ {{ number_format($item->sub_total, 2, ',', '.') }}</td>
             </tr>
           @endforeach

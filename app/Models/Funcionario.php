@@ -7,13 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Activitylog\LogOptions;
 
-
 class Funcionario extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
-       
+
         'nome',
         'cpf_cnpj',
         'endereco',
@@ -21,7 +21,7 @@ class Funcionario extends Model
         'cidade_id',
         'telefone',
         'email',
-        
+
     ];
 
     public function Estado()

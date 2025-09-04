@@ -32,7 +32,7 @@ class CompraResource extends Resource
             ->schema([
                     Section::make()
                     ->columns([
-                        'xl' => 2,
+                        'xl'  => 2,
                         '2xl' => 2,
                     ])
                     ->schema([
@@ -48,7 +48,7 @@ class CompraResource extends Resource
                         Forms\Components\TextInput::make('outros_custos'),
                         Forms\Components\Textarea::make('obs')
                             ->label('Observações'),
-                        ])->columns(2)
+                        ])->columns(2),
             ]);
     }
 
@@ -90,16 +90,16 @@ class CompraResource extends Resource
     {
         return [
             ItensCompraRelationManager::class,
-            ContasPagarRelationManager::class
+            ContasPagarRelationManager::class,
         ];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCompras::route('/'),
+            'index'  => Pages\ListCompras::route('/'),
             'create' => Pages\CreateCompra::route('/create'),
-            'edit' => Pages\EditCompra::route('/{record}/edit'),
+            'edit'   => Pages\EditCompra::route('/{record}/edit'),
         ];
     }
 }

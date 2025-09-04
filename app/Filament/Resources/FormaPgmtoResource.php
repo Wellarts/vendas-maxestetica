@@ -3,15 +3,12 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\FormaPgmtoResource\Pages;
-use App\Filament\Resources\FormaPgmtoResource\RelationManagers;
 use App\Models\FormaPgmto;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Notifications\Notification;
 
 class FormaPgmtoResource extends Resource
@@ -60,14 +57,14 @@ class FormaPgmtoResource extends Resource
                     ->modalHeading('Editar forma de pagamento'),
                 Tables\Actions\DeleteAction::make()
                     ->before(function (\Filament\Tables\Actions\DeleteAction $action, FormaPgmto $record) {
-                        if ($record->venda()->exists() || $record->vendasPdv()->exists()) {                            
+                        if ($record->venda()->exists() || $record->vendasPdv()->exists()) {
                             Notification::make()
                                 ->title('Ação cancelada')
                                 ->body('Esta forma de pagamento não pode ser excluído porque está vinculado a uma ou mais vendas.')
                                 ->danger()
                                 ->send();
-                        $action->cancel();
-                          
+                            $action->cancel();
+
                         }
                     }),
             ])
@@ -77,11 +74,11 @@ class FormaPgmtoResource extends Resource
                 ]),
             ]);
     }
-    
+
     public static function getPages(): array
     {
         return [
             'index' => Pages\ManageFormaPgmtos::route('/'),
         ];
-    }    
+    }
 }

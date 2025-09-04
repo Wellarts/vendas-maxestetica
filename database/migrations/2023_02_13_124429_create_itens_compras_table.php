@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      *
@@ -17,9 +16,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('compra_id');
             $table->foreignId('produto_id');
-            $table->decimal('valor_compra',10,2);
+            $table->decimal('valor_compra', 10, 2);
             $table->string('qtd');
-            $table->decimal('sub_total',10,2);
+            $table->decimal('sub_total', 10, 2);
             $table->timestamps();
         });
     }

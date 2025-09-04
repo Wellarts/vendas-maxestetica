@@ -21,12 +21,14 @@ class Cidade extends Model
         return $this->belongsTo(Estado::class);
 
     }
-   
-    public function cliente() {
+
+    public function cliente()
+    {
         return $this->hasMany(Cliente::class);
     }
 
-    public function fornecedor() {
+    public function fornecedor()
+    {
         return $this->hasMany(Fornecedor::class);
     }
 }

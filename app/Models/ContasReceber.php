@@ -9,7 +9,8 @@ use Spatie\Activitylog\LogOptions;
 
 class ContasReceber extends Model
 {
-    use HasFactory, LogsActivity;
+    use HasFactory;
+    use LogsActivity;
 
     protected $fillable = [
         'cliente_id',
@@ -23,7 +24,7 @@ class ContasReceber extends Model
         'valor_total',
         'valor_parcela',
         'valor_recebido',
-        'obs'
+        'obs',
     ];
 
     public function venda()

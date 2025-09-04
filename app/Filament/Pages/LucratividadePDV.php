@@ -3,7 +3,6 @@
 namespace App\Filament\Pages;
 
 use App\Models\VendaPDV;
-use App\Models\PDV;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
@@ -47,11 +46,11 @@ class LucratividadePDV extends Page implements HasTable
     {
 
         $vendas = VendaPDV::all();
-       
+
         foreach ($vendas as $venda) {
-                $custo_venda = $venda->itensVenda()->sum('total_custo_atual');
-                $venda->lucro_venda = ($venda->valor_total_desconto - $custo_venda);
-                $venda->save();
+            $custo_venda        = $venda->itensVenda()->sum('total_custo_atual');
+            $venda->lucro_venda = ($venda->valor_total_desconto - $custo_venda);
+            $venda->save();
 
         }
     }
@@ -59,7 +58,7 @@ class LucratividadePDV extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->defaultSort('data_venda','desc')
+            ->defaultSort('data_venda', 'desc')
             ->query(VendaPDV::query())
           //  ->defaultGroup('data_venda','year')
             ->columns([
@@ -103,8 +102,9 @@ class LucratividadePDV extends Page implements HasTable
                     ->color('success')
                     ->getStateUsing(function (VendaPDV $record): float {
                         $custoProdutos = $record->itensVenda()->sum('total_custo_atual');
+
                         return ($record->valor_total_desconto - $custoProdutos);
-                    })
+                    }),
 
 
             ])
@@ -128,7 +128,7 @@ class LucratividadePDV extends Page implements HasTable
                                 $data['venda_ate'],
                                 fn ($query) => $query->whereDate('data_venda', '<=', $data['venda_ate'])
                             );
-                    })
+                    }),
             ]);
     }
 

@@ -15,7 +15,7 @@ class ManageFuncionarios extends ManageRecords
         return [
             Actions\CreateAction::make()
                 ->label('Novo')
-                ->modalHeading('Criar Funcionário')
+                ->modalHeading('Criar Funcionário'),
         ];
     }
 }
