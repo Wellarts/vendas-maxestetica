@@ -1,5 +1,6 @@
 <?php
 
+    
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,6 +68,13 @@ class VendaPDV extends Model
     public function pdv()
     {
         return $this->hasMany(PDV::class);
+    }
+
+
+    public function produtos()
+    {
+        return $this->belongsToMany(\App\Models\Produto::class, 'venda_produto', 'venda_id', 'produto_id')
+            ->withPivot('quantidade', 'preco');
     }
 
 }
