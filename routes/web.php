@@ -34,3 +34,6 @@ Route::get('/relatorio-vendas-pdf', [VendaPDVReportController::class, 'vendasPdf
 
 Route::get('/relatorio-venda-produtos', [VendaPDVReportController::class, 'vendasPorProdutoPdf'])->name('relatorio.venda.produtos');
 Route::get('/relatorio-estoque-contabil', [EstoqueContabil::class, 'exportarPdf'])->name('relatorio.estoque.contabil');
+
+use App\Http\Controllers\LucratividadePDVPdfController;
+Route::get('/relatorio-lucratividade-pdv', [LucratividadePDVPdfController::class, 'gerarRelatorio'])->name('relatorio.lucratividade.pdv');

@@ -42,25 +42,17 @@ class LucratividadePDV extends Page implements HasTable
     // }
 
 
-    public function mount()
-    {
-
-        $vendas = VendaPDV::all();
-
-        foreach ($vendas as $venda) {
-            $custo_venda        = $venda->itensVenda()->sum('total_custo_atual');
-            $venda->lucro_venda = ($venda->valor_total_desconto - $custo_venda);
-            $venda->save();
-
-        }
-    }
+    // Removido processamento desnecessário de lucro no mount()
 
     public function table(Table $table): Table
     {
+        // Otimiza a query para já trazer o sum do custo dos itens
         return $table
             ->defaultSort('data_venda', 'desc')
-            ->query(VendaPDV::query())
-          //  ->defaultGroup('data_venda','year')
+            ->query(
+                VendaPDV::query()->withSum('itensVenda as total_custo_produtos', 'total_custo_atual')
+            )
+            // ->defaultGroup('data_venda','year')
             ->columns([
                 TextColumn::make('id')
                     ->alignCenter()
@@ -73,7 +65,7 @@ class LucratividadePDV extends Page implements HasTable
                     ->date('d/m/Y')
                     ->sortable()
                     ->alignCenter(),
-                TextColumn::make('itens_venda_sum_total_custo_atual')->sum('itensVenda', 'total_custo_atual')
+                TextColumn::make('total_custo_produtos')
                     ->badge()
                     ->alignCenter()
                     ->label('Custo Produtos')
@@ -101,9 +93,8 @@ class LucratividadePDV extends Page implements HasTable
                     ->money('BRL')
                     ->color('success')
                     ->getStateUsing(function (VendaPDV $record): float {
-                        $custoProdutos = $record->itensVenda()->sum('total_custo_atual');
-
-                        return ($record->valor_total_desconto - $custoProdutos);
+                        // Usa o valor já carregado do withSum
+                        return ($record->valor_total_desconto - ($record->total_custo_produtos ?? 0));
                     }),
 
 
@@ -130,6 +121,17 @@ class LucratividadePDV extends Page implements HasTable
                             );
                     }),
             ]);
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            \Filament\Actions\Action::make('exportar_pdf')
+                ->label('Exportar PDF')
+                ->icon('heroicon-o-document-arrow-down')
+                ->url(route('relatorio.lucratividade.pdv'), true)
+                ->openUrlInNewTab(),
+        ];
     }
 
 

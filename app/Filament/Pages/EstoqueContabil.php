@@ -35,25 +35,26 @@ class EstoqueContabil extends Page implements HasForms, HasTable
 
     protected static ?int $navigationSort = 16;
 
-    public function mount()
-    {
-
-        $allEstoque = Produto::all();
-
-        foreach ($allEstoque as $all) {
-            $all->total_compra        = ($all->estoque * $all->valor_compra);
-            $all->total_venda         = ($all->estoque * $all->valor_venda);
-            $all->total_lucratividade = ($all->total_venda - $all->total_compra);
-            $all->save();
-        }
-    }
+    // Removido o mount para evitar processamento desnecessário a cada acesso da página
 
     public function exportarPdf(): Response
     {
-        $produtos = Produto::where('tipo', 1)->get();
-        $pdf = Pdf::loadView('relatorios.estoque-contabil-pdf', compact('produtos'))
-            ->setPaper('a4', 'landscape');
-        return $pdf->stream('estoque-contabil.pdf');
+    $produtos = Produto::where('tipo', 1)->orderBy('nome', 'asc')->get();
+    $totais = Produto::where('tipo', 1)
+        ->selectRaw('
+            SUM(estoque) as somaEstoque,
+            SUM(valor_compra) as somaValorCompra,
+            SUM(valor_venda) as somaValorVenda,
+            SUM(estoque * valor_compra) as somaTotalCompra,
+            SUM(estoque * valor_venda) as somaTotalVenda,
+            SUM((estoque * valor_venda) - (estoque * valor_compra)) as somaTotalLucratividade
+        ')
+        ->first();
+
+    $pdf = Pdf::loadView('relatorios.estoque-contabil-pdf', compact('produtos', 'totais'))
+        ->setPaper('a4', 'landscape');
+
+    return $pdf->stream('estoque-contabil.pdf');
     }
 
     protected function getTableQuery(): Builder
@@ -84,6 +85,7 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                     ->alignCenter()
                     ->money('BRL'),
                 TextColumn::make('total_compra')
+                    ->badge()
                     ->alignCenter()
                     ->getStateUsing(function (Produto $record): float {
                         return (($record->estoque * $record->valor_compra));
@@ -92,6 +94,7 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                     ->summarize(Sum::make()->label('Total')->money('BRL'))
                     ->color('danger'),
                 TextColumn::make('total_venda')
+                    ->badge()
                     ->alignCenter()
                     ->getStateUsing(function (Produto $record): float {
                         return ($record->estoque * $record->valor_venda);
@@ -100,6 +103,7 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                     ->summarize(Sum::make()->label('Total')->money('BRL'))
                     ->color('warning'),
                 TextColumn::make('total_lucratividade')
+                    ->badge()
                     ->alignCenter()
                     ->getStateUsing(function (Produto $record): float {
                         return ((($record->estoque * $record->valor_venda)) - (($record->estoque * $record->valor_compra)));

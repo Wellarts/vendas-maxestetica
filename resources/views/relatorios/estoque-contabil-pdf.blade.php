@@ -31,23 +31,7 @@
             </tr>
         </thead>
         <tbody>
-            @php
-                $somaEstoque = 0;
-                $somaValorCompra = 0;
-                $somaValorVenda = 0;
-                $somaTotalCompra = 0;
-                $somaTotalVenda = 0;
-                $somaTotalLucratividade = 0;
-            @endphp
             @foreach($produtos as $produto)
-                @php
-                    $somaEstoque += $produto->estoque;
-                    $somaValorCompra += $produto->valor_compra;
-                    $somaValorVenda += $produto->valor_venda;
-                    $somaTotalCompra += ($produto->estoque * $produto->valor_compra);
-                    $somaTotalVenda += ($produto->estoque * $produto->valor_venda);
-                    $somaTotalLucratividade += (($produto->estoque * $produto->valor_venda) - ($produto->estoque * $produto->valor_compra));
-                @endphp
             <tr>
                 <td>{{ $produto->nome }}</td>
                 <td>{{ $produto->codbar }}</td>
@@ -62,13 +46,13 @@
             @endforeach
             <tr style="font-weight:bold;background:#f9f9f9;">
                 <td colspan="2">Totais</td>
-                <td>{{ $somaEstoque }}</td>
-                <td>R$ {{ number_format($somaValorCompra, 2, ',', '.') }}</td>
-                <td>R$ {{ number_format($somaValorVenda, 2, ',', '.') }}</td>
+                <td>{{ $totais->somaEstoque ?? 0 }}</td>
+                <td>R$ {{ number_format($totais->somaValorCompra ?? 0, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($totais->somaValorVenda ?? 0, 2, ',', '.') }}</td>
                 <td>-</td>
-                <td>R$ {{ number_format($somaTotalCompra, 2, ',', '.') }}</td>
-                <td>R$ {{ number_format($somaTotalVenda, 2, ',', '.') }}</td>
-                <td>R$ {{ number_format($somaTotalLucratividade, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($totais->somaTotalCompra ?? 0, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($totais->somaTotalVenda ?? 0, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($totais->somaTotalLucratividade ?? 0, 2, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
