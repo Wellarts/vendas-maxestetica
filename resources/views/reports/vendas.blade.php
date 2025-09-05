@@ -8,7 +8,7 @@
                 <th>Venda</th>
                 <th>Data</th>
                 <th>Cliente</th>
-                <th>Funcionário</th>
+                <th>Vendedor</th>
                 <th>Produto</th>
                 <th>Qtd</th>
                 <th>Preço Unitário</th>

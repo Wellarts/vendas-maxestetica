@@ -12,6 +12,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Illuminate\Database\Eloquent\Builder;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
+use Filament\Actions\Action;
 
 class EstoqueContabil extends Page implements HasForms, HasTable
 {
@@ -43,6 +46,14 @@ class EstoqueContabil extends Page implements HasForms, HasTable
             $all->total_lucratividade = ($all->total_venda - $all->total_compra);
             $all->save();
         }
+    }
+
+    public function exportarPdf(): Response
+    {
+        $produtos = Produto::where('tipo', 1)->get();
+        $pdf = Pdf::loadView('relatorios.estoque-contabil-pdf', compact('produtos'))
+            ->setPaper('a4', 'landscape');
+        return $pdf->stream('estoque-contabil.pdf');
     }
 
     protected function getTableQuery(): Builder
@@ -97,6 +108,18 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                     ->color('success')
                     ->money('BRL'),
 
+        ];
+    }
+
+    public function getHeaderActions(): array
+    {
+        return [
+            Action::make('Exportar PDF')
+                ->label('Exportar PDF')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->url(route('relatorio.estoque.contabil'))
+                ->openUrlInNewTab()
+                ->color('success'),
         ];
     }
 }

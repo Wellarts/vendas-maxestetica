@@ -1,4 +1,7 @@
+
 <?php
+use App\Filament\Pages\EstoqueContabil;
+
 
 use App\Http\Controllers\ComprovantesController;
 use App\Http\Controllers\ControllerNovaParcela;
@@ -30,3 +33,4 @@ Route::get('novaParcelaPagar/{id}', [ControllerNovaParcelaPagar::class, 'novaPar
 Route::get('/relatorio-vendas-pdf', [VendaPDVReportController::class, 'vendasPdf'])->name('relatorio.vendas.pdf');
 
 Route::get('/relatorio-venda-produtos', [VendaPDVReportController::class, 'vendasPorProdutoPdf'])->name('relatorio.venda.produtos');
+Route::get('/relatorio-estoque-contabil', [EstoqueContabil::class, 'exportarPdf'])->name('relatorio.estoque.contabil');
