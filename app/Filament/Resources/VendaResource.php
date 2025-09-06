@@ -33,6 +33,8 @@ class VendaResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+        protected static bool $shouldRegisterNavigation = false; // Definido como false para ocultar do menu
+
     public static function form(Form $form): Form
     {
         return $form

@@ -25,6 +25,8 @@ class Lucratividade extends Page implements HasTable
 
     protected static ?string $navigationGroup = 'Consultas';
 
+    protected static bool $shouldRegisterNavigation = false; // Definido como false para ocultar do menu
+
     protected static ?int $navigationSort = 17;
 
 

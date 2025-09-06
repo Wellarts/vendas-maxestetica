@@ -61,6 +61,13 @@ class LucratividadePDV extends Page implements HasTable
                 TextColumn::make('cliente.nome')
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('funcionario.nome')
+                    ->label('Vendedor')
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('formaPgmto.nome')
+                    ->label('Forma de Pagamento')
+                    ->alignCenter(),
                 TextColumn::make('data_venda')
                     ->date('d/m/Y')
                     ->sortable()
@@ -100,9 +107,22 @@ class LucratividadePDV extends Page implements HasTable
 
             ])
             ->filters([
-                SelectFilter::make('cliente')->relationship('cliente', 'nome'),
+                // Filtro por cliente
+                SelectFilter::make('cliente')
+                    ->relationship('cliente', 'nome')
+                    ->label('Cliente'),
 
-                Filter::make('data_vencimento')
+                // Filtro por funcionário
+                SelectFilter::make('funcionario')
+                    ->relationship('funcionario', 'nome')
+                    ->label('Funcionário'),
+                // Filtro por forma de pagamento
+                SelectFilter::make('forma_pgmto_id')
+                    ->relationship('formaPgmto', 'nome')
+                    ->label('Forma de Pagamento'),
+
+                // Filtro por data
+                Filter::make('data_venda')
                     ->form([
                         DatePicker::make('venda_de')
                             ->label('Data da Venda de:'),
@@ -129,8 +149,39 @@ class LucratividadePDV extends Page implements HasTable
             \Filament\Actions\Action::make('exportar_pdf')
                 ->label('Exportar PDF')
                 ->icon('heroicon-o-document-arrow-down')
-                ->url(route('relatorio.lucratividade.pdv'), true)
-                ->openUrlInNewTab(),
+                ->form([
+                    \Filament\Forms\Components\Select::make('cliente_id')
+                        ->label('Cliente')
+                        ->options(\App\Models\Cliente::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todos'),
+                    \Filament\Forms\Components\Select::make('funcionario_id')
+                        ->label('Funcionário')
+                        ->options(\App\Models\Funcionario::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todos'),
+                    \Filament\Forms\Components\Select::make('forma_pgmto_id')
+                        ->label('Forma de Pagamento')
+                        ->options(\App\Models\FormaPgmto::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todas'),
+                    \Filament\Forms\Components\DatePicker::make('data_de')
+                        ->label('Data de'),
+                    \Filament\Forms\Components\DatePicker::make('data_ate')
+                        ->label('Data até'),
+                ])
+                ->requiresConfirmation()
+                ->action(function(array $data, $livewire) {
+                    $params = [];
+                    if(!empty($data['cliente_id'])) $params['cliente_id'] = $data['cliente_id'];
+                    if(!empty($data['funcionario_id'])) $params['funcionario_id'] = $data['funcionario_id'];
+                    if(!empty($data['forma_pgmto_id'])) $params['forma_pgmto_id'] = $data['forma_pgmto_id'];
+                    if(!empty($data['data_de'])) $params['data_de'] = $data['data_de'];
+                    if(!empty($data['data_ate'])) $params['data_ate'] = $data['data_ate'];
+                    $queryString = http_build_query($params);
+                    $url = route('relatorio.lucratividade.pdv') . ($queryString ? ('?' . $queryString) : '');
+                    $livewire->js("window.open('{$url}', '_blank')");
+                })
         ];
     }
 

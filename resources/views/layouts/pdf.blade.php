@@ -164,10 +164,6 @@
         </header>
         @yield('content')
         @yield('summary')
-        <div class="signature">
-            <hr>
-            <p>Assinatura do Cliente</p>
-        </div>
         <footer class="footer">
             Documento gerado em {{ date('d/m/Y H:i') }}
         </footer>

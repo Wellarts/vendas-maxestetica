@@ -2,77 +2,89 @@
 
 @section('content')
     <h2>Relatório de Lucratividade PDV</h2>
-    <table width="100%" border="1" cellspacing="0" cellpadding="5">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Cliente</th>
-                <th>Data</th>
-                <th>Funcionário</th>
-                <th>Valor Total</th>
-                <th>Desconto Valor</th>
-                <th>% Desconto</th>
-                <th>Valor Total</th>
-                <th>Valor Total com Desconto</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($vendas as $venda)
+    <style>
+        table.reduzida th, table.reduzida td {
+            padding: 2px 4px;
+            font-size: 0.95em;
+        }
+        fieldset.venda {
+            border: 1px solid #bbb;
+            margin-bottom: 10px;
+            padding: 6px 10px 8px 10px;
+        }
+        legend.venda {
+            font-size: 1em;
+            font-weight: bold;
+            padding: 0 8px;
+        }
+    </style>
+    @foreach($vendas as $venda)
+        <fieldset class="venda">
+            <legend class="venda">Venda #{{ $venda->id }} - {{ $venda->cliente->nome ?? '-' }}</legend>
+            <table width="100%" border="1" cellspacing="0" cellpadding="0" class="reduzida">
                 <tr>
-                    <td>{{ $venda->id }}</td>
+                    <th style="width:16%">Cliente</th>
+                    <th style="width:10%">Data</th>
+                    <th style="width:16%">Vendedor</th>
+                    <th style="width:14%">Forma Pgto</th>
+                    <th style="width:10%">Valor Total</th>
+                    <th style="width:10%">Asc/Desc Valor</th>
+                    <th style="width:8%">Asc/Desc % </th>
+                    <th style="width:8%">Total</th>
+                    <th style="width:12%">Total c/ Desc.</th>
+                </tr>
+                <tr>
                     <td>{{ $venda->cliente->nome ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
                     <td>{{ $venda->funcionario->nome ?? '-' }}</td>
+                    <td>{{ $venda->formaPgmto->nome ?? '-' }}</td>
                     <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
                     <td>R$ {{ number_format($venda->valor_acres_desc, 2, ',', '.') }}</td>
                     <td>{{ $venda->percent_acres_desc ? number_format($venda->percent_acres_desc, 2, ',', '.') . '%' : '-' }}</td>
                     <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
                     <td>R$ {{ number_format($venda->valor_total_desconto, 2, ',', '.') }}</td>
                 </tr>
-                <tr>
-                    <td colspan="9">
-                        <b>Produtos da Venda:</b>
-                        <table width="100%" border="1" cellspacing="0" cellpadding="3" style="margin-top: 5px;">
-                            <thead>
-                                <tr>
-                                    <th>Produto</th>
-                                    <th>Qtd</th>
-                                    <th>Preço Unitário</th>
-                                    <th>Subtotal</th>
-                                    <th>Custo Atual</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($venda->itensVenda as $item)
-                                    <tr>
-                                        <td>{{ $item->produto->nome ?? '-' }}</td>
-                                        <td>{{ $item->qtd }}</td>
-                                        <td>R$ {{ number_format($item->valor_venda, 2, ',', '.') }}</td>
-                                        <td>R$ {{ number_format($item->sub_total, 2, ',', '.') }}</td>
-                                        <td>R$ {{ number_format($item->total_custo_atual, 2, ',', '.') }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </table>
+            <div style="margin-top:2px;">
+                <b>Produtos da Venda:</b>
+                <table width="100%" border="1" cellspacing="0" cellpadding="0" class="reduzida">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Qtd</th>
+                            <th>Preço Unitário</th>
+                            <th>Subtotal</th>
+                           
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($venda->itensVenda as $item)
+                            <tr>
+                                <td>{{ $item->produto->nome ?? '-' }}</td>
+                                <td style="text-align: center;">{{ $item->qtd }}</td>
+                                <td>R$ {{ number_format($item->valor_venda, 2, ',', '.') }}</td>
+                                <td>R$ {{ number_format($item->sub_total, 2, ',', '.') }}</td>                                
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </fieldset>
+    @endforeach
     <br>
     <h4>Somatórios</h4>
-    <table width="100%" border="1" cellspacing="0" cellpadding="5">
-        <tr>
+    <table width="100%" border="1" cellspacing="0" cellpadding="2" class="reduzida" style="font-size:1.1em;">
+        <tr style="background-color:#f0f0f0;">
             <th>Custo Produtos</th>
             <th>Valor Total</th>
             <th>Valor Total Desconto</th>
             <th>Lucratividade</th>
         </tr>
         <tr>
-            <td>R$ {{ number_format($somaCustoProdutos, 2, ',', '.') }}</td>
-            <td>R$ {{ number_format($somaValorTotal, 2, ',', '.') }}</td>
-            <td>R$ {{ number_format($somaValorTotalDesconto, 2, ',', '.') }}</td>
-            <td>R$ {{ number_format($somaLucro, 2, ',', '.') }}</td>
+            <td style="font-weight:bold; font-size:1.2em;">R$ {{ number_format($somaCustoProdutos, 2, ',', '.') }}</td>
+            <td style="font-weight:bold; font-size:1.2em;">R$ {{ number_format($somaValorTotal, 2, ',', '.') }}</td>
+            <td style="font-weight:bold; font-size:1.2em;">R$ {{ number_format($somaValorTotalDesconto, 2, ',', '.') }}</td>
+            <td style="font-weight:bold; font-size:1.2em;">R$ {{ number_format($somaLucro, 2, ',', '.') }}</td>
         </tr>
     </table>
 @endsection
