@@ -1,7 +1,7 @@
 @extends('layouts.pdf')
 
 @section('content')
-    <h2>Relatório de Vendas por Cliente</h2>
+    <h2>Relatório Valor Vendido por Cliente</h2>
   
     <table width="100%" border="1" cellspacing="0" cellpadding="3" style="font-size:1em;">
         <thead>
@@ -15,7 +15,7 @@
             @foreach($registros as $registro)
                 <tr>
                     <td>{{ $registro->cliente_nome }}</td>
-                    <td>R$ {{ number_format($registro->valor_total, 2, ',', '.') }}</td>
+                    <td>R$ {{ number_format($registro->valor_total_desconto, 2, ',', '.') }}</td>
                     <td>{{ $registro->ultima_compra ?? 'Nunca comprou' }}</td>
                 </tr>
             @endforeach

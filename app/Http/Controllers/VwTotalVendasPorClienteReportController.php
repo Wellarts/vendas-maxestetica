@@ -16,8 +16,8 @@ class VwTotalVendasPorClienteReportController extends Controller
             $query->where('cliente_nome', 'like', '%' . $request->cliente . '%');
         }
 
-        $registros = $query->orderByDesc('valor_total')->get();
-        $somaTotal = $registros->sum('valor_total');
+        $registros = $query->orderByDesc('valor_total_desconto')->get();
+        $somaTotal = $registros->sum('valor_total_desconto');
 
 
 

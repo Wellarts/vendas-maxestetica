@@ -147,8 +147,9 @@ class LucratividadePDV extends Page implements HasTable
     {
         return [
             \Filament\Actions\Action::make('exportar_pdf')
-                ->label('Exportar PDF')
-                ->icon('heroicon-o-document-arrow-down')
+                ->label('Relatório de Vendas - PDF')
+                 ->icon('heroicon-o-arrow-down-tray')
+                ->color('success')
                 ->form([
                     \Filament\Forms\Components\Select::make('cliente_id')
                         ->label('Cliente')

@@ -68,10 +68,10 @@ class VwTotalVendasPorClienteResource extends Resource
             ])
         ->headerActions([
          Tables\Actions\Action::make('gerar_pdf')
-            ->label('Gerar PDF')
-            ->icon('heroicon-o-document-text')
+            ->label('Relatório Valor Vendido por Cliente - PDF')
+            ->icon('heroicon-o-arrow-down-tray')
             ->url(route('relatorio.vendas.por.cliente'), true)
-            ->color('primary'),
+            ->color('success'),
         ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

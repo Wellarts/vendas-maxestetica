@@ -1,15 +1,15 @@
 <?php
 use App\Http\Controllers\VwTotalVendasPorClienteReportController;
-Route::get('/relatorio-vendas-por-cliente', [VwTotalVendasPorClienteReportController::class, 'gerarRelatorio'])->name('relatorio.vendas.por.cliente');
+use App\Http\Controllers\ContasPagarReportController;
 use App\Filament\Pages\EstoqueContabil;
-
-
 use App\Http\Controllers\ComprovantesController;
 use App\Http\Controllers\ControllerNovaParcela;
 use App\Http\Controllers\ControllerNovaParcelaPagar;
 use App\Http\Controllers\VendaPDVReportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LucratividadePDVPdfController;
+use App\Http\Controllers\ContasReceberReportController;
+use App\Http\Controllers\FluxoCaixaReportController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,3 +35,7 @@ Route::get('/relatorio-vendas-pdf', [VendaPDVReportController::class, 'vendasPdf
 Route::get('/relatorio-venda-produtos', [VendaPDVReportController::class, 'vendasPorProdutoPdf'])->name('relatorio.venda.produtos');
 Route::get('/relatorio-estoque-contabil', [EstoqueContabil::class, 'exportarPdf'])->name('relatorio.estoque.contabil');
 Route::get('/relatorio-lucratividade-pdv', [LucratividadePDVPdfController::class, 'gerarRelatorio'])->name('relatorio.lucratividade.pdv');
+Route::get('/relatorio-vendas-por-cliente', [VwTotalVendasPorClienteReportController::class, 'gerarRelatorio'])->name('relatorio.vendas.por.cliente');
+Route::get('/relatorio-contas-pagar-pdf', [ContasPagarReportController::class, 'pdf'])->name('relatorio.contas.pagar.pdf'); 
+Route::get('/relatorio-contas-receber-pdf', [ContasReceberReportController::class, 'pdf'])->name('relatorio.contas.receber.pdf');
+Route::get('/relatorio-fluxo-caixa-pdf', [FluxoCaixaReportController::class, 'pdf'])->name('relatorio.fluxo.caixa.pdf');

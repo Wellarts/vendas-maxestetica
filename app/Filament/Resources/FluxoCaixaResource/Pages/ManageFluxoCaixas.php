@@ -17,6 +17,27 @@ class ManageFluxoCaixas extends ManageRecords
             Actions\CreateAction::make()
                 ->label('Lançamento')
                 ->modalHeading('Lançamento no Caixa'),
+            Actions\Action::make('exportar_pdf')
+                ->label('Relatório Fluxo de Caixa')
+                ->icon('heroicon-o-printer')
+                ->color('success')
+                ->form([
+                    \Filament\Forms\Components\DatePicker::make('data_de')->label('Data de'),
+                    \Filament\Forms\Components\DatePicker::make('data_ate')->label('Data até'),
+                    \Filament\Forms\Components\Select::make('tipo')
+                        ->label('Tipo')
+                        ->options([
+                            '' => 'Todos',
+                            'CREDITO' => 'Crédito',
+                            'DEBITO' => 'Débito',
+                        ]),
+                   
+                ])
+                ->action(function (array $data, $livewire) {
+                    $query = http_build_query(array_filter($data));
+                    $url = route('relatorio.fluxo.caixa.pdf') . '?' . $query;
+                     $livewire->js("window.open('{$url}', '_blank')");
+                }),
         ];
     }
 

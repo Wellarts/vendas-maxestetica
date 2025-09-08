@@ -13,7 +13,7 @@ class VwTotalVendasPorCliente extends Model
     protected $fillable = [
         'id',
         'cliente_nome',
-        'valor_total',
+        'valor_total_desconto',
         'ultima_venda',
     ];
 
