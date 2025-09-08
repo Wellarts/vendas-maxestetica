@@ -33,7 +33,7 @@ class VendaResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-        protected static bool $shouldRegisterNavigation = false; // Definido como false para ocultar do menu
+    protected static bool $shouldRegisterNavigation = false; // Definido como false para ocultar do menu
 
     public static function form(Form $form): Form
     {
@@ -57,69 +57,69 @@ class VendaResource extends Resource
                                     'xl'  => 4,
                                     '2xl' => 4,
                                 ])
-                                ->schema([
-                                    Forms\Components\TextInput::make('nome')
-                                        ->columnSpan([
-                                            'xl'  => 2,
-                                            '2xl' => 2,
-                                        ])
-                                        ->required()
-                                        ->maxLength(255),
-                                    Forms\Components\TextInput::make('cpf_cnpj')
-                                        ->label('CPF/CNPJ')
-                                        ->mask(RawJs::make(<<<'JS'
+                                    ->schema([
+                                        Forms\Components\TextInput::make('nome')
+                                            ->columnSpan([
+                                                'xl'  => 2,
+                                                '2xl' => 2,
+                                            ])
+                                            ->required()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('cpf_cnpj')
+                                            ->label('CPF/CNPJ')
+                                            ->mask(RawJs::make(<<<'JS'
                                             $input.length > 14 ? '99.999.999/9999-99' : '999.999.999-99'
                                         JS))
-                                        ->rule('cpf_ou_cnpj'),
-                                    Forms\Components\TextInput::make('telefone')
-                                        ->minLength(11)
-                                        ->maxLength(11)
-                                        ->mask('(99)99999-9999')
-                                        ->tel()
-                                        ->maxLength(255),
-                                    Forms\Components\Textarea::make('endereco')
-                                        ->columnSpan([
-                                            'xl'  => 2,
-                                            '2xl' => 2,
-                                        ])
-                                        ->label('Endereço'),
-                                    Forms\Components\Select::make('estado_id')
-                                        ->label('Estado')
-                                        ->native(false)
-                                        ->searchable()
-                                        ->required()
-                                        ->options(Estado::all()->pluck('nome', 'id')->toArray())
-                                        ->reactive(),
-                                    Forms\Components\Select::make('cidade_id')
-                                        ->label('Cidade')
-                                        ->native(false)
-                                        ->searchable()
-                                        ->required()
-                                        ->options(function (callable $get) {
-                                            $estado = Estado::find($get('estado_id'));
-                                            if (!$estado) {
-                                                return Estado::all()->pluck('nome', 'id');
-                                            }
+                                            ->rule('cpf_ou_cnpj'),
+                                        Forms\Components\TextInput::make('telefone')
+                                            ->minLength(11)
+                                            ->maxLength(11)
+                                            ->mask('(99)99999-9999')
+                                            ->tel()
+                                            ->maxLength(255),
+                                        Forms\Components\Textarea::make('endereco')
+                                            ->columnSpan([
+                                                'xl'  => 2,
+                                                '2xl' => 2,
+                                            ])
+                                            ->label('Endereço'),
+                                        Forms\Components\Select::make('estado_id')
+                                            ->label('Estado')
+                                            ->native(false)
+                                            ->searchable()
+                                            ->required()
+                                            ->options(Estado::all()->pluck('nome', 'id')->toArray())
+                                            ->reactive(),
+                                        Forms\Components\Select::make('cidade_id')
+                                            ->label('Cidade')
+                                            ->native(false)
+                                            ->searchable()
+                                            ->required()
+                                            ->options(function (callable $get) {
+                                                $estado = Estado::find($get('estado_id'));
+                                                if (!$estado) {
+                                                    return Estado::all()->pluck('nome', 'id');
+                                                }
 
-                                            return $estado->cidade->pluck('nome', 'id');
-                                        })
-                                        ->reactive(),
-                                    Forms\Components\TextInput::make('email')
-                                        ->columnSpan([
-                                            'xl'  => 2,
-                                            '2xl' => 2,
-                                        ])
-                                        ->email()
-                                        ->maxLength(255),
-                                    Forms\Components\TextInput::make('numero_conselho')
-                                        ->placeholder('Ex: CRM-12345')
-                                        ->label('Número do Conselho'),
-                                ]),
+                                                return $estado->cidade->pluck('nome', 'id');
+                                            })
+                                            ->reactive(),
+                                        Forms\Components\TextInput::make('email')
+                                            ->columnSpan([
+                                                'xl'  => 2,
+                                                '2xl' => 2,
+                                            ])
+                                            ->email()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('numero_conselho')
+                                            ->placeholder('Ex: CRM-12345')
+                                            ->label('Número do Conselho'),
+                                    ]),
                             ]),
-            Forms\Components\Select::make('funcionario_id')
-                ->default(1)
-                ->label('Vendedor(a)')
-                ->native(false)
+                        Forms\Components\Select::make('funcionario_id')
+                            ->default(1)
+                            ->label('Vendedor(a)')
+                            ->native(false)
                             ->searchable()
                             ->options(Funcionario::all()->pluck('nome', 'id')->toArray())
                             ->required(),
@@ -135,7 +135,7 @@ class VendaResource extends Resource
                             ->default(now())
                             ->required(),
                         Section::make('Descontos e Acréscimos')
-                            ->visible(fn ($context) => $context == 'edit')
+                            ->visible(fn($context) => $context == 'edit')
                             ->columns([
                                 'xl'  => 2,
                                 '2xl' => 2,
@@ -157,7 +157,7 @@ class VendaResource extends Resource
                                     }),
                                 Forms\Components\TextInput::make('percent_acres_desc')
                                     ->label('Percentual')
-                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
+                                    ->visible(fn(callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
                                     ->numeric()
                                     ->hint('Para desconto use um valor negativo Ex. -10')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
@@ -181,7 +181,7 @@ class VendaResource extends Resource
                                     ->label('Valor Desconto/Acréscimo')
                                     ->hint('Para desconto use um valor negativo Ex. -10')
                                     // ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Valor')
-                                    ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
+                                    ->hidden(fn(callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                     ->numeric()
                                     ->prefix('R$')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
@@ -202,7 +202,7 @@ class VendaResource extends Resource
                                     }),
                             ]),
                         Section::make('Valores Totais')
-                            ->visible(fn ($context) => $context == 'edit')
+                            ->visible(fn($context) => $context == 'edit')
                             ->columns([
                                 'xl'  => 2,
                                 '2xl' => 2,
@@ -218,7 +218,7 @@ class VendaResource extends Resource
                                     ->required(),
                                 Forms\Components\TextInput::make('valor_total_desconto')
                                     ->label('Valor Total com Desconto/Acréscimo')
-                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') != '')
+                                    ->visible(fn(callable $get) => $get('tipo_acres_desc') != '')
                                     ->numeric()
                                     ->prefix('R$')
                                     ->minValue(0)
@@ -231,21 +231,21 @@ class VendaResource extends Resource
                                 Action::make('recarregar_valores')
                                     ->label('Recarregar Valores')
                                     // ->icon('heroicon-o-refresh')
-                                        ->action(function ($livewire) {
-                                            $livewire->form->fill([
-                                                'cliente_id'           => $livewire->record->cliente_id,
-                                                'data_venda'           => $livewire->record->data_venda,
-                                                'funcionario_id'       => $livewire->record->funcionario_id,
-                                                'forma_pgmto_id'       => $livewire->record->forma_pgmto_id,
-                                                'valor_total'          => $livewire->record->valor_total,
-                                                'valor_total_desconto' => $livewire->record->valor_total_desconto,
-                                            ]);
-                                            Notification::make()
-                                                ->title('Valores recarregados')
-                                                ->success()
-                                                ->duration(3000)
-                                                ->send();
-                                        }),
+                                    ->action(function ($livewire) {
+                                        $livewire->form->fill([
+                                            'cliente_id'           => $livewire->record->cliente_id,
+                                            'data_venda'           => $livewire->record->data_venda,
+                                            'funcionario_id'       => $livewire->record->funcionario_id,
+                                            'forma_pgmto_id'       => $livewire->record->forma_pgmto_id,
+                                            'valor_total'          => $livewire->record->valor_total,
+                                            'valor_total_desconto' => $livewire->record->valor_total_desconto,
+                                        ]);
+                                        Notification::make()
+                                            ->title('Valores recarregados')
+                                            ->success()
+                                            ->duration(3000)
+                                            ->send();
+                                    }),
                             ])
                             ->footerActionsAlignment(Alignment::End),
                         Forms\Components\Textarea::make('obs')
@@ -289,12 +289,12 @@ class VendaResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('Imprimir')
-                ->url(fn (Venda $record): string => route('comprovanteNormal', $record))
-                ->openUrlInNewTab(),
+                    ->url(fn(Venda $record): string => route('comprovanteNormal', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                  //  Tables\Actions\DeleteBulkAction::make(),
+                    //  Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }
@@ -315,7 +315,4 @@ class VendaResource extends Resource
             'edit'   => Pages\EditVenda::route('/{record}/edit'),
         ];
     }
-
-
-
 }

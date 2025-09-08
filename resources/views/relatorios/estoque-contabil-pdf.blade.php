@@ -14,7 +14,7 @@
         tbody tr:nth-child(even) { background: #f7f7f7; }
         tbody tr:nth-child(odd) { background: #fff; }
     </style>
-    <h2>Relatório de Estoque Contábil</h2>
+    <h2>Relatório de Estoque Financeiro</h2>
     <p>Data de emissão: {{ Carbon::now()->format('d/m/Y H:i') }}</p>
     <table>
         <thead>

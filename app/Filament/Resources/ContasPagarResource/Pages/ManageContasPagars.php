@@ -42,13 +42,16 @@ class ManageContasPagars extends ManageRecords
                             contasPagar::create($parcelas);
                         }
                     } else {
-                        $addFluxoCaixa = [
-                            'valor' => ($record->valor_total * -1),
-                            'tipo'  => 'DEBITO',
-                            'obs'   => 'Pagamento da conta: ' . $record->fornecedor->nome . '',
-                        ];
+                        if (($data['status'] == 1)) {
+                            $addFluxoCaixa = [
+                                'id_lancamento' => $record->id,
+                                'valor' => ($record->valor_total * -1),
+                                'tipo'  => 'DEBITO',
+                                'obs'   => 'Pagamento da conta: ' . $record->fornecedor->nome . '',
+                            ];
 
-                        FluxoCaixa::create($addFluxoCaixa);
+                            FluxoCaixa::create($addFluxoCaixa);
+                        }
                     }
 
 

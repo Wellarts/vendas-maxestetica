@@ -66,6 +66,13 @@ class VwTotalVendasPorClienteResource extends Resource
                 // Tables\Actions\EditAction::make(),
                 // Tables\Actions\DeleteAction::make(),
             ])
+        ->headerActions([
+         Tables\Actions\Action::make('gerar_pdf')
+            ->label('Gerar PDF')
+            ->icon('heroicon-o-document-text')
+            ->url(route('relatorio.vendas.por.cliente'), true)
+            ->color('primary'),
+        ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),

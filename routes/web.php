@@ -1,5 +1,6 @@
-
 <?php
+use App\Http\Controllers\VwTotalVendasPorClienteReportController;
+Route::get('/relatorio-vendas-por-cliente', [VwTotalVendasPorClienteReportController::class, 'gerarRelatorio'])->name('relatorio.vendas.por.cliente');
 use App\Filament\Pages\EstoqueContabil;
 
 
@@ -8,6 +9,7 @@ use App\Http\Controllers\ControllerNovaParcela;
 use App\Http\Controllers\ControllerNovaParcelaPagar;
 use App\Http\Controllers\VendaPDVReportController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LucratividadePDVPdfController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,11 +31,7 @@ Route::get('pdf/{id}', [ComprovantesController::class, 'geraPdf'])->name('compro
 Route::get('pdfPdv/{id}', [ComprovantesController::class, 'geraPdfPDV'])->name('comprovantePDV');
 Route::get('novaParcela/{id}', [ControllerNovaParcela::class, 'novaParcela'])->name('novaParcela');
 Route::get('novaParcelaPagar/{id}', [ControllerNovaParcelaPagar::class, 'novaParcelaPagar'])->name('novaParcelaPagar');
-
 Route::get('/relatorio-vendas-pdf', [VendaPDVReportController::class, 'vendasPdf'])->name('relatorio.vendas.pdf');
-
 Route::get('/relatorio-venda-produtos', [VendaPDVReportController::class, 'vendasPorProdutoPdf'])->name('relatorio.venda.produtos');
 Route::get('/relatorio-estoque-contabil', [EstoqueContabil::class, 'exportarPdf'])->name('relatorio.estoque.contabil');
-
-use App\Http\Controllers\LucratividadePDVPdfController;
 Route::get('/relatorio-lucratividade-pdv', [LucratividadePDVPdfController::class, 'gerarRelatorio'])->name('relatorio.lucratividade.pdv');

@@ -14,6 +14,7 @@
         "flowframe/laravel-trend": "^0.1.5",
         "guzzlehttp/guzzle": "^7.2",
         "hugomyb/filament-error-mailer": "v3.2.0.3",
+        "jpgraph/jpgraph": "^4.0",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",

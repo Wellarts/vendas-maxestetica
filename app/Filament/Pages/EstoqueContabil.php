@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Response;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\DatePicker;
+
 
 class EstoqueContabil extends Page implements HasForms, HasTable
 {
@@ -119,11 +122,45 @@ class EstoqueContabil extends Page implements HasForms, HasTable
     {
         return [
             Action::make('Exportar PDF')
-                ->label('Exportar PDF')
+                ->label('Estoque Financeiro - PDF')
                 ->icon('heroicon-o-arrow-down-tray')
                 ->url(route('relatorio.estoque.contabil'))
                 ->openUrlInNewTab()
                 ->color('success'),
+            Action::make('relatorio_venda_produtos')
+               ->label('Relatório de Vendas por Produto')
+                ->icon('heroicon-o-arrow-down-tray')
+               ->color('success')
+               ->form([ 
+             Select::make('produto_id')
+                 ->label('Produto')
+                 ->options(\App\Models\Produto::where('tipo', 1)->pluck('nome', 'id'))
+                 ->searchable()
+                 ->preload()
+                 ->required(false),
+                    DatePicker::make('data_inicial')
+                          ->label('Data Inicial')
+                          ->required(false),
+                    DatePicker::make('data_final')
+                          ->label('Data Final')
+                          ->required(false),
+               ])
+                ->action(function(array $data, $livewire) {
+                    $produtoId = $data['produto_id'];
+                    $dataInicial = $data['data_inicial'];
+                    $dataFinal = $data['data_final'];
+
+                    $params = [
+                        'produto_id' => $produtoId,
+                        'data_inicial' => $dataInicial,
+                        'data_final' => $dataFinal,
+                    ];
+
+                    $queryString = http_build_query($params);
+                    $url = route('relatorio.venda.produtos') . ($queryString ? ('?' . $queryString) : '');
+                    $livewire->js("window.open('{$url}', '_blank')");
+                })
+            
         ];
     }
 }

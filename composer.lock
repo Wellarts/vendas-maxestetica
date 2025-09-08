@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ba044b1c1353b807f0ef6f0233eccfa",
+    "content-hash": "0b59b9b5db6e311c2d86f1a4bebd732b",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2654,6 +2654,51 @@
                 }
             ],
             "time": "2025-01-08T11:17:08+00:00"
+        },
+        {
+            "name": "jpgraph/jpgraph",
+            "version": "4.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/ztec/JpGraph.git",
+                "reference": "e82db7da6a546d3926c24c9a346226da7aa49094"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ztec/JpGraph/zipball/e82db7da6a546d3926c24c9a346226da7aa49094",
+                "reference": "e82db7da6a546d3926c24c9a346226da7aa49094",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "lib/JpGraph.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "QPL 1.0"
+            ],
+            "authors": [
+                {
+                    "name": "JpGraph team"
+                }
+            ],
+            "description": "jpGraph, library to make graphs and charts",
+            "homepage": "http://jpgraph.net/",
+            "keywords": [
+                "chart",
+                "data",
+                "graph",
+                "jpgraph",
+                "pie"
+            ],
+            "support": {
+                "issues": "https://github.com/ztec/JpGraph/issues",
+                "source": "https://github.com/ztec/JpGraph/tree/4.x"
+            },
+            "abandoned": true,
+            "time": "2017-02-23T09:44:15+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",

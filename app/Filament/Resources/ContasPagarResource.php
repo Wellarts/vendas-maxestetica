@@ -264,8 +264,9 @@ class ContasPagarResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->hidden(fn ($record) => $record->status == 1)
                     ->after(function ($data, $record) {
+                        // Exclui o lançamento no fluxo de caixa ao excluir a conta
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
 
                         if ($record->status = 1 and $record->valor_parcela != $record->valor_pago) {
                             Notification::make()
@@ -283,19 +284,29 @@ class ContasPagarResource extends Resource
                         }
 
                         $addFluxoCaixa = [
+                            'id_lancamento' => $record->id,
                             'valor' => ($record->valor_pago * -1),
                             'tipo'  => 'DEBITO',
-                            'obs'   => 'Pagamento da Compra nº: ' . $record->compra_id . '',
+                            'obs'   => 'Pagamento '.$record->obs. '',
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);
                     }),
                 Tables\Actions\DeleteAction::make()
-                    ->hidden(fn ($record) => $record->status == 1),
+                    ->after(function ($record) {
+                        // Exclui o lançamento no fluxo de caixa ao excluir a conta
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->after(function ($records) {
+                            foreach ($records as $record) {
+                                // Exclui o lançamento no fluxo de caixa ao excluir a conta
+                                \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+                            }
+                        }),
                 ]),
             ]);
     }

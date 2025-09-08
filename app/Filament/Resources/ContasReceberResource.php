@@ -264,24 +264,10 @@ class ContasReceberResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                   // ->hidden(fn ($record) => $record->status == 1)
-                    ->after(function ($livewire, $record) {
-
-                       
+                    ->after(function ($livewire, $record) {                       
                         // Exclui o lançamento anterior no fluxo de caixa
-                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
-                        // Cria novo lançamento se status for true
-                        if ($record->status == true) {
-                            $addFluxoCaixa = [
-                                'valor' => ($record->valor_recebido),
-                                'tipo'  => 'CREDITO',
-                                'obs'   => 'Recebimento da conta do cliente ' . $record->cliente->nome . ' da parcela nº: ' . $record->ordem_parcela,
-                                'id_lancamento' => $record->id,
-                            ];
-                            \App\Models\FluxoCaixa::create($addFluxoCaixa);
-                        }
-                        // Verifica se o pagamento foi parcial
-
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();                        
+                        
                         if ($record->status == 1 && $record->valor_parcela != $record->valor_recebido) {
                             Notification::make()
                                 ->title('RECEBIMENTO PARCIAL')
@@ -301,7 +287,7 @@ class ContasReceberResource extends Resource
                             'id_lancamento' => $record->id,
                             'valor' => ($record->valor_recebido),
                             'tipo'  => 'CREDITO',
-                            'obs'   => 'Recebido: '.$record->obs. '',
+                            'obs'   => 'Recebido '.$record->obs. '',
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);
@@ -315,7 +301,13 @@ class ContasReceberResource extends Resource
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->after(function ($records) {
+                            foreach ($records as $record) {
+                                // Exclui o lançamento no fluxo de caixa ao excluir a conta
+                                \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+                            }
+                        }),
                 ]),
             ]);
     }

@@ -42,13 +42,15 @@ class ManageContasRecebers extends ManageRecords
                             ContasReceber::create($parcelas);
                         }
                     } else {
-                        $addFluxoCaixa = [
-                          'valor' => ($record->valor_total),
-                          'tipo'  => 'CREDITO',
-                          'obs'   => 'Recebimento de conta: ' . $record->cliente->nome . '',
-                        ];
-
-                        FluxoCaixa::create($addFluxoCaixa);
+                        if (($data['status'] == 1)) {
+                            $addFluxoCaixa = [
+                                'id_lancamento' => $record->id,
+                                'valor' => ($record->valor_total),
+                                'tipo'  => 'CREDITO',
+                                'obs'   => 'Recebimento de conta: ' . $record->cliente->nome . '',
+                            ];                      
+                            FluxoCaixa::create($addFluxoCaixa);
+                        }
                     }
                 }
             ),
