@@ -121,14 +121,24 @@ class ProdutoResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('codbar')
+                    ->label('Cód. Barras')
+                    ->alignCenter()
+                    ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('estoque')
+                    ->alignCenter()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('valor_compra')
+                    ->label('Valor Compra')
+                    ->alignCenter()
                     ->money('BRL'),
                 Tables\Columns\TextColumn::make('lucratividade')
-                    ->label('Lucratividade (%)'),
+                    ->label('Lucratividade (%)')
+                    ->alignCenter()
+                    ->suffix('%'),
                 Tables\Columns\TextColumn::make('valor_venda')
+                    ->label('Valor Venda')
+                    ->alignCenter()
                     ->money('BRL'),
                 ImageColumn::make('foto')
                     ->label('Fotos')

@@ -63,14 +63,14 @@ class ClienteResource extends Resource
                             ->label('Estado')
                             ->native(false)
                             ->searchable()
-                            ->required()
+                            ->required(false)
                             ->options(Estado::all()->pluck('nome', 'id')->toArray())
                             ->reactive(),
                         Forms\Components\Select::make('cidade_id')
                             ->label('Cidade')
                             ->native(false)
                             ->searchable()
-                            ->required()
+                            ->required(false)
                             ->options(function (callable $get) {
                                 $estado = Estado::find($get('estado_id'));
                                 if (!$estado) {

@@ -22,7 +22,7 @@ class VendaPDVResource extends Resource
 
     protected static ?string $navigationGroup = 'Ponto de Venda';
 
-    protected static ?string $navigationLabel = 'Vendas em PDV';
+    protected static ?string $navigationLabel = 'Histórico de Vendas (PDV)';
 
     protected static ?string $title = 'Vendas PDV';
 
@@ -116,7 +116,7 @@ class VendaPDVResource extends Resource
                                         $set('valor_total_desconto', $novoValor);
                                     }),
                                 Forms\Components\TextInput::make('valor_acres_desc')
-                                    ->label('Valor Desconto/Acréscimo')
+                                    ->label('Valor Desc/Acres')
                                     ->hint('Para desconto Ex. -10')
                                     ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                     ->numeric()
@@ -251,6 +251,8 @@ class VendaPDVResource extends Resource
                 Tables\Actions\EditAction::make()
                     ->modalHeading('Vendas PDV'),
                 Tables\Actions\Action::make('Imprimir')
+                    ->icon('heroicon-s-printer')
+                    ->label('Comprovante de Venda')
                     ->url(fn (VendaPDV $record): string => route('comprovantePDV', $record))
                     ->openUrlInNewTab(),
             ])

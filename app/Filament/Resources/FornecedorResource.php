@@ -63,14 +63,14 @@ class FornecedorResource extends Resource
                             ->label('Endereço'),
                         Forms\Components\Select::make('estado_id')
                             ->label('Estado')
-                            ->required()
+                            ->required(false)
                             ->native(false)
                             ->searchable()
                             ->options(Estado::all()->pluck('nome', 'id')->toArray())
                             ->reactive(),
                         Forms\Components\Select::make('cidade_id')
                             ->label('Cidade')
-                            ->required()
+                            ->required(false)
                             ->native(false)
                             ->searchable()
                             ->options(function (callable $get) {

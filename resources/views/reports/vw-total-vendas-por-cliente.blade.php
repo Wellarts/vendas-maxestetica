@@ -3,9 +3,9 @@
 @section('content')
     <h2>Relatório Valor Vendido por Cliente</h2>
   
-    <table width="100%" border="1" cellspacing="0" cellpadding="3" style="font-size:1em;">
+    <table width="100%" cellspacing="0" cellpadding="3" style="font-size:0.8em; border-collapse:collapse;">
         <thead>
-            <tr style="background:#f0f0f0;">
+            <tr style="background:#f0f0f0; border-bottom:1px solid #ccc;">
                 <th>Cliente</th>
                 <th>Valor Total</th>
                 <th>Última Compra</th>
@@ -21,7 +21,7 @@
             @endforeach
         </tbody>
         <tfoot>
-            <tr style="font-weight:bold; background:#f9f9f9;">
+            <tr style="font-weight:bold; background:#f9f9f9; border-top:1px solid #ccc;">
                 <td>Total Geral</td>
                 <td colspan="2">R$ {{ number_format($somaTotal, 2, ',', '.') }}</td>
             </tr>

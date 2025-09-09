@@ -2,7 +2,7 @@
 
 @section('content')
     <h2>Relatório de Vendas de Produtos</h2>
-    <table width="100%" border="1" cellspacing="0" cellpadding="5">
+    <table width="100%" border="0" cellspacing="0" cellpadding="5">
         <thead>
             <tr>
                 <th>Venda</th>

@@ -98,7 +98,7 @@
       width: 100%;
       border-collapse: collapse;
       margin: 20px 0;
-      font-size: 0.95rem;
+      font-size: 0.8rem;
     }
 
     th, td {
@@ -124,7 +124,7 @@
     /* Resumo */
     .summary {
       margin-top: 20px;
-      font-size: 1rem;
+      font-size: 0.85rem;
       padding: 15px;
       background: #f9fafc;
       border: 1px solid #eee;
@@ -159,7 +159,7 @@
     .footer {
       text-align: center;
       margin-top: 30px;
-      font-size: 0.85rem;
+      font-size: 0.75rem;
       color: #888;
     }
   </style>
@@ -279,13 +279,7 @@
         @endif
     </section>
 
-    <!-- Assinatura -->
-    <div class="signature">
-      <hr>
-      <p>Assinatura do Cliente</p>
-    </div>
-
-    <!-- Rodapé -->
+        <!-- Rodapé -->
     <footer class="footer">
       Documento gerado em {{ date('d/m/Y H:i') }}
     </footer>

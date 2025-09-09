@@ -62,7 +62,14 @@ class EstoqueContabil extends Page implements HasForms, HasTable
 
     protected function getTableQuery(): Builder
     {
-        return Produto::query()->where('tipo', 1);
+        return Produto::query()
+            ->where('tipo', 1)
+            ->select([
+                '*',
+                \DB::raw('(estoque * valor_compra) as total_compra_calc'),
+                \DB::raw('(estoque * valor_venda) as total_venda_calc'),
+                \DB::raw('((estoque * valor_venda) - (estoque * valor_compra)) as total_lucratividade_calc'),
+            ]);
     }
 
     protected function getTableColumns(): array
@@ -87,33 +94,27 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                 TextColumn::make('valor_venda')
                     ->alignCenter()
                     ->money('BRL'),
-                TextColumn::make('total_compra')
+                TextColumn::make('total_compra_calc')
+                    ->label('Total Compra')
                     ->badge()
                     ->alignCenter()
-                    ->getStateUsing(function (Produto $record): float {
-                        return (($record->estoque * $record->valor_compra));
-                    })
                     ->money('BRL')
                     ->summarize(Sum::make()->label('Total')->money('BRL'))
                     ->color('danger'),
-                TextColumn::make('total_venda')
+                TextColumn::make('total_venda_calc')
+                    ->label('Total Venda')
                     ->badge()
                     ->alignCenter()
-                    ->getStateUsing(function (Produto $record): float {
-                        return ($record->estoque * $record->valor_venda);
-                    })
                     ->money('BRL')
                     ->summarize(Sum::make()->label('Total')->money('BRL'))
                     ->color('warning'),
-                TextColumn::make('total_lucratividade')
+                TextColumn::make('total_lucratividade_calc')
+                    ->label('Total Lucratividade')
                     ->badge()
                     ->alignCenter()
-                    ->getStateUsing(function (Produto $record): float {
-                        return ((($record->estoque * $record->valor_venda)) - (($record->estoque * $record->valor_compra)));
-                    })
+                    ->money('BRL')
                     ->summarize(Sum::make()->label('Total')->money('BRL'))
-                    ->color('success')
-                    ->money('BRL'),
+                    ->color('success'),
 
         ];
     }

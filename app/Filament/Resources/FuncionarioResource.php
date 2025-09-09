@@ -61,12 +61,12 @@ class FuncionarioResource extends Resource
                             ->label('Estado')
                             ->native(false)
                             ->searchable()
-                            ->required()
+                            ->required(false)
                             ->options(Estado::all()->pluck('nome', 'id')->toArray())
                             ->reactive(),
                         Forms\Components\Select::make('cidade_id')
                             ->label('Cidade')
-                            ->required()
+                            ->required(false)
                             ->native(false)
                             ->searchable()
                             ->options(function (callable $get) {

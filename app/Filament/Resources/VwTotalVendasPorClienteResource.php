@@ -27,7 +27,7 @@ class VwTotalVendasPorClienteResource extends Resource
     {
         return $table
             ->defaultSort(
-                'valor_total',
+                'valor_total_desconto',
                 'desc'
             )
             ->columns([
@@ -35,7 +35,7 @@ class VwTotalVendasPorClienteResource extends Resource
                     ->label('Cliente')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('valor_total')
+                Tables\Columns\TextColumn::make('valor_total_desconto')
                     ->label('Valor Total')
                     ->money('BRL')
                     ->badge()

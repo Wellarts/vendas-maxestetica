@@ -5,15 +5,7 @@
 @extends('layouts.pdf')
 
 @section('content')
-    <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-        th { background: #f2f2f2; }
-        h2 { text-align: center; }
-        tbody tr:nth-child(even) { background: #f7f7f7; }
-        tbody tr:nth-child(odd) { background: #fff; }
-    </style>
+   
     <h2>Relatório de Estoque Financeiro</h2>
     <p>Data de emissão: {{ Carbon::now()->format('d/m/Y H:i') }}</p>
     <table>

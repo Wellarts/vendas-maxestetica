@@ -9,6 +9,7 @@ use Spatie\Activitylog\LogOptions;
 
 class Produto extends Model
 {
+
     use HasFactory;
     use LogsActivity;
 

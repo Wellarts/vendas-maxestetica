@@ -45,9 +45,11 @@ class CompraResource extends Resource
                         Forms\Components\DatePicker::make('data_compra')
                             ->default(now())
                             ->required(),
-                        Forms\Components\TextInput::make('outros_custos'),
+                      //  Forms\Components\TextInput::make('outros_custos'),
                         Forms\Components\Textarea::make('obs')
-                            ->label('Observações'),
+                            ->label('Observações')
+                            ->autosize()
+                            ->columnSpanFull()
                         ])->columns(2),
             ]);
     }

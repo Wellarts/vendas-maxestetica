@@ -24,7 +24,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #eee;
+            /* border-bottom: 2px solid #eee; */
             padding-bottom: 18px;
             margin-bottom: 22px;
         }

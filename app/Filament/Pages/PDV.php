@@ -50,6 +50,8 @@ class PDV extends Page implements HasForms, HasTable
 
     protected static ?string $title = 'PDV';
 
+    protected static ?string $navigationLabel = 'Efetuar Venda (PDV)';
+
     protected static ?string $navigationGroup = 'Ponto de Venda';
 
     protected static ?int $navigationSort = 2;
@@ -245,6 +247,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->required(),
                             Select::make('cliente_id')
                                 ->label('Cliente')
+                                ->required()
                                 ->default('1')
                                 //  ->options(Cliente::all()->pluck('nome', 'id')->toArray())
                                 ->relationship(name: 'cliente', titleAttribute: 'nome')
@@ -284,14 +287,14 @@ class PDV extends Page implements HasForms, HasTable
                                                 ->label('Estado')
                                                 ->native(false)
                                                 ->searchable()
-                                                ->required()
+                                                ->required(false)
                                                 ->options(Estado::all()->pluck('nome', 'id')->toArray())
                                                 ->live(debounce: 500),
                                             Select::make('cidade_id')
                                                 ->label('Cidade')
                                                 ->native(false)
                                                 ->searchable()
-                                                ->required()
+                                                ->required(false)
                                                 ->options(function (callable $get) {
                                                     $estado = Estado::find($get('estado_id'));
                                                     if (!$estado) {
@@ -314,15 +317,18 @@ class PDV extends Page implements HasForms, HasTable
                             Select::make('funcionario_id')
                                 ->label('Vendedor')
                                 ->default('1')
+                                ->required()
                                 ->options(Funcionario::all()->pluck('nome', 'id')->toArray()),
                             Select::make('forma_pgmto_id')
                                 ->label('Forma de Pagamento')
                                 ->default('1')
                                 ->native(false)
+                                ->required()
                                 ->searchable()
                                 ->options(FormaPgmto::all()->pluck('nome', 'id')->toArray()),
                             DatePicker::make('data_venda')
                                 ->label('Data da Venda')
+                                ->required()
                                 ->default(now()),
                             TextInput::make('valor_total')
                                 ->numeric()
