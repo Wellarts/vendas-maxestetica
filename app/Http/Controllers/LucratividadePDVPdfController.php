@@ -10,7 +10,9 @@ class LucratividadePDVPdfController extends Controller
 {
     public function gerarRelatorio(Request $request)
     {
+
         $query = VendaPDV::with(['cliente', 'funcionario', 'formaPgmto', 'itensVenda.produto'])
+            ->where('tipo_registro', 'venda')
             ->withSum('itensVenda as total_custo_produtos', 'total_custo_atual');
 
         // Filtros
@@ -40,12 +42,36 @@ class LucratividadePDVPdfController extends Controller
             return $venda->valor_total_desconto - ($venda->total_custo_produtos ?? 0);
         });
 
+        // Buscar nomes dos filtros
+        $clienteNome = null;
+        $funcionarioNome = null;
+        $formaPgmtoNome = null;
+        if ($request->filled('cliente_id')) {
+            $cliente = \App\Models\Cliente::find($request->cliente_id);
+            $clienteNome = $cliente ? $cliente->nome : $request->cliente_id;
+        }
+        if ($request->filled('funcionario_id')) {
+            $funcionario = \App\Models\Funcionario::find($request->funcionario_id);
+            $funcionarioNome = $funcionario ? $funcionario->nome : $request->funcionario_id;
+        }
+        if ($request->filled('forma_pgmto_id')) {
+            $forma = \App\Models\FormaPgmto::find($request->forma_pgmto_id);
+            $formaPgmtoNome = $forma ? $forma->nome : $request->forma_pgmto_id;
+        }
+
         $pdf = Pdf::loadView('reports.lucratividade-pdv', [
             'vendas' => $vendas,
             'somaCustoProdutos' => $somaCustoProdutos,
             'somaValorTotal' => $somaValorTotal,
             'somaValorTotalDesconto' => $somaValorTotalDesconto,
             'somaLucro' => $somaLucro,
+            'filtrosNomes' => [
+                'Cliente' => $clienteNome,
+                'Funcionário' => $funcionarioNome,
+                'Forma de Pagamento' => $formaPgmtoNome,
+                'Data Inicial' => $request->filled('data_de') ? $request->data_de : null,
+                'Data Final' => $request->filled('data_ate') ? $request->data_ate : null,
+            ],
         ])->setPaper('a4', 'landscape');
         return $pdf->stream('relatorio_lucratividade_pdv.pdf');
     }

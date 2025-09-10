@@ -18,7 +18,7 @@ class VendaPDVResource extends Resource
 {
     protected static ?string $model = VendaPDV::class;
 
-    protected static ?string $navigationIcon = 'heroicon-s-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-s-clipboard-document-list';
 
     protected static ?string $navigationGroup = 'Ponto de Venda';
 
@@ -73,7 +73,7 @@ class VendaPDVResource extends Resource
                             ->relationship('formaPgmto', 'nome')
                             ->required(),
 
-                        Section::make('Descontos e Acréscimos')
+                        Section::make('Descontos e Acréscimos (Para desconto use valor negativo Ex. -10)')
                             ->columns([
                                 'xl'  => 4,
                                 '2xl' => 4,
@@ -81,7 +81,7 @@ class VendaPDVResource extends Resource
                             ->schema([
                                 Forms\Components\Radio::make('tipo_acres_desc')
                                     ->label('Forma')
-                                    ->hint('Porcentagem ou Valor')
+                                  //  ->hint('Porcentagem ou Valor')
                                     ->live()
                                     ->options([
                                         'Valor'       => 'Valor',
@@ -97,7 +97,7 @@ class VendaPDVResource extends Resource
                                     ->label('Percentual')
                                     ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
                                     ->numeric()
-                                    ->hint('Para desconto Ex. -10')
+                                  //  ->hint('Para desconto Ex. -10')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->suffix('%')
                                     ->required(false)
@@ -116,8 +116,8 @@ class VendaPDVResource extends Resource
                                         $set('valor_total_desconto', $novoValor);
                                     }),
                                 Forms\Components\TextInput::make('valor_acres_desc')
-                                    ->label('Valor Desc/Acres')
-                                    ->hint('Para desconto Ex. -10')
+                                    ->label('Desc/Acres')
+                                 //   ->hint('Para desconto Ex. -10')
                                     ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                     ->numeric()
                                     ->prefix('R$')
@@ -250,6 +250,7 @@ class VendaPDVResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->modalHeading('Vendas PDV'),
+                    
                 Tables\Actions\Action::make('Imprimir')
                     ->icon('heroicon-s-printer')
                     ->label('Comprovante de Venda')

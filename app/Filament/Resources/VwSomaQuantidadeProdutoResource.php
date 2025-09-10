@@ -49,7 +49,7 @@ class VwSomaQuantidadeProdutoResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->defaultSort('rentabilidade', 'desc')
+            ->defaultSort('pontuacao_rentabilidade', 'desc')
             ->columns([
                 Tables\Columns\TextColumn::make('tipo')
                     ->sortable()
@@ -97,7 +97,7 @@ class VwSomaQuantidadeProdutoResource extends Resource
                     ->label('Total Lucro')
                     ->money('BRL')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('rentabilidade')
+                Tables\Columns\TextColumn::make('pontuacao_rentabilidade')
                     // ->getStateUsing(function(VwSomaQuantidadeProduto $record,):float {
                     //    // dd($record->total_vendido_compra);
                     //     return ($record->total_vendido_qtd * ($record->total_vendido_valor - $record->total_vendido_custo));

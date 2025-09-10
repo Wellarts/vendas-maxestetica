@@ -16,6 +16,25 @@
     </style>
     <h2>Relatório de Contas a Receber</h2>
     <p>Data de emissão: {{ Carbon::now()->format('d/m/Y H:i') }}</p>
+    @if(isset($filtrosNomes) && collect($filtrosNomes)->filter()->count())
+        <div style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
+            <strong>Filtros aplicados:</strong>
+            @php $sep = false; @endphp
+            @foreach($filtrosNomes as $chave => $valor)
+                @if($valor)
+                    @if($sep) | @endif
+                    <span><b>{{ $chave }}:</b>
+                        @if(str_contains($chave, 'Data') && $valor)
+                            {{ \Carbon\Carbon::parse($valor)->format('d/m/Y') }}
+                        @else
+                            {{ $valor }}
+                        @endif
+                    </span>
+                    @php $sep = true; @endphp
+                @endif
+            @endforeach
+        </div>
+    @endif
     <table>
         <thead>
             <tr>

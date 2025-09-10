@@ -9,6 +9,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditVendaPDV extends EditRecord
 {
+    
     protected static string $resource = VendaPDVResource::class;
 
     protected static ?string $title = 'Venda PDV';
@@ -120,5 +121,15 @@ class EditVendaPDV extends EditRecord
                         ->send();
                 }),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        \Filament\Notifications\Notification::make()
+            ->title('Atenção')
+            ->body('Se houve alterações de valores. Faça os ajustes nas parcelas ou fluxo de caixa.')
+            ->danger()
+            ->persistent()
+            ->send();
     }
 }

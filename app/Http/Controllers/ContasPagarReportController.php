@@ -28,9 +28,21 @@ class ContasPagarReportController extends Controller
 
         $contas = $query->with('fornecedor')->orderBy('data_vencimento')->get();
 
+        // Filtros com nomes
+        $fornecedorNome = null;
+        if ($request->filled('fornecedor_id')) {
+            $fornecedor = Fornecedor::find($request->fornecedor_id);
+            $fornecedorNome = $fornecedor ? $fornecedor->nome : $request->fornecedor_id;
+        }
+        $filtrosNomes = [
+            'Fornecedor' => $fornecedorNome,
+            'Data Inicial' => $request->filled('data_de') ? $request->data_de : null,
+            'Data Final' => $request->filled('data_ate') ? $request->data_ate : null,
+            'Status' => $request->filled('status') ? ($request->status == 1 ? 'Pago' : 'Em aberto') : null,
+        ];
         $pdf = Pdf::loadView('relatorios.contas-pagar-pdf', [
             'contas' => $contas,
-            'filtros' => $request->all(),
+            'filtrosNomes' => $filtrosNomes,
             'fornecedores' => Fornecedor::pluck('nome', 'id'),
         ])->setPaper('a4', 'landscape');
         return $pdf->stream('contas-a-pagar.pdf');

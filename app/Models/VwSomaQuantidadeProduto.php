@@ -16,6 +16,6 @@ class VwSomaQuantidadeProduto extends Model
         'total_vendido_valor',
         'total_vendido_custo',
         'total_vendido_lucro',
-        'rentabilidade',
+        'pontuacao_rentabilidade',
     ];
 }

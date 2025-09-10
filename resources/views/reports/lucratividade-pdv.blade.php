@@ -2,6 +2,25 @@
 
 @section('content')
     <h2>Relatório de Lucratividade PDV</h2>
+    @if(isset($filtrosNomes) && collect($filtrosNomes)->filter()->count())
+        <div style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
+            <strong>Filtros aplicados:</strong>
+            @php $sep = false; @endphp
+            @foreach($filtrosNomes as $chave => $valor)
+                @if($valor)
+                    @if($sep) | @endif
+                    <span><b>{{ $chave }}:</b> 
+                        @if(str_contains($chave, 'Data') && $valor)
+                            {{ \Carbon\Carbon::parse($valor)->format('d/m/Y') }}
+                        @else
+                            {{ $valor }}
+                        @endif
+                    </span>
+                    @php $sep = true; @endphp
+                @endif
+            @endforeach
+        </div>
+    @endif
     <style>
         table.reduzida th, table.reduzida td {
             padding: 2px 4px;

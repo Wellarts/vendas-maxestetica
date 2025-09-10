@@ -16,6 +16,25 @@
     </style>
     <h2>Relatório de Fluxo de Caixa</h2>
     <p>Data de emissão: {{ Carbon::now()->format('d/m/Y H:i') }}</p>
+    @if(isset($filtros) && is_array($filtros) && collect($filtros)->filter()->count())
+        <div style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
+            <strong>Filtros aplicados:</strong>
+            @php $sep = false; @endphp
+            @foreach($filtros as $chave => $valor)
+                @if($valor)
+                    @if($sep) | @endif
+                    <span><b>{{ ucfirst(str_replace('_', ' ', $chave)) }}:</b>
+                        @if(str_contains($chave, 'data') && $valor)
+                            {{ \Carbon\Carbon::parse($valor)->format('d/m/Y') }}
+                        @else
+                            {{ is_array($valor) ? implode(', ', $valor) : $valor }}
+                        @endif
+                    </span>
+                    @php $sep = true; @endphp
+                @endif
+            @endforeach
+        </div>
+    @endif
     <table>
         <thead>
             <tr>

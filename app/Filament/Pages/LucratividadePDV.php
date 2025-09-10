@@ -50,7 +50,9 @@ class LucratividadePDV extends Page implements HasTable
         return $table
             ->defaultSort('data_venda', 'desc')
             ->query(
-                VendaPDV::query()->withSum('itensVenda as total_custo_produtos', 'total_custo_atual')
+                VendaPDV::query()
+                    ->where('tipo_registro', 'venda')
+                    ->withSum('itensVenda as total_custo_produtos', 'total_custo_atual')
             )
             // ->defaultGroup('data_venda','year')
             ->columns([

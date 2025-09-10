@@ -2,6 +2,21 @@
 
 @section('content')
     <h2>Relatório de Vendas de Produtos</h2>
+
+    @if(isset($produtoId) || isset($dataInicial) || isset($dataFinal))
+    <div style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
+            <strong>Filtros aplicados:</strong>
+            @if(isset($produtoId) && $produtoId)
+                <span><b>Produto ID:</b> {{ $produtoId }}</span>@if(isset($dataInicial) && $dataInicial || isset($dataFinal) && $dataFinal) | @endif
+            @endif
+            @if(isset($dataInicial) && $dataInicial)
+                <span><b>Data Inicial:</b> {{ \Carbon\Carbon::parse($dataInicial)->format('d/m/Y') }}</span>@if(isset($dataFinal) && $dataFinal) | @endif
+            @endif
+            @if(isset($dataFinal) && $dataFinal)
+                <span><b>Data Final:</b> {{ \Carbon\Carbon::parse($dataFinal)->format('d/m/Y') }}</span>
+            @endif
+        </div>
+    @endif
     <table width="100%" border="0" cellspacing="0" cellpadding="5">
         <thead>
             <tr>
@@ -68,6 +83,7 @@
         <thead>
             <tr style="background: #f4f6f9;">
                 <th style="padding: 8px; border: 1px solid #e5e7eb;">Produto</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb;">Quantidade Vendida</th>
                 <th style="padding: 8px; border: 1px solid #e5e7eb;">Valor Total Vendido (R$)</th>
             </tr>
         </thead>
@@ -75,7 +91,10 @@
             @foreach($vendas->groupBy('produto_nome') as $produto => $items)
                 <tr>
                     <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ $produto }}</td>
-                    <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ number_format($items->sum(function($item){ return $item->preco_unitario * $item->quantidade; }), 2, ',', '.') }}</td>
+                    <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ $items->sum('quantidade') }}</td>
+                    <td style="padding: 8px; border: 1px solid #e5e7eb;">
+                        {{ number_format($items->sum(function($item){ return $item->preco_unitario * $item->quantidade; }), 2, ',', '.') }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -86,6 +105,7 @@
         <thead>
             <tr style="background: #f4f6f9;">
                 <th style="padding: 8px; border: 1px solid #e5e7eb;">Cliente</th>
+                <th style="padding: 8px; border: 1px solid #e5e7eb;">Quantidade Comprada</th>
                 <th style="padding: 8px; border: 1px solid #e5e7eb;">Valor Total Vendido (R$)</th>
             </tr>
         </thead>
@@ -93,7 +113,10 @@
             @foreach($vendas->groupBy('cliente_nome') as $cliente => $items)
                 <tr>
                     <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ $cliente }}</td>
-                    <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ number_format($items->sum(function($item){ return $item->preco_unitario * $item->quantidade; }), 2, ',', '.') }}</td>
+                    <td style="padding: 8px; border: 1px solid #e5e7eb;">{{ $items->sum('quantidade') }}</td>
+                    <td style="padding: 8px; border: 1px solid #e5e7eb;">
+                        {{ number_format($items->sum(function($item){ return $item->preco_unitario * $item->quantidade; }), 2, ',', '.') }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
