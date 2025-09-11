@@ -69,12 +69,22 @@ class ManageContasRecebers extends ManageRecords
                         ->label('Status')
                         ->options([
                             '' => 'Todos',
-                            '0' => 'Em aberto',
-                            '1' => 'Recebido',
+                            0 => 'Em aberto',
+                            1 => 'Recebido',
                         ]),
                 ])
                 ->action(function (array $data, $livewire) {
-                    $query = http_build_query(array_filter($data));
+                    // Só envia o filtro de status se for 0 ou 1
+                    if (array_key_exists('status', $data) && ($data['status'] === 0 || $data['status'] === 1 || $data['status'] === '0' || $data['status'] === '1')) {
+                        $data['status'] = (int) $data['status'];
+                    } else {
+                        unset($data['status']); // Remove para exibir todos
+                    }
+
+                    // Remove apenas valores nulos ou string vazia, mas mantém 0
+                    $query = http_build_query(array_filter($data, function($v) {
+                        return $v !== null && $v !== '';
+                    }));
                     $url = route('relatorio.contas.receber.pdf') . '?' . $query;
                     $livewire->js("window.open('{$url}', '_blank')");
                 }),

@@ -127,21 +127,9 @@ class ContasReceberResource extends Resource
                             })
                             ->required(),
 
-                        Forms\Components\TextInput::make('valor_recebido')
-                            ->numeric()
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            })
-                            ->label('Valor Recebido'),
+                        
                         Forms\Components\Textarea::make('obs')
-                            ->columnSpan([
-                                'xl'  => 2,
-                                '2xl' => 2,
-                            ])
+                            ->columnSpanFull()
                             ->label('Observações'),
                     ]),
                 Forms\Components\Toggle::make('status')
@@ -166,8 +154,16 @@ class ContasReceberResource extends Resource
                             }
                         }
                     ),
-
-
+                    Forms\Components\TextInput::make('valor_recebido')
+                            ->numeric()
+                            ->hidden(function ($context) {
+                                if ($context == 'edit') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->label('Valor Recebido'),
             ]);
     }
 
@@ -239,9 +235,9 @@ class ContasReceberResource extends Resource
             ])
             ->filters([
                 Filter::make('A receber')
-                    ->query(fn (Builder $query): Builder => $query->where('status', false))->default(true),
+                    ->query(fn (Builder $query): Builder => $query->where('status', 0))->default(true),
                 Filter::make('Recebidas')
-                    ->query(fn (Builder $query): Builder => $query->where('status', true)),
+                    ->query(fn (Builder $query): Builder => $query->where('status', 1)),
                 SelectFilter::make('cliente')->relationship('cliente', 'nome')->searchable(),
                 Tables\Filters\Filter::make('data_vencimento')
                     ->form([

@@ -127,21 +127,9 @@ class ContasPagarResource extends Resource
                             })
                             ->required(),
 
-                        Forms\Components\TextInput::make('valor_pago')
-                            ->numeric()
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            })
-                            ->label('Valor Pago'),
+                        
                         Forms\Components\Textarea::make('obs')
-                            ->columnSpan([
-                                'xl'  => 2,
-                                '2xl' => 2,
-                            ])
+                            ->columnSpanFull()
                             ->label('Observações'),
                     ]),
                 Forms\Components\Toggle::make('status')
@@ -166,6 +154,16 @@ class ContasPagarResource extends Resource
                             }
                         }
                     ),
+                Forms\Components\TextInput::make('valor_pago')
+                            ->numeric()
+                            ->hidden(function ($context) {
+                                if ($context == 'edit') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->label('Valor Pago'),
 
 
             ]);

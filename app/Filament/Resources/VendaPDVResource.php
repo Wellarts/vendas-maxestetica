@@ -97,11 +97,11 @@ class VendaPDVResource extends Resource
                                     ->label('Percentual')
                                     ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
                                     ->numeric()
-                                  //  ->hint('Para desconto Ex. -10')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->suffix('%')
                                     ->required(false)
                                     ->live(onBlur: true)
+                                    ->dehydrated(true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $valorTotal     = (float) $get('valor_total');
                                         $percentual     = (float) $state;
@@ -117,13 +117,13 @@ class VendaPDVResource extends Resource
                                     }),
                                 Forms\Components\TextInput::make('valor_acres_desc')
                                     ->label('Desc/Acres')
-                                 //   ->hint('Para desconto Ex. -10')
                                     ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                     ->numeric()
                                     ->prefix('R$')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->required(false)
                                     ->live(onBlur: true)
+                                    ->dehydrated(true)
                                     ->afterStateUpdated(function ($state, callable $set, callable $get) {
                                         $valorTotal     = (float) $get('valor_total');
                                         $tipo           = $get('tipo_acres_desc');
@@ -146,13 +146,14 @@ class VendaPDVResource extends Resource
                                     ->numeric()
                                     ->label('Valor Total c/ Desconto/Acréscimo')
                                     ->readOnly()
+                                    ->dehydrated(true)
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;']),
                                     
                             ]),
                        
                          Forms\Components\Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
-                               // ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
+                                ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
@@ -162,7 +163,7 @@ class VendaPDVResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2),
+                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2 && $get('tipo_registro') === 'venda'),
                                
                          
 
@@ -253,7 +254,7 @@ class VendaPDVResource extends Resource
                     
                 Tables\Actions\Action::make('Imprimir')
                     ->icon('heroicon-s-printer')
-                    ->label('Comprovante de Venda')
+                    ->label('Comprovante - PDF')
                     ->url(fn (VendaPDV $record): string => route('comprovantePDV', $record))
                     ->openUrlInNewTab(),
             ])

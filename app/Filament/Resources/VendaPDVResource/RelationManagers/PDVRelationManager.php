@@ -21,13 +21,45 @@ class PDVRelationManager extends RelationManager
     {
         return $form
             ->schema([
-               Forms\Components\TextInput::make('produto_id')
-                    ->required(),
-                Forms\Components\TextInput::make('qtd')
-                    ->required(),
-                Forms\Components\TextInput::make('sub_total')
-                    ->numeric()
-                    ->required(),
+            Forms\Components\Select::make('produto_id')
+                ->label('Produto')
+                ->options(Produto::all()->pluck('nome', 'id'))
+                ->searchable()
+                ->required()
+                ->live(onBlur: true)
+                ->afterStateUpdated(function ($state, callable $set) {
+                    if ($state) {
+                        $produto = Produto::find($state);
+                        if ($produto) {
+                            $set('valor_venda', $produto->valor_venda);
+                        }
+                    } else {
+                        $set('valor_venda', null);
+                    }
+                }),
+            Forms\Components\TextInput::make('qtd')
+                ->label('Quantidade')
+                ->numeric()
+                ->required()
+                ->live(onBlur: true)
+                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    $valorVenda = $get('valor_venda') ?? 0;
+                    $set('sub_total', (float)$state * (float)$valorVenda);
+                }),
+            Forms\Components\TextInput::make('valor_venda')
+                ->label('Valor Unitário')
+                ->numeric()
+                ->required()
+                ->live(onBlur: true)
+                ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                    $qtd = $get('qtd') ?? 0;
+                    $set('sub_total', (float)$qtd * (float)$state);
+                }),
+            Forms\Components\TextInput::make('sub_total')
+                ->label('Sub-Total')
+                ->numeric()
+                ->required()
+                ->readonly(),
 
 
             ]);
@@ -74,10 +106,46 @@ class PDVRelationManager extends RelationManager
                     }),
             ])
             ->headerActions([
-                // Nenhuma ação personalizada de relatório aqui
+                Tables\Actions\CreateAction::make()
+                    ->label('Adicionar Item')
+                    ->icon('heroicon-o-plus')
+                    ->modalHeading('Adicionar Item à Venda')
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
+                    ->after(function ($data, $record, $livewire) {
+                        $venda = VendaPDV::find($record->venda_p_d_v_id);
+                        // Soma todos os sub_totals dos itens da venda
+                        $novoValorTotal = $venda->PDV()->sum('sub_total');
+                        $venda->valor_total = $novoValorTotal;
+                        $venda->valor_total_desconto = $novoValorTotal;
+
+                        // Remove todos os descontos aplicados
+                        $venda->tipo_acres_desc = null;
+                        $venda->valor_acres_desc = null;
+                        $venda->percent_acres_desc = null;
+
+                        $venda->save();
+                        return redirect(request()->header('Referer'));
+                    }),
             ])
             ->actions([
-              //  Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->visible(fn ($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
+                    ->after(function ($data, $record, $livewire) {
+                        $venda = VendaPDV::find($record->venda_p_d_v_id);
+                        // Soma todos os sub_totals dos itens da venda
+                        $novoValorTotal = $venda->PDV()->sum('sub_total');
+                        $venda->valor_total = $novoValorTotal;
+                        $venda->valor_total_desconto = $novoValorTotal;
+
+                        // Remove todos os descontos aplicados
+                        $venda->tipo_acres_desc = null;
+                        $venda->valor_acres_desc = null;
+                        $venda->percent_acres_desc = null;
+
+                        $venda->save();
+                        return redirect(request()->header('Referer'));
+                    }),
+                   
                 Tables\Actions\DeleteAction::make()
                 ->before(function ($data, $record) {
                     $produto = Produto::find($record->produto_id);

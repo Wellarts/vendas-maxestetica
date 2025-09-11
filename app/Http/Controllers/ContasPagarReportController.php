@@ -22,8 +22,11 @@ class ContasPagarReportController extends Controller
         if ($request->filled('fornecedor_id')) {
             $query->where('fornecedor_id', $request->fornecedor_id);
         }
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
+        if ($request->has('status')) {
+            $status = $request->input('status');
+            if ($status !== '' && $status !== null) {
+                $query->where('status', (int)$status);
+            }
         }
 
         $contas = $query->with('fornecedor')->orderBy('data_vencimento')->get();
@@ -34,11 +37,25 @@ class ContasPagarReportController extends Controller
             $fornecedor = Fornecedor::find($request->fornecedor_id);
             $fornecedorNome = $fornecedor ? $fornecedor->nome : $request->fornecedor_id;
         }
+        // Exibe o nome do status mesmo se for 0
+        $statusFiltro = null;
+        if ($request->has('status') && $request->input('status') !== '' && $request->input('status') !== null) {
+            $statusInt = (int)$request->input('status');
+            if ($statusInt === 1) {
+                $statusFiltro = 'Pago';
+            } elseif ($statusInt === 0) {
+                $statusFiltro = 'Em aberto';
+            } else {
+                $statusFiltro = 'Todos';
+            }
+        } else {
+            $statusFiltro = 'Todos';
+        }
         $filtrosNomes = [
             'Fornecedor' => $fornecedorNome,
             'Data Inicial' => $request->filled('data_de') ? $request->data_de : null,
             'Data Final' => $request->filled('data_ate') ? $request->data_ate : null,
-            'Status' => $request->filled('status') ? ($request->status == 1 ? 'Pago' : 'Em aberto') : null,
+            'Status' => $statusFiltro,
         ];
         $pdf = Pdf::loadView('relatorios.contas-pagar-pdf', [
             'contas' => $contas,

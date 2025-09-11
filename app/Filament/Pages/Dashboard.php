@@ -49,86 +49,78 @@ class Dashboard extends \Filament\Pages\Dashboard
         //     ])
         //     ->send();
 
-        PDV::whereNotIn('venda_p_d_v_id', VendaPDV::pluck('id'))->delete();
+
+        // Otimização: buscar IDs em lote e deletar apenas se necessário
+        $vendaPDVIds = VendaPDV::pluck('id');
+        if ($vendaPDVIds->isNotEmpty()) {
+            PDV::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
+        }
 
         //***********NOTIFICAÇÃO DE CONTAS A RECEBER*************
-        $contasReceberVencer = ContasReceber::where('status', '=', '0')->get();
-        // dd($contasReceberVencer);
-        $hoje = Carbon::today();
 
+        // Otimização: eager loading e cálculo de data fora do loop
+        $contasReceberVencer = ContasReceber::where('status', '=', '0')->with('cliente')->get();
+        $hoje = Carbon::today();
         foreach ($contasReceberVencer as $cr) {
-            $hoje           = Carbon::today();
             $dataVencimento = Carbon::parse($cr->data_vencimento);
-            $qtd_dias       = $hoje->diffInDays($dataVencimento, false);
+            $qtd_dias = $hoje->diffInDays($dataVencimento, false);
+            $clienteNome = $cr->cliente->nome ?? 'Desconhecido';
+            $valorParcela = number_format($cr->valor_parcela, 2, ',', '.');
+            $dataFormatada = $dataVencimento->format('d/m/Y');
             if ($qtd_dias <= 3 && $qtd_dias > 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento próximo.')
-                    ->body('Do cliente <b>' . $cr->cliente->nome. '</b> no valor de R$ <b>' . $cr->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cr->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->success()
                     ->persistent()
                     ->send();
-
-
-            }
-            if ($qtd_dias == 0) {
+            } elseif ($qtd_dias == 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento para hoje.')
-                    ->body('Do cliente <b>' . $cr->cliente->nome. '</b> no valor de R$ <b>' . $cr->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cr->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->warning()
                     ->persistent()
                     ->send();
-
-
-            }
-            if ($qtd_dias < 0) {
+            } elseif ($qtd_dias < 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber vencida.')
-                    ->body('Do cliente <b>' . $cr->cliente->nome. '</b> no valor de R$ <b>' . $cr->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cr->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->danger()
                     ->persistent()
                     ->send();
-
-
             }
         }
 
         //***********NOTIFICAÇÃO DE CONTAS A PAGAR*************
-        $contasPagarVencer = ContasPagar::where('status', '=', '0')->get();
-        $hoje              = Carbon::today();
-
+        $contasPagarVencer = ContasPagar::where('status', '=', '0')->with('fornecedor')->get();
+        $hoje = Carbon::today();
         foreach ($contasPagarVencer as $cp) {
-            $hoje           = Carbon::today();
             $dataVencimento = Carbon::parse($cp->data_vencimento);
-            $qtd_dias       = $hoje->diffInDays($dataVencimento, false);
+            $qtd_dias = $hoje->diffInDays($dataVencimento, false);
+            $fornecedorNome = $cp->fornecedor->nome ?? 'Desconhecido';
+            $valorParcela = number_format($cp->valor_parcela, 2, ',', '.');
+            $dataFormatada = $dataVencimento->format('d/m/Y');
             if ($qtd_dias <= 3 && $qtd_dias > 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar com vencimento próximo.')
-                    ->body('Do fornecedor <b>' . $cp->fornecedor->nome. '</b> no valor de R$ <b>' . $cp->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cp->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->success()
                     ->persistent()
                     ->send();
-
-
-            }
-            if ($qtd_dias == 0) {
+            } elseif ($qtd_dias == 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar com vencimento para hoje.')
-                    ->body('Do fornecedor <b>' . $cp->fornecedor->nome. '</b> no valor de R$ <b>' . $cp->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cp->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->warning()
                     ->persistent()
                     ->send();
-
-
-            }
-            if ($qtd_dias < 0) {
+            } elseif ($qtd_dias < 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar vencida.')
-                    ->body('Do fornecedor <b>' . $cp->fornecedor->nome. '</b> no valor de R$ <b>' . $cp->valor_parcela . '</b> com vencimento em <b>'.carbon::parse($cp->data_vencimento)->format('d/m/Y').'</b>.')
+                    ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->danger()
                     ->persistent()
                     ->send();
-
-
             }
         }
     }

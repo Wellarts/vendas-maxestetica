@@ -125,11 +125,14 @@ class EditVendaPDV extends EditRecord
 
     protected function afterSave(): void
     {
-        \Filament\Notifications\Notification::make()
-            ->title('Atenção')
-            ->body('Se houve alterações de valores. Faça os ajustes nas parcelas ou fluxo de caixa.')
-            ->danger()
-            ->persistent()
-            ->send();
+        
+        if ($this->record->tipo_registro !== 'orcamento') {
+            \Filament\Notifications\Notification::make()
+                ->title('Atenção')
+                ->body('Se houve alterações de valores. Faça os ajustes nas parcelas ou fluxo de caixa.')
+                ->danger()
+                ->persistent()
+                ->send();
+        }
     }
 }
