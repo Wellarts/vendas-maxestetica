@@ -26,7 +26,7 @@ class ProdutoResource extends Resource
 
     protected static ?string $navigationGroup = 'Cadastros';
 
-    protected static ?string $label = 'Produtos/Serviços';
+    protected static ?string $label = 'Produtos';
 
     protected static ?int $navigationSort = 9;
 
