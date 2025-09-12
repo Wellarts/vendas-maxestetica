@@ -153,7 +153,6 @@ class VendaPDVResource extends Resource
                        
                          Forms\Components\Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
-                                ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
@@ -163,7 +162,7 @@ class VendaPDVResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2 && $get('tipo_registro') === 'venda'),
+                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2),
                                
                          
 

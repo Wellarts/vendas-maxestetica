@@ -15,8 +15,18 @@ class ManageFluxoCaixas extends ManageRecords
     {
         return [
             Actions\CreateAction::make()
-                ->label('Lançamento')
-                ->modalHeading('Lançamento no Caixa'),
+                ->label('Novo Lançamento')
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->after(
+                    function ($data, $record) {
+                        if ($record->tipo == 'DEBITO') {
+                            $record->update([
+                                'valor' => $record->valor * -1,
+                            ]);
+                        }
+                    }
+                ),
             Actions\Action::make('exportar_pdf')
                 ->label('Relatório Fluxo de Caixa')
                 ->icon('heroicon-o-printer')

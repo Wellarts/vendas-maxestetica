@@ -39,7 +39,7 @@ class FluxoCaixaResource extends Resource
 
                         Forms\Components\TextInput::make('valor')
                             ->numeric()
-                            ->hint('Use (-) no Débito')
+                          //  ->hint('Use (-) no Débito')
                             ->required(),
 
                         Forms\Components\Textarea::make('obs')
