@@ -56,7 +56,7 @@
                     <th style="width:10%">Asc/Desc Valor</th>
                     <th style="width:8%">Asc/Desc % </th>
                     <th style="width:8%">Total</th>
-                    <th style="width:12%">Total c/ Desc.</th>
+                    <th style="width:12%">Total c/ Desc/Acres</th>
                     <th style="width:12%">Lucratividade</th>
                 </tr>
                 <tr>

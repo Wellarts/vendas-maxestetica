@@ -91,7 +91,7 @@ class LucratividadePDV extends Page implements HasTable
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->badge()
                     ->alignCenter()
-                    ->label('Venda com Desconto')
+                    ->label('Venda com Desc/Acres')
                     ->money('BRL')
                     ->color('warning'),
                 TextColumn::make('lucro_venda')
