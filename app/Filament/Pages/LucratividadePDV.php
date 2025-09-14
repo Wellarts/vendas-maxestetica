@@ -95,7 +95,15 @@ class LucratividadePDV extends Page implements HasTable
                     ->money('BRL')
                     ->color('warning'),
                 TextColumn::make('lucro_venda')
-                    ->summarize(Sum::make()->money('BRL')->label('Total'))
+                    ->summarize(new class extends \Filament\Tables\Columns\Summarizers\Summarizer {
+                        public function summarize(\Illuminate\Database\Query\Builder $query, string $attribute): mixed {
+                            $records = $query->get();
+                            $total = $records->sum(function ($record) {
+                                return ($record->valor_total_desconto - ($record->total_custo_produtos ?? 0));
+                            });
+                            return 'R$ ' . number_format($total, 2, ',', '.');
+                        }
+                    })
                     ->badge()
                     ->alignCenter()
                     ->label('Lucro por Venda')

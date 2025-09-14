@@ -121,7 +121,8 @@ class FuncionarioResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->modalHeading('Editar funcionário'),                   
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

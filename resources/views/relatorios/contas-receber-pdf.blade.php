@@ -6,25 +6,54 @@
 
 @section('content')
     <style>
-        body { font-family: Arial, sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 6px; text-align: center; }
-        th { background: #f2f2f2; }
-        h2 { text-align: center; }
-        tbody tr:nth-child(even) { background: #f7f7f7; }
-        tbody tr:nth-child(odd) { background: #fff; }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            /* border: 1px solid #ccc; */
+            padding: 6px;
+            text-align: center;
+        }
+
+        th {
+            background: #f2f2f2;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f7f7f7;
+        }
+
+        tbody tr:nth-child(odd) {
+            background: #fff;
+        }
     </style>
     <h2>Relatório de Contas a Receber</h2>
     <p>Data de emissão: {{ Carbon::now()->format('d/m/Y H:i') }}</p>
-    @if(isset($filtrosNomes) && collect($filtrosNomes)->filter()->count())
-        <div style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
+    @if (isset($filtrosNomes) && collect($filtrosNomes)->filter()->count())
+        <div
+            style="margin-bottom: 18px; font-size: 1rem; color: #888; background: #f4f6f9; padding: 8px 12px; border-radius: 6px;">
             <strong>Filtros aplicados:</strong>
             @php $sep = false; @endphp
-            @foreach($filtrosNomes as $chave => $valor)
-                @if($valor)
-                    @if($sep) | @endif
+            @foreach ($filtrosNomes as $chave => $valor)
+                @if ($valor)
+                    @if ($sep)
+                        |
+                    @endif
                     <span><b>{{ $chave }}:</b>
-                        @if(str_contains($chave, 'Data') && $valor)
+                        @if (str_contains($chave, 'Data') && $valor)
                             {{ \Carbon\Carbon::parse($valor)->format('d/m/Y') }}
                         @else
                             {{ $valor }}
@@ -53,21 +82,22 @@
                 $totalParcela = 0;
                 $totalRecebido = 0;
             @endphp
-            @foreach($contas as $conta)
-            @php
-                $totalParcela += $conta->valor_parcela;
-                $totalRecebido += $conta->valor_recebido;
-            @endphp
-            <tr>
-                <td>{{ $conta->cliente->nome ?? '-' }}</td>
-                <td>{{ $conta->ordem_parcela }}</td>
-                <td>{{ \Carbon\Carbon::parse($conta->data_vencimento)->format('d/m/Y') }}</td>
-                <td>R$ {{ number_format($conta->valor_parcela, 2, ',', '.') }}</td>
-                <td>{{ $conta->data_pagamento ? \Carbon\Carbon::parse($conta->data_pagamento)->format('d/m/Y') : '-' }}</td>
-                <td>{{ $conta->valor_recebido ? 'R$ ' . number_format($conta->valor_recebido, 2, ',', '.') : '-' }}</td>
-                <td>{{ $conta->status ? 'Recebido' : 'Em aberto' }}</td>
-                <td>{{ $conta->obs }}</td>
-            </tr>
+            @foreach ($contas as $conta)
+                @php
+                    $totalParcela += $conta->valor_parcela;
+                    $totalRecebido += $conta->valor_recebido;
+                @endphp
+                <tr>
+                    <td>{{ $conta->cliente->nome ?? '-' }}</td>
+                    <td>{{ $conta->ordem_parcela }}</td>
+                    <td>{{ \Carbon\Carbon::parse($conta->data_vencimento)->format('d/m/Y') }}</td>
+                    <td>R$ {{ number_format($conta->valor_parcela, 2, ',', '.') }}</td>
+                    <td>{{ $conta->data_pagamento ? \Carbon\Carbon::parse($conta->data_pagamento)->format('d/m/Y') : '-' }}
+                    </td>
+                    <td>{{ $conta->valor_recebido ? 'R$ ' . number_format($conta->valor_recebido, 2, ',', '.') : '-' }}</td>
+                    <td>{{ $conta->status ? 'Recebido' : 'Em aberto' }}</td>
+                    <td>{{ $conta->obs }}</td>
+                </tr>
             @endforeach
         </tbody>
         <tfoot>
