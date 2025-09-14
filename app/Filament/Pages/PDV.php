@@ -264,7 +264,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ]),
                             Select::make('funcionario_id')
                                 ->label('Vendedor')
-                                ->default('1')
+                               // ->default('1')
                                 ->searchable()
                                 ->required()
                                 ->columnSpan([
