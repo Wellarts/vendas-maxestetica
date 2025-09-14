@@ -107,10 +107,6 @@ class ClienteResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('endereco')
                     ->label('Endereço'),
-                Tables\Columns\TextColumn::make('estado.nome')
-                    ->label('Estado'),
-                Tables\Columns\TextColumn::make('cidade.nome')
-                    ->label('Cidade'),
                 Tables\Columns\TextColumn::make('telefone')
 
                     ->formatStateUsing(fn (string $state) => vsprintf('(%d%d)%d%d%d%d%d-%d%d%d%d', str_split($state)))
@@ -118,6 +114,10 @@ class ClienteResource extends Resource
 
                 Tables\Columns\TextColumn::make('email')
                     ->label('Email'),
+                Tables\Columns\TextColumn::make('profissao')
+                    ->label('Profissão'),
+                Tables\Columns\TextColumn::make('numero_conselho')
+                    ->label('Nº Conselho'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->dateTime(),
