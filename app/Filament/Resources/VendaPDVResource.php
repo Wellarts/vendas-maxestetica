@@ -263,7 +263,7 @@ class VendaPDVResource extends Resource
                 //     ->openUrlInNewTab(),
 
                 Tables\Actions\Action::make('ComprovanteImagemImagick')
-                    ->icon('heroicon-s-sparkles')
+                    ->icon('heroicon-s-photo')
                     ->label('Comprovante - Imagem ')
                     ->url(fn (VendaPDV $record): string => route('comprovantePDVImagemImagick', $record))
                     ->openUrlInNewTab(),
