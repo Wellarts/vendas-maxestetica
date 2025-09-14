@@ -59,27 +59,27 @@ class ClienteResource extends Resource
                                 '2xl' => 2,
                             ])
                             ->label('Endereço'),
-                        Forms\Components\Select::make('estado_id')
-                            ->label('Estado')
-                            ->native(false)
-                            ->searchable()
-                            ->required(false)
-                            ->options(Estado::all()->pluck('nome', 'id')->toArray())
-                            ->reactive(),
-                        Forms\Components\Select::make('cidade_id')
-                            ->label('Cidade')
-                            ->native(false)
-                            ->searchable()
-                            ->required(false)
-                            ->options(function (callable $get) {
-                                $estado = Estado::find($get('estado_id'));
-                                if (!$estado) {
-                                    return Estado::all()->pluck('nome', 'id');
-                                }
+                        // Forms\Components\Select::make('estado_id')
+                        //     ->label('Estado')
+                        //     ->native(false)
+                        //     ->searchable()
+                        //     ->required(false)
+                        //     ->options(Estado::all()->pluck('nome', 'id')->toArray())
+                        //     ->reactive(),
+                        // Forms\Components\Select::make('cidade_id')
+                        //     ->label('Cidade')
+                        //     ->native(false)
+                        //     ->searchable()
+                        //     ->required(false)
+                        //     ->options(function (callable $get) {
+                        //         $estado = Estado::find($get('estado_id'));
+                        //         if (!$estado) {
+                        //             return Estado::all()->pluck('nome', 'id');
+                        //         }
 
-                                return $estado->cidade->pluck('nome', 'id');
-                            })
-                            ->reactive(),
+                        //         return $estado->cidade->pluck('nome', 'id');
+                        //     })
+                        //     ->reactive(),
 
                         Forms\Components\TextInput::make('email')
                             ->columnSpan([
@@ -88,6 +88,8 @@ class ClienteResource extends Resource
                             ])
                             ->email()
                             ->maxLength(255),
+                        Forms\Components\TextInput::make('profissao')
+                            ->label('Profissão'),                            
                         Forms\Components\TextInput::make('numero_conselho')
                             ->placeholder('Ex: CRM-12345')
                             ->label('Número do Conselho'),

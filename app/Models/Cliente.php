@@ -13,16 +13,15 @@ class Cliente extends Model
     use LogsActivity;
 
     protected $fillable = [
-
-            'nome',
-            'cpf_cnpj',
-            'endereco',
-            'estado_id',
-            'cidade_id',
-            'telefone',
-            'email',
-            'numero_conselho',
-
+        'nome',
+        'cpf_cnpj',
+        'endereco',
+        'estado_id',
+        'cidade_id',
+        'telefone',
+        'email',
+        'profissao',
+        'numero_conselho',
     ];
 
     public function Estado()

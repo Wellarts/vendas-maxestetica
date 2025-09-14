@@ -248,7 +248,8 @@ class PDV extends Page implements HasForms, HasTable
                             Select::make('cliente_id')
                                 ->label('Cliente')
                                 ->required()
-                                ->default('1')
+                                ->searchable()
+                              //  ->default('1')
                                 //  ->options(Cliente::all()->pluck('nome', 'id')->toArray())
                                 ->relationship(name: 'cliente', titleAttribute: 'nome')
                                 ->createOptionForm([
@@ -283,28 +284,29 @@ class PDV extends Page implements HasForms, HasTable
                                                     '2xl' => 2,
                                                 ])
                                                 ->label('Endereço'),
-                                            Select::make('estado_id')
-                                                ->label('Estado')
-                                                ->native(false)
-                                                ->searchable()
-                                                ->required(false)
-                                                ->options(Estado::all()->pluck('nome', 'id')->toArray())
-                                                ->live(debounce: 500),
-                                            Select::make('cidade_id')
-                                                ->label('Cidade')
-                                                ->native(false)
-                                                ->searchable()
-                                                ->required(false)
-                                                ->options(function (callable $get) {
-                                                    $estado = Estado::find($get('estado_id'));
-                                                    if (!$estado) {
-                                                        return Estado::all()->pluck('nome', 'id');
-                                                    }
+                                            // Select::make('estado_id')
+                                            //     ->label('Estado')
+                                            //     ->native(false)
+                                            //     ->searchable()
+                                            //     ->required(false)
+                                            //     ->options(Estado::all()->pluck('nome', 'id')->toArray())
+                                            //     ->live(debounce: 500),
+                                            // Select::make('cidade_id')
+                                            //     ->label('Cidade')
+                                            //     ->native(false)
+                                            //     ->searchable()
+                                            //     ->required(false)
+                                            //     ->options(function (callable $get) {
+                                            //         $estado = Estado::find($get('estado_id'));
+                                            //         if (!$estado) {
+                                            //             return Estado::all()->pluck('nome', 'id');
+                                            //         }
 
-                                                    return $estado->cidade->pluck('nome', 'id');
-                                                })
-                                                ->live(debounce: 500),
-
+                                            //         return $estado->cidade->pluck('nome', 'id');
+                                            //     })
+                                            //     ->live(debounce: 500),
+                                            Forms\Components\TextInput::make('profissao')
+                                                    ->label('Profissão'),                                                    
                                             TextInput::make('email')
                                                 ->columnSpan([
                                                     'xl'  => 2,
