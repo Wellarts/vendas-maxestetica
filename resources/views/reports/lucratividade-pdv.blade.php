@@ -113,7 +113,7 @@
         <tr style="background-color:#f0f0f0;">
             <th>Custo Produtos</th>
             <th>Valor Total</th>
-            <th>Valor Total Desconto</th>
+            <th>Valor Total Desc/Acres</th>
             <th>Lucratividade</th>
         </tr>
         <tr>
