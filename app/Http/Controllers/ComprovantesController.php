@@ -39,26 +39,23 @@ class ComprovantesController extends Controller
     public function geraImagemPDV($id)
     {
         $vendas = \App\Models\VendaPDV::find($id);
-        // Gera o PDF temporário
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfPdv.venda', compact('vendas'));
-        $output = $pdf->output();
+        $html = view('pdfPdv.venda', compact('vendas'))->render();
 
-        // Salva PDF temporário
-        $tempPdf = tempnam(sys_get_temp_dir(), 'pdv_') . '.pdf';
-        file_put_contents($tempPdf, $output);
+        // Define o caminho público para salvar a imagem
+        $fileName = 'comprovante_' . $id . '_' . time() . '.png';
+        $publicPath = public_path('comprovantes');
+        if (!file_exists($publicPath)) {
+            mkdir($publicPath, 0777, true);
+        }
+        $imagePath = $publicPath . DIRECTORY_SEPARATOR . $fileName;
 
-        // Usa Imagick para converter PDF em imagem (PNG)
-        $imagick = new \Imagick();
-        $imagick->setResolution(200, 200);
-        $imagick->readImage($tempPdf.'[0]'); // primeira página
-        $imagick->setImageFormat('png');
-        $imageData = $imagick->getImageBlob();
-        $imagick->clear();
-        $imagick->destroy();
-        unlink($tempPdf);
+        \Spatie\Browsershot\Browsershot::html($html)
+            ->setScreenshotType('png')
+            ->windowSize(900, 1200)
+            ->save($imagePath);
 
-        return response($imageData)
-            ->header('Content-Type', 'image/png')
-            ->header('Content-Disposition', 'inline; filename="comprovante.png"');
+        $url = asset('comprovantes/' . $fileName);
+        // Redireciona para a URL da imagem ou retorna a URL
+        return redirect($url);
     }
 }
