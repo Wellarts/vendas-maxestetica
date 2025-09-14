@@ -70,26 +70,26 @@ class ComprovantesController extends Controller
         return Pdf::loadView('pdfPdv.venda', compact('vendas'))->download('comprovante.pdf');
     }
 
-    public function geraImagemPDV($id)
-    {
-        $vendas = \App\Models\VendaPDV::find($id);
-        $html = view('pdfPdv.venda', compact('vendas'))->render();
+    // public function geraImagemPDV($id)
+    // {
+    //     $vendas = \App\Models\VendaPDV::find($id);
+    //     $html = view('pdfPdv.venda', compact('vendas'))->render();
 
-        // Define o caminho público para salvar a imagem
-        $fileName = 'comprovante_' . $id . '_' . time() . '.png';
-        $publicPath = public_path('comprovantes');
-        if (!file_exists($publicPath)) {
-            mkdir($publicPath, 0777, true);
-        }
-        $imagePath = $publicPath . DIRECTORY_SEPARATOR . $fileName;
+    //     // Define o caminho público para salvar a imagem
+    //     $fileName = 'comprovante_' . $id . '_' . time() . '.png';
+    //     $publicPath = public_path('comprovantes');
+    //     if (!file_exists($publicPath)) {
+    //         mkdir($publicPath, 0777, true);
+    //     }
+    //     $imagePath = $publicPath . DIRECTORY_SEPARATOR . $fileName;
 
-        \Spatie\Browsershot\Browsershot::html($html)
-            ->setScreenshotType('png')
-            ->windowSize(900, 1200)
-            ->save($imagePath);
+    //     \Spatie\Browsershot\Browsershot::html($html)
+    //         ->setScreenshotType('png')
+    //         ->windowSize(900, 1200)
+    //         ->save($imagePath);
 
-        $url = asset('comprovantes/' . $fileName);
-        // Redireciona para a URL da imagem ou retorna a URL
-        return redirect($url);
-    }
+    //     $url = asset('comprovantes/' . $fileName);
+    //     // Redireciona para a URL da imagem ou retorna a URL
+    //     return redirect($url);
+    // }
 }
