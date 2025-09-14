@@ -35,4 +35,30 @@ class ComprovantesController extends Controller
 
         return Pdf::loadView('pdfPdv.venda', compact('vendas'))->download('comprovante.pdf');
     }
+
+    public function geraImagemPDV($id)
+    {
+        $vendas = \App\Models\VendaPDV::find($id);
+        // Gera o PDF temporário
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdfPdv.venda', compact('vendas'));
+        $output = $pdf->output();
+
+        // Salva PDF temporário
+        $tempPdf = tempnam(sys_get_temp_dir(), 'pdv_') . '.pdf';
+        file_put_contents($tempPdf, $output);
+
+        // Usa Imagick para converter PDF em imagem (PNG)
+        $imagick = new \Imagick();
+        $imagick->setResolution(200, 200);
+        $imagick->readImage($tempPdf.'[0]'); // primeira página
+        $imagick->setImageFormat('png');
+        $imageData = $imagick->getImageBlob();
+        $imagick->clear();
+        $imagick->destroy();
+        unlink($tempPdf);
+
+        return response($imageData)
+            ->header('Content-Type', 'image/png')
+            ->header('Content-Disposition', 'inline; filename="comprovante.png"');
+    }
 }
