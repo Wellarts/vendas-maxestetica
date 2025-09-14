@@ -230,12 +230,23 @@ class PDV extends Page implements HasForms, HasTable
                 // ->keyBindings(['keypress', 'f7'])
                 // ->keyBindings(['command+s', 'ctrl+s'])
                 ->form([
-                    Grid::make('4')
+                    Grid::make([
+                        'default' => 1,
+                        'md' => 2,
+                        'xl' => 4,
+                        '2xl' => 4,
+                    ])
                         ->schema([
                             TextInput::make('id')
                                 ->label('Código da Venda')
                                 ->readOnly()
-                                ->default($this->venda),
+                                ->default($this->venda)
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 1,
+                                    'xl' => 1,
+                                    '2xl' => 1,
+                                ]),
                             Radio::make('tipo_registro')
                                 ->label('Tipo de Registro')
                                 ->live()
@@ -244,22 +255,48 @@ class PDV extends Page implements HasForms, HasTable
                                     'orcamento' => 'Orçamento',
                                 ])
                                 ->default('venda')
-                                ->required(),
+                                ->required()
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 1,
+                                    'xl' => 1,
+                                    '2xl' => 1,
+                                ]),
+                            Select::make('funcionario_id')
+                                ->label('Vendedor')
+                                ->default('1')
+                                ->searchable()
+                                ->required()
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl'  => 2,
+                                    '2xl' => 2,
+                                ])
+                                ->options(Funcionario::all()->pluck('nome', 'id')->toArray()),
                             Select::make('cliente_id')
                                 ->label('Cliente')
                                 ->required()
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl'  => 2,
+                                    '2xl' => 2,
+                                ])
                                 ->searchable()
-                              //  ->default('1')
-                                //  ->options(Cliente::all()->pluck('nome', 'id')->toArray())
                                 ->relationship(name: 'cliente', titleAttribute: 'nome')
                                 ->createOptionForm([
                                     Grid::make([
+                                        'default' => 1,
+                                        'md' => 2,
                                         'xl'  => 4,
                                         '2xl' => 4,
                                     ])
                                         ->schema([
                                             TextInput::make('nome')
                                                 ->columnSpan([
+                                                    'default' => 1,
+                                                    'md' => 2,
                                                     'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
@@ -271,7 +308,6 @@ class PDV extends Page implements HasForms, HasTable
                                                         $input.length > 14 ? '99.999.999/9999-99' : '999.999.999-99'
                                                     JS))
                                                 ->rule('cpf_ou_cnpj'),
-
                                             TextInput::make('telefone')
                                                 ->minLength(11)
                                                 ->maxLength(11)
@@ -280,35 +316,18 @@ class PDV extends Page implements HasForms, HasTable
                                                 ->maxLength(255),
                                             Textarea::make('endereco')
                                                 ->columnSpan([
+                                                    'default' => 1,
+                                                    'md' => 2,
                                                     'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
                                                 ->label('Endereço'),
-                                            // Select::make('estado_id')
-                                            //     ->label('Estado')
-                                            //     ->native(false)
-                                            //     ->searchable()
-                                            //     ->required(false)
-                                            //     ->options(Estado::all()->pluck('nome', 'id')->toArray())
-                                            //     ->live(debounce: 500),
-                                            // Select::make('cidade_id')
-                                            //     ->label('Cidade')
-                                            //     ->native(false)
-                                            //     ->searchable()
-                                            //     ->required(false)
-                                            //     ->options(function (callable $get) {
-                                            //         $estado = Estado::find($get('estado_id'));
-                                            //         if (!$estado) {
-                                            //             return Estado::all()->pluck('nome', 'id');
-                                            //         }
-
-                                            //         return $estado->cidade->pluck('nome', 'id');
-                                            //     })
-                                            //     ->live(debounce: 500),
-                                            Forms\Components\TextInput::make('profissao')
-                                                    ->label('Profissão'),                                                    
+                                            TextInput::make('profissao')
+                                                ->label('Profissão'),
                                             TextInput::make('email')
                                                 ->columnSpan([
+                                                    'default' => 1,
+                                                    'md' => 2,
                                                     'xl'  => 2,
                                                     '2xl' => 2,
                                                 ])
@@ -316,101 +335,116 @@ class PDV extends Page implements HasForms, HasTable
                                                 ->maxLength(255),
                                         ]),
                                 ]),
-                            Select::make('funcionario_id')
-                                ->label('Vendedor')
-                                ->default('1')
-                                ->required()
-                                ->options(Funcionario::all()->pluck('nome', 'id')->toArray()),
+                            
                             Select::make('forma_pgmto_id')
                                 ->label('Forma de Pagamento')
                                 ->default('1')
                                 ->native(false)
                                 ->required()
                                 ->searchable()
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl'  => 2,
+                                    '2xl' => 2,
+                                ])
                                 ->options(FormaPgmto::all()->pluck('nome', 'id')->toArray()),
                             DatePicker::make('data_venda')
                                 ->label('Data da Venda')
                                 ->required()
-                                ->default(now()),
+                                ->default(now())
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 1,
+                                    'xl' => 1,
+                                    '2xl' => 1,
+                                ]),
                             TextInput::make('valor_total')
                                 ->numeric()
                                 ->label('Valor Total')
                                 ->readOnly()
                                 ->default(function () {
                                     $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
-
                                     return $valorTotal;
                                 })
                                 ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
-                                ->columnSpan(2)
-                                ->columnStart(3),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl'  => 2,
+                                    '2xl' => 2,
+                                ])
+                                ->columnStart([
+                                    'xl' => 3,
+                                    '2xl' => 3,
+                                ]),
                             Section::make('Descontos e Acréscimos')
                                 ->columns([
+                                    'default' => 1,
+                                    'md' => 2,
                                     'xl'  => 2,
                                     '2xl' => 2,
                                 ])
                                 ->schema([
-                                Radio::make('tipo_acres_desc')
-                                    ->label('Tipo de Desconto/Acréscimo')
-                                    ->hint('Porcentagem ou Valor')
-                                    ->live()
-                                    ->options([
-                                        'Valor'       => 'Valor',
-                                        'Porcentagem' => 'Porcentagem',
-                                    ])
-                                    ->required(false)
-                                    ->afterStateUpdated(function ($state, callable $set, Get $get) {
-                                        $set('percent_acres_desc', null);
-                                        $set('valor_acres_desc', null);
-                                        $set('valor_total_desconto', $get('valor_total'));
-                                    }),
-                               TextInput::make('percent_acres_desc')
-                                    ->label('Percentual')
-                                    ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
-                                    ->numeric()
-                                    ->hint('Para desconto use um valor negativo Ex. -10')
-                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
-                                    ->suffix('%')
-                                    ->required(false)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal     = (float) $get('valor_total');
-                                        $percentual     = (float) $state;
-                                        $tipo           = $get('tipo_acres_desc');
-                                        $valorAcresDesc = (float) $get('valor_acres_desc');
-                                        $novoValor      = $valorTotal;
-                                        if ($tipo === 'Porcentagem' && $percentual != 0) {
-                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
-                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
-                                            $novoValor = $valorTotal + $valorAcresDesc;
-                                        }
-                                        $set('valor_total_desconto', $novoValor);
-                                    }),
-                                TextInput::make('valor_acres_desc')
-                                    ->label('Valor Desconto/Acréscimo')
-                                    ->hint('Para desconto use um valor negativo Ex. -10')
-                                    // ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Valor')
-                                    ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
-                                    ->numeric()
-                                    ->prefix('R$')
-                                    ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
-                                    ->required(false)
-                                    ->live(onBlur: true)
-                                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                                        $valorTotal     = (float) $get('valor_total');
-                                        $tipo           = $get('tipo_acres_desc');
-                                        $percentual     = (float) $get('percent_acres_desc');
-                                        $valorAcresDesc = (float) $state;
-                                        $novoValor      = $valorTotal;
-                                        if ($tipo === 'Porcentagem' && $percentual > 0) {
-                                            $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
-                                        } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
-                                            $novoValor = $valorTotal + $valorAcresDesc;
-                                        }
-                                        $set('valor_total_desconto', $novoValor);
-                                    }),
-                            ]),
-
+                                    Radio::make('tipo_acres_desc')
+                                        ->label('Tipo de Desconto/Acréscimo')
+                                        ->hint('Porcentagem ou Valor')
+                                        ->live()
+                                        ->options([
+                                            'Valor'       => 'Valor',
+                                            'Porcentagem' => 'Porcentagem',
+                                        ])
+                                        ->required(false)
+                                        ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                            $set('percent_acres_desc', null);
+                                            $set('valor_acres_desc', null);
+                                            $set('valor_total_desconto', $get('valor_total'));
+                                        }),
+                                    TextInput::make('percent_acres_desc')
+                                        ->label('Percentual')
+                                        ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
+                                        ->numeric()
+                                        ->hint('Para desconto use um valor negativo Ex. -10')
+                                        ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                        ->suffix('%')
+                                        ->required(false)
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            $valorTotal     = (float) $get('valor_total');
+                                            $percentual     = (float) $state;
+                                            $tipo           = $get('tipo_acres_desc');
+                                            $valorAcresDesc = (float) $get('valor_acres_desc');
+                                            $novoValor      = $valorTotal;
+                                            if ($tipo === 'Porcentagem' && $percentual != 0) {
+                                                $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                            } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                                $novoValor = $valorTotal + $valorAcresDesc;
+                                            }
+                                            $set('valor_total_desconto', $novoValor);
+                                        }),
+                                    TextInput::make('valor_acres_desc')
+                                        ->label('Valor Desconto/Acréscimo')
+                                        ->hint('Para desconto use um valor negativo Ex. -10')
+                                        ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
+                                        ->numeric()
+                                        ->prefix('R$')
+                                        ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
+                                        ->required(false)
+                                        ->live(onBlur: true)
+                                        ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                                            $valorTotal     = (float) $get('valor_total');
+                                            $tipo           = $get('tipo_acres_desc');
+                                            $percentual     = (float) $get('percent_acres_desc');
+                                            $valorAcresDesc = (float) $state;
+                                            $novoValor      = $valorTotal;
+                                            if ($tipo === 'Porcentagem' && $percentual > 0) {
+                                                $novoValor = $valorTotal + ($valorTotal * ($percentual / 100));
+                                            } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
+                                                $novoValor = $valorTotal + $valorAcresDesc;
+                                            }
+                                            $set('valor_total_desconto', $novoValor);
+                                        }),
+                                ]),
                             Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
                                 ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
@@ -418,26 +452,44 @@ class PDV extends Page implements HasForms, HasTable
                                 ->options([
                                     '1' => 'Direto no Caixa',
                                     '2' => 'Conta a Receber',
-                                ])->default('1'),
+                                ])->default('1')
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl' => 2,
+                                    '2xl' => 2,
+                                ]),
                             TextInput::make('parcelas')
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->hidden(fn (Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento'),
+                                ->hidden(fn (Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento')
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 1,
+                                    'xl' => 1,
+                                    '2xl' => 1,
+                                ]),
                             TextInput::make('valor_total_desconto')
                                 ->numeric()
                                 ->label('Valor Total c/ Desconto/Acréscimo')
                                 ->readOnly()
                                 ->default(function () {
                                     $valorTotal = PDVs::where('venda_p_d_v_id', $this->venda)->sum('sub_total');
-
                                     return $valorTotal;
                                 })
                                 ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #32CD32; text-align: right;'])
-                                ->columnSpan(2)
-                                ->columnStart(3),
+                                ->columnSpan([
+                                    'default' => 1,
+                                    'md' => 2,
+                                    'xl'  => 2,
+                                    '2xl' => 2,
+                                ])
+                                ->columnStart([
+                                    'xl' => 3,
+                                    '2xl' => 3,
+                                ]),
                         ]),
-
                 ])
                 ->after(function ($data) {
 
