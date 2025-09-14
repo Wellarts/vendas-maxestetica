@@ -256,11 +256,17 @@ class VendaPDVResource extends Resource
                     ->label('Comprovante - PDF')
                     ->url(fn (VendaPDV $record): string => route('comprovantePDV', $record))
                     ->openUrlInNewTab(),
-                // Tables\Actions\Action::make('ComprovanteImagem')
-                //                 ->icon('heroicon-s-photo')
-                //                 ->label('Comprovante - Imagem')
-                //                 ->url(fn (VendaPDV $record): string => route('comprovantePDVImagem', $record))
-                //                 ->openUrlInNewTab(),
+                Tables\Actions\Action::make('ComprovanteImagem')
+                    ->icon('heroicon-s-photo')
+                    ->label('Comprovante - Imagem')
+                    ->url(fn (VendaPDV $record): string => route('comprovantePDVImagem', $record))
+                    ->openUrlInNewTab(),
+
+                Tables\Actions\Action::make('ComprovanteImagemImagick')
+                    ->icon('heroicon-s-sparkles')
+                    ->label('Comprovante - Imagem (Imagick)')
+                    ->url(fn (VendaPDV $record): string => route('comprovantePDVImagemImagick', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

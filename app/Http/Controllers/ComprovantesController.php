@@ -8,6 +8,40 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class ComprovantesController extends Controller
 {
+    public function geraImagemPDVImagick($id)
+    {
+        $vendas = \App\Models\VendaPDV::find($id);
+        $html = view('pdfPdv.venda', compact('vendas'))->render();
+
+        // Caminho para salvar o PDF temporário
+        $publicPath = public_path('comprovantes');
+        if (!file_exists($publicPath)) {
+            mkdir($publicPath, 0777, true);
+        }
+        $pdfFile = $publicPath . DIRECTORY_SEPARATOR . 'comprovante_' . $id . '_' . time() . '.pdf';
+        $imageFile = $publicPath . DIRECTORY_SEPARATOR . 'comprovante_' . $id . '_' . time() . '.png';
+
+        // Gerar PDF temporário
+        \Barryvdh\DomPDF\Facade\Pdf::loadHTML($html)->save($pdfFile);
+
+        // Converter PDF em imagem usando Imagick
+        $imagick = new \Imagick();
+        $imagick->setResolution(150, 150);
+        $imagick->readImage($pdfFile.'[0]'); // primeira página
+        $imagick->setImageFormat('png');
+        $imagick->writeImage($imageFile);
+        $imagick->clear();
+        $imagick->destroy();
+
+        // Remove o PDF temporário
+        if (file_exists($pdfFile)) {
+            unlink($pdfFile);
+        }
+
+        $url = asset('comprovantes/' . basename($imageFile));
+        return redirect($url);
+    }
+
     public function geraPdf($id)
     {
 
