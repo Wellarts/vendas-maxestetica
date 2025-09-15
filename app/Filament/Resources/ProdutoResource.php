@@ -77,14 +77,18 @@ class ProdutoResource extends Resource
                             ->numeric()
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Get $get, Set $set) {
-                                $set('valor_venda', ((((float)$get('valor_compra') * (float)$get('lucratividade')) / 100) + (float)$get('valor_compra')));
-                            }),
+                                if ($get('tipo') == 1 && (float)$get('lucratividade') > 0) {
+                                    $set('valor_venda', ((((float)$get('valor_compra') * (float)$get('lucratividade')) / 100) + (float)$get('valor_compra')));
+                                }
+                            }),                               
                         Forms\Components\TextInput::make('lucratividade')
                             ->label('Lucratividade (%)')
                             ->default(0)
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Get $get, Set $set) {
-                                $set('valor_venda', ((((float)$get('valor_compra') * (float)$get('lucratividade')) / 100) + (float)$get('valor_compra')));
+                                if ($get('tipo') == 1 && (float)$get('valor_compra') > 0) {
+                                     $set('valor_venda', ((((float)$get('valor_compra') * (float)$get('lucratividade')) / 100) + (float)$get('valor_compra')));
+                                }                               
                             }),
                         Forms\Components\TextInput::make('valor_venda')
                             ->label('Valor Venda')
@@ -92,7 +96,7 @@ class ProdutoResource extends Resource
                             // ->disabled(),
                             ->live(onBlur: true)
                             ->afterStateUpdated(function (Get $get, Set $set) {
-                                if ($get('tipo') == 1) {
+                                if ($get('tipo') == 1 && (float)$get('valor_compra') > 0) {
                                     $set('lucratividade', (((((float)$get('valor_venda') - (float)$get('valor_compra')) / (float)$get('valor_compra')) * 100)));
                                 }
                             }),
