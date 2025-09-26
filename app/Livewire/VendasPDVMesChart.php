@@ -15,22 +15,25 @@ class VendasPDVMesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $data = Trend::model(VendaPDV::class)
-        ->between(
-            start: now()->startOfYear(),
-            end: now()->endOfYear(),
-        )
-        ->perMonth()
-        ->sum('valor_total');
+
+        $query = VendaPDV::where('tipo_registro', 'VENDA');
+
+        $data = Trend::query($query)
+            ->between(
+                start: now()->startOfYear(),
+                end: now()->endOfYear(),
+            )
+            ->perMonth()
+            ->sum('valor_total_desconto');
 
         return [
             'datasets' => [
                 [
                     'label' => 'Vendas Mensal - PDV',
-                    'data'  => $data->map(fn (TrendValue $value) => $value->aggregate),
+                    'data'  => $data->map(fn(TrendValue $value) => $value->aggregate),
                 ],
             ],
-            'labels' => $data->map(fn (TrendValue $value) => $value->date),
+            'labels' => $data->map(fn(TrendValue $value) => $value->date),
         ];
     }
 
