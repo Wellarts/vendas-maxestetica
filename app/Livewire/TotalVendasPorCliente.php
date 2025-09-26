@@ -8,6 +8,8 @@ class TotalVendasPorCliente extends ChartWidget
 {
     protected static ?string $heading = 'Clientes 10+';
 
+    protected int | string | array $columnSpan = 'full';
+
     protected function getData(): array
     {
         return [
