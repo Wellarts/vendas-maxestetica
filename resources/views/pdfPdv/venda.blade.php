@@ -183,7 +183,7 @@
                             <p style="font-size: 10px; color: #aaa;">
                                 MAXSAUDE DISTRIBUIDORA DE PRODUTOS ODONTOLOGICOS E HOSPITALARES LTDA<br>
                                 CNPJ: 53.322.401/0001-24<br>
-                                Endereço: rua buriti 47, centro, Eusébio/Ceará
+                                Endereço: Rua Buriti 47, Centro, Eusébio/Ceará
                             </p>
                             <p style="font-size: 10px; color: #aaa;">
                                 Telefones: 85 99168-6536 / 85 99172-5715

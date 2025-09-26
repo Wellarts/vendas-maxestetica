@@ -11,6 +11,8 @@ class VendasPDVMesChart extends ChartWidget
 {
     protected static ?string $heading = 'Vendas Mensal - PDV';
 
+    protected int | string | array $columnSpan = 'full';
+
     protected function getData(): array
     {
         $data = Trend::model(VendaPDV::class)
