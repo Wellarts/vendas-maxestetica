@@ -80,7 +80,8 @@ class PDV extends Page implements HasForms, HasTable
     public function mount(): void
     {
         $this->form->fill();
-        $this->venda = random_int(0000000000, 9999999999);
+        $lastVenda = VendaPDV::orderBy('id', 'desc')->first();
+        $this->venda = $lastVenda ? $lastVenda->id + 1 : 1;
     }
 
     public function form(Form $form): Form
