@@ -79,6 +79,12 @@ class PDV extends Page implements HasForms, HasTable
 
     public function mount(): void
     {
+        // Otimização: buscar IDs em lote e deletar apenas se necessário
+        $vendaPDVIds = VendaPDV::pluck('id');
+        if ($vendaPDVIds->isNotEmpty()) {
+            PDV::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
+        }
+        // Gera o próximo número de venda
         $this->form->fill();
         $lastVenda = VendaPDV::orderBy('id', 'desc')->first();
         $this->venda = $lastVenda ? $lastVenda->id + 1 : 1;
