@@ -24,6 +24,11 @@ class VwSomaQuantidadeProdutoResource extends Resource
 
     protected static ?int $navigationSort = 19;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole(['Administrador','TI']);
+    }
+
     public static function form(Form $form): Form
     {
         return $form
