@@ -21,8 +21,14 @@ use Filament\Forms\Components\DatePicker;
 
 class EstoqueContabil extends Page implements HasForms, HasTable
 {
+    
     use InteractsWithTable;
     use InteractsWithForms;
+
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole(['Administrador','TI']);
+    }
 
     // protected static string $resource = ProdutoResource::class;
 
