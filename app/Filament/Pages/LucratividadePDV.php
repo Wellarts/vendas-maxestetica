@@ -41,6 +41,11 @@ class LucratividadePDV extends Page implements HasTable
     //      }
     // }
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole(['Administrador','TI']);
+    }
+
 
     // Removido processamento desnecessário de lucro no mount()
 

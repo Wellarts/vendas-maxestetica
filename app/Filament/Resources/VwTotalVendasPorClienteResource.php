@@ -21,6 +21,11 @@ class VwTotalVendasPorClienteResource extends Resource
 
     protected static ?int $navigationSort = 20;
 
+    public static function canAccess(): bool
+    {
+        return auth()->user()?->hasRole(['Administrador','TI']);
+    }
+
 
 
     public static function table(Table $table): Table
