@@ -141,7 +141,7 @@
             <table style="width:100%;">
                 <tr>
                     <td style="width: 80px; vertical-align: middle;">
-                        <img src="{{ public_path('img/logo.png') }}" alt="logo" style="height: 100px;">
+                        <img src="{{ public_path('img/logo.png') }}" alt="logo" style="height: 80px; width: auto;">
                     </td>
                     <td style="text-align: right;">
                         <div class="header-info">
