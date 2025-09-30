@@ -103,18 +103,7 @@ class ContasReceberResource extends Resource
                         Forms\Components\DatePicker::make('data_vencimento')
                             ->label('Data do Vencimento')
                             ->displayFormat('d/m/Y')
-                            ->required(),
-                        Forms\Components\DatePicker::make('data_pagamento')
-                            ->label('Data do Recebimento')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            })
-                            ->displayFormat('d/m/Y'),
-
+                            ->required(),      
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
                             ->label('Valor Total')
@@ -132,29 +121,37 @@ class ContasReceberResource extends Resource
                             ->columnSpanFull()
                             ->label('Observações'),
                     ]),
-                Forms\Components\Toggle::make('status')
-                    /* ->columnSpan([
-                            'xl' => 3,
-                            '2xl' => 3,
-                        ]) */
-                    ->inlineLabel(false)
-                    ->default(0)
-                    ->label('Recebido')
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(
-                        function (Get $get, Set $set) {
-                            if ($get('status') == 1) {
-                                $set('valor_recebido', $get('valor_parcela'));
-                                $set('data_pagamento', Carbon::now()->format('Y-m-d'));
-                            } else {
-
-                                $set('valor_recebido', 0);
-                                $set('data_pagamento', null);
-                            }
-                        }
-                    ),
-                    Forms\Components\TextInput::make('valor_recebido')
+                Forms\Components\Section::make('Recebimento')
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Toggle::make('status')
+                            ->inlineLabel(false)
+                            ->default(0)
+                            ->label('Recebido')
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(
+                                function (Get $get, Set $set) {
+                                    if ($get('status') == 1) {
+                                        $set('valor_recebido', $get('valor_parcela'));
+                                        $set('data_pagamento', Carbon::now()->format('Y-m-d'));
+                                    } else {
+                                        $set('valor_recebido', 0);
+                                        $set('data_pagamento', null);
+                                    }
+                                }
+                            ),
+                        Forms\Components\DatePicker::make('data_pagamento')
+                            ->label('Data do Recebimento')
+                            ->hidden(function ($context) {
+                                if ($context == 'edit') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->displayFormat('d/m/Y'),
+                        Forms\Components\TextInput::make('valor_recebido')
                             ->numeric()
                             ->hidden(function ($context) {
                                 if ($context == 'edit') {
@@ -164,6 +161,7 @@ class ContasReceberResource extends Resource
                                 }
                             })
                             ->label('Valor Recebido'),
+                    ]),
             ]);
     }
 

@@ -104,16 +104,7 @@ class ContasPagarResource extends Resource
                             ->label('Data do Vencimento')
                             ->displayFormat('d/m/Y')
                             ->required(),
-                        Forms\Components\DatePicker::make('data_pagamento')
-                            ->label('Data do Pagamento')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
-                                    return false;
-                                } else {
-                                    return true;
-                                }
-                            })
-                            ->displayFormat('d/m/Y'),
+                        
 
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
@@ -132,29 +123,37 @@ class ContasPagarResource extends Resource
                             ->columnSpanFull()
                             ->label('Observações'),
                     ]),
-                Forms\Components\Toggle::make('status')
-                    /* ->columnSpan([
-                            'xl' => 3,
-                            '2xl' => 3,
-                        ]) */
-                    ->inlineLabel(false)
-                    ->default(0)
-                    ->label('Pago')
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(
-                        function (Get $get, Set $set) {
-                            if ($get('status') == 1) {
-                                $set('valor_pago', $get('valor_parcela'));
-                                $set('data_pagamento', Carbon::now()->format('Y-m-d'));
-                            } else {
-
-                                $set('valor_pago', 0);
-                                $set('data_pagamento', null);
-                            }
-                        }
-                    ),
-                Forms\Components\TextInput::make('valor_pago')
+                Forms\Components\Section::make('Pagamento')
+                    ->columns(3)
+                    ->schema([
+                        Forms\Components\Toggle::make('status')
+                            ->inlineLabel(false)
+                            ->default(0)
+                            ->label('Pago')
+                            ->required()
+                            ->live()
+                            ->afterStateUpdated(
+                                function (Get $get, Set $set) {
+                                    if ($get('status') == 1) {
+                                        $set('valor_pago', $get('valor_parcela'));
+                                        $set('data_pagamento', Carbon::now()->format('Y-m-d'));
+                                    } else {
+                                        $set('valor_pago', 0);
+                                        $set('data_pagamento', null);
+                                    }
+                                }
+                            ),
+                        Forms\Components\DatePicker::make('data_pagamento')
+                            ->label('Data do Pagamento')
+                            ->hidden(function ($context) {
+                                if ($context == 'edit') {
+                                    return false;
+                                } else {
+                                    return true;
+                                }
+                            })
+                            ->displayFormat('d/m/Y'),
+                        Forms\Components\TextInput::make('valor_pago')
                             ->numeric()
                             ->hidden(function ($context) {
                                 if ($context == 'edit') {
@@ -164,6 +163,7 @@ class ContasPagarResource extends Resource
                                 }
                             })
                             ->label('Valor Pago'),
+                    ]),
 
 
             ]);
