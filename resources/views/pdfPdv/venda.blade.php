@@ -27,9 +27,9 @@
         /* Cabeçalho */
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; 
             align-items: center;
-            border-bottom: 2px solid #eee;
+          /*  border-bottom: 2px solid #eee; */
             padding-bottom: 18px;
             margin-bottom: 22px;
         }
@@ -170,25 +170,24 @@
 <body>
     <main class="comprovante">
         <!-- Cabeçalho -->
-        <header class="header">
+        <header class="header" style="padding-bottom: 8px; margin-bottom: 12px;">
             <table style="width:100%;">
                 <tr>
-                    <td style="width: 80px; vertical-align: middle;">
-                        <img src="{{ public_path('img/logo.png') }}" alt="logo" style="height: 100px;">
+                    <td style="width: 60px; vertical-align: middle;">
+                        <img src="{{ public_path('img/logo.png') }}" alt="logo" style="height: 60px;">
                     </td>
                     <td style="text-align: right;">
                         <div class="header-info">
-                            <h2 style="font-size: 1.6rem; margin: 0; color: #777f1a; font-weight: 700;">Max Estética
-                            </h2>
-                            <p style="font-size: 10px; color: #aaa;">
+                            <h2 style="font-size: 1.1rem; margin: 0; color: #777f1a; font-weight: 700; line-height: 1.1;">Max Estética</h2>
+                            <p style="font-size: 9px; color: #aaa; margin: 1px 0; line-height: 1.1;">
                                 MAXSAUDE DISTRIBUIDORA DE PRODUTOS ODONTOLOGICOS E HOSPITALARES LTDA<br>
                                 CNPJ: 53.322.401/0001-24<br>
                                 Endereço: Rua Buriti 47, Centro, Eusébio/Ceará
                             </p>
-                            <p style="font-size: 10px; color: #aaa;">
+                            <p style="font-size: 9px; color: #aaa; margin: 1px 0; line-height: 1.1;">
                                 Telefones: 85 99168-6536 / 85 99172-5715
                             </p>
-                            <p style="font-size: 10px; color: #aaa;">
+                            <p style="font-size: 9px; color: #aaa; margin: 1px 0; line-height: 1.1;">
                                 Instagram: @Maxesteticaoficial
                             </p>
                         </div>
@@ -198,21 +197,54 @@
         </header>
 
         <!-- Identificação -->
-        <div class="text-center">
-            <h2 class="section-title">
+        <div class="text-center" style="margin: 6px 0 4px 0;">
+            <h2 class="section-title" style="margin-bottom: 2px; border: none;">
                 {{ $vendas->tipo_registro == 'orcamento' ? 'Comprovante de Orçamento' : 'Comprovante de Venda' }}
             </h2>
             <span class="badge">
                 {{ $vendas->tipo_registro == 'orcamento' ? 'Orçamento Nº ' : 'Venda Nº ' }}{{ $vendas->id }}
             </span>
         </div>
+        <!-- Dados completos do Cliente -->
+        <section style="margin: 18px 0 10px 0;">
+            <table style="width:100%; border-radius:10px; overflow:hidden; background: #f9fafc; border: 1px solid #eee; font-size: 0.80rem; table-layout: fixed;">
+                <tr>
+                    <td colspan="4" style="padding: 6px 8px; background: #e8ebf0;">
+                        <strong>Dados do Cliente</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="width: 18%; padding: 6px 8px;"><strong>Nome:</strong></td>
+                    <td style="width: 32%; padding: 6px 0px;">{{ $vendas->cliente->nome ?? '-' }}</td>
+                    <td style="width: 18%; padding: 6px 8px;"><strong>CPF/CNPJ:</strong></td>
+                    <td style="width: 32%; padding: 6px 8px;">{{ $vendas->cliente->cpf_cnpj ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px 8px;"><strong>Telefone:</strong></td>
+                    <td style="padding: 6px 8px;">{{ $vendas->cliente->telefone ?? '-' }}</td>
+                    <td style="padding: 6px 8px;"><strong>E-mail:</strong></td>
+                    <td style="padding: 6px 8px;">{{ $vendas->cliente->email ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="padding: 6px 8px;"><strong>Endereço:</strong></td>
+                    <td colspan="3" style="padding: 6px 8px;">{{ $vendas->cliente->endereco ?? '-' }}</td>
+                </tr>
+                <tr>
+                    <td style="width: 18%; padding: 6px 8px;"><strong>Profissão:</strong></td>
+                    <td style="width: 32%; padding: 6px 0px;">{{ $vendas->cliente->profissao ?? '-' }}</td>
+                    <td style="width: 18%; padding: 6px 8px;"><strong>Nº Conselho:</strong></td>
+                    <td style="width: 32%; padding: 6px 8px;">{{ $vendas->cliente->numero_conselho ?? '-' }}</td>
+                </tr>
+                
+                
+            </table>
+        </section>
 
         <!-- Dados principais em tabela -->
         <section>
             <table class="info-table" style="width:100%; margin: 18px 0 10px 0; border-radius:10px; overflow:hidden;">
                 <thead>
-                    <tr style="background:#f4f6f9;">
-                        <th>Cliente</th>
+                    <tr style="background:#f4f6f9;">                       
                         <th>Vendedor</th>
                         <th>Data</th>
                         <th>Pagamento</th>
@@ -221,7 +253,6 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td>{{ $vendas->cliente->nome ?? '-' }}</td>
                         <td>{{ $vendas->funcionario->nome ?? '-' }}</td>
                         <td>{{ \Carbon\Carbon::parse($vendas->data_venda)->format('d/m/Y') }}</td>
                         <td>{{ $vendas->formaPgmto->nome ?? '-' }}</td>

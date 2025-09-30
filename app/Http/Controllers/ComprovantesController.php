@@ -67,7 +67,7 @@ class ComprovantesController extends Controller
 
         //  return pdf::loadView('pdf.venda', compact(['vendas']))->stream();
 
-        return Pdf::loadView('pdfPdv.venda', compact('vendas'))->download('comprovante.pdf');
+        return Pdf::loadView('pdfPdv.venda', compact('vendas'))->stream('comprovante.pdf');
     }
 
     // public function geraImagemPDV($id)
