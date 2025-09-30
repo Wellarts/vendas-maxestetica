@@ -74,7 +74,7 @@ class ContasPagarResource extends Resource
                             // })
                             ->maxLength(10),
                         Forms\Components\TextInput::make('valor_parcela')
-                            //->numeric()
+                            ->numeric()
                             ->label('Valor da Parcela')
                             ->prefix('R$')
                             ->readOnly(function ($context) {
