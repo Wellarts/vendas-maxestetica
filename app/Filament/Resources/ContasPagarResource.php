@@ -23,6 +23,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
+
 class ContasPagarResource extends Resource
 {
     protected static ?string $model = ContasPagar::class;
@@ -73,8 +74,9 @@ class ContasPagarResource extends Resource
                             // })
                             ->maxLength(10),
                         Forms\Components\TextInput::make('valor_parcela')
-                            ->numeric()
+                            //->numeric()
                             ->label('Valor da Parcela')
+                            ->prefix('R$')
                             ->readOnly(function ($context) {
                                 if ($context == 'create') {
                                     return false;
@@ -82,7 +84,6 @@ class ContasPagarResource extends Resource
                                     return true;
                                 }
                             })
-
                             ->required(),
                         Forms\Components\TextInput::make('parcelas')
                             ->label('Qtd Parcelas')
@@ -104,11 +105,12 @@ class ContasPagarResource extends Resource
                             ->label('Data do Vencimento')
                             ->displayFormat('d/m/Y')
                             ->required(),
-                        
+
 
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
                             ->label('Valor Total')
+                            ->prefix('R$')
                             ->readOnly(function ($context) {
                                 if ($context == 'create') {
                                     return false;
@@ -118,7 +120,7 @@ class ContasPagarResource extends Resource
                             })
                             ->required(),
 
-                        
+
                         Forms\Components\Textarea::make('obs')
                             ->columnSpanFull()
                             ->label('Observações'),
@@ -155,6 +157,7 @@ class ContasPagarResource extends Resource
                             ->displayFormat('d/m/Y'),
                         Forms\Components\TextInput::make('valor_pago')
                             ->numeric()
+                            ->prefix('R$')
                             ->hidden(function ($context) {
                                 if ($context == 'edit') {
                                     return false;
@@ -179,7 +182,7 @@ class ContasPagarResource extends Resource
                     ->Label('Pago?')
                     ->badge()
                     ->alignCenter()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         '0' => 'danger',
                         '1' => 'success',
                     })
@@ -237,9 +240,9 @@ class ContasPagarResource extends Resource
             ])
             ->filters([
                 Filter::make('A pagar')
-                    ->query(fn (Builder $query): Builder => $query->where('status', false))->default(true),
+                    ->query(fn(Builder $query): Builder => $query->where('status', false))->default(true),
                 Filter::make('Pagas')
-                    ->query(fn (Builder $query): Builder => $query->where('status', true)),
+                    ->query(fn(Builder $query): Builder => $query->where('status', true)),
                 SelectFilter::make('fornecedor')->relationship('fornecedor', 'nome')->searchable(),
                 Tables\Filters\Filter::make('data_vencimento')
                     ->form([
@@ -252,11 +255,11 @@ class ContasPagarResource extends Resource
                         return $query
                             ->when(
                                 $data['vencimento_de'],
-                                fn ($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
+                                fn($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
                             )
                             ->when(
                                 $data['vencimento_ate'],
-                                fn ($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
+                                fn($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
                             );
                     }),
             ])
@@ -285,7 +288,7 @@ class ContasPagarResource extends Resource
                             'id_lancamento' => $record->id,
                             'valor' => ($record->valor_pago * -1),
                             'tipo'  => 'DEBITO',
-                            'obs'   => 'Pagamento '.$record->obs. '',
+                            'obs'   => 'Pagamento ' . $record->obs . '',
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);

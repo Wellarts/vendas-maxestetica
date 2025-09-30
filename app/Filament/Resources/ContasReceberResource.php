@@ -74,6 +74,7 @@ class ContasReceberResource extends Resource
                             ->maxLength(10),
                         Forms\Components\TextInput::make('valor_parcela')
                             ->numeric()
+                            ->prefix('R$')                            
                             ->label('Valor da Parcela')
                             ->readOnly(function ($context) {
                                 if ($context == 'create') {
@@ -87,7 +88,7 @@ class ContasReceberResource extends Resource
                         Forms\Components\TextInput::make('parcelas')
                             ->label('Qtd Parcelas')
                             ->required()
-                            ->live(onBlur:true)
+                            ->live(onBlur: true)
                             ->readOnly(function ($context) {
                                 if ($context == 'create') {
                                     return false;
@@ -103,10 +104,11 @@ class ContasReceberResource extends Resource
                         Forms\Components\DatePicker::make('data_vencimento')
                             ->label('Data do Vencimento')
                             ->displayFormat('d/m/Y')
-                            ->required(),      
+                            ->required(),
                         Forms\Components\TextInput::make('valor_total')
                             ->numeric()
                             ->label('Valor Total')
+                            ->prefix('R$')
                             ->readOnly(function ($context) {
                                 if ($context == 'create') {
                                     return false;
@@ -116,7 +118,7 @@ class ContasReceberResource extends Resource
                             })
                             ->required(),
 
-                        
+
                         Forms\Components\Textarea::make('obs')
                             ->columnSpanFull()
                             ->label('Observações'),
@@ -153,6 +155,7 @@ class ContasReceberResource extends Resource
                             ->displayFormat('d/m/Y'),
                         Forms\Components\TextInput::make('valor_recebido')
                             ->numeric()
+                            ->prefix('R$')
                             ->hidden(function ($context) {
                                 if ($context == 'edit') {
                                     return false;
@@ -168,14 +171,14 @@ class ContasReceberResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-        ->defaultSort('data_vencimento', 'asc')
+            ->defaultSort('data_vencimento', 'asc')
             ->columns([
                 Tables\Columns\TextColumn::make('status')
                     ->summarize(Count::make())
                     ->Label('Recebido?')
                     ->badge()
                     ->alignCenter()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn(string $state): string => match ($state) {
                         '0' => 'danger',
                         '1' => 'success',
                     })
@@ -233,9 +236,9 @@ class ContasReceberResource extends Resource
             ])
             ->filters([
                 Filter::make('A receber')
-                    ->query(fn (Builder $query): Builder => $query->where('status', 0))->default(true),
+                    ->query(fn(Builder $query): Builder => $query->where('status', 0))->default(true),
                 Filter::make('Recebidas')
-                    ->query(fn (Builder $query): Builder => $query->where('status', 1)),
+                    ->query(fn(Builder $query): Builder => $query->where('status', 1)),
                 SelectFilter::make('cliente')->relationship('cliente', 'nome')->searchable(),
                 Tables\Filters\Filter::make('data_vencimento')
                     ->form([
@@ -248,20 +251,20 @@ class ContasReceberResource extends Resource
                         return $query
                             ->when(
                                 $data['vencimento_de'],
-                                fn ($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
+                                fn($query) => $query->whereDate('data_vencimento', '>=', $data['vencimento_de'])
                             )
                             ->when(
                                 $data['vencimento_ate'],
-                                fn ($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
+                                fn($query) => $query->whereDate('data_vencimento', '<=', $data['vencimento_ate'])
                             );
                     }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->after(function ($livewire, $record) {                       
+                    ->after(function ($livewire, $record) {
                         // Exclui o lançamento anterior no fluxo de caixa
-                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();                        
-                        
+                        \App\Models\FluxoCaixa::where('id_lancamento', $record->id)->delete();
+
                         if ($record->status == 1 && $record->valor_parcela != $record->valor_recebido) {
                             Notification::make()
                                 ->title('RECEBIMENTO PARCIAL')
@@ -270,7 +273,7 @@ class ContasReceberResource extends Resource
                                 ->actions([
                                     Action::make('Sim')
                                         ->button()
-                                         ->url(route('novaParcela', $record)),
+                                        ->url(route('novaParcela', $record)),
 
                                 ])
                                 ->persistent()
@@ -281,11 +284,10 @@ class ContasReceberResource extends Resource
                             'id_lancamento' => $record->id,
                             'valor' => ($record->valor_recebido),
                             'tipo'  => 'CREDITO',
-                            'obs'   => 'Recebido '.$record->obs. '',
+                            'obs'   => 'Recebido ' . $record->obs . '',
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);
-
                     }),
                 Tables\Actions\DeleteAction::make()
                     ->after(function ($record) {
@@ -312,6 +314,4 @@ class ContasReceberResource extends Resource
             'index' => Pages\ManageContasRecebers::route('/'),
         ];
     }
-
-
 }
