@@ -118,7 +118,7 @@ class VendaPDVResource extends Resource
                                 Forms\Components\TextInput::make('valor_acres_desc')
                                     ->label('Desc/Acres')
                                     ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
-                                    ->numeric()
+                                    //->numeric()
                                     ->prefix('R$')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->required(false)
