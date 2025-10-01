@@ -65,8 +65,8 @@
                     <td>{{ $venda->funcionario->nome ?? '-' }}</td>
                     <td>{{ $venda->formaPgmto->nome ?? '-' }}</td>
                     <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
-                    <td>R$ {{ number_format($venda->valor_acres_desc, 2, ',', '.') }}</td>
-                    <td>{{ $venda->percent_acres_desc ? number_format($venda->percent_acres_desc, 2, ',', '.') . '%' : '-' }}
+                    <td>R$ {{$venda->valor_acres_desc }}</td>
+                    <td>{{ $venda->percent_acres_desc ? $venda->percent_acres_desc . '%' : '-' }}
                     </td>
                     <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
                     <td>R$ {{ number_format($venda->valor_total_desconto, 2, ',', '.') }}</td>
