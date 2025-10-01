@@ -433,7 +433,7 @@ class PDV extends Page implements HasForms, HasTable
                                         ->label('Valor Desconto/Acréscimo')
                                         ->hint('Para desconto use um valor negativo Ex. -10')
                                         ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
-                                       // ->numeric()
+                                        ->numeric()
                                         ->prefix('R$')
                                         ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                         ->required(false)
