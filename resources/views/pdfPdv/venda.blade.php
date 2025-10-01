@@ -301,7 +301,7 @@
                         @if ($valorAcresDesc != 0)
                             (
                             {{ $vendas->percent_acres_desc < 0 ? 'Desconto' : 'Acréscimo' }}:
-                            R$ {{ number_format(abs($valorAcresDesc), 2, ',', '.') }}
+                            R$ {{ $valorAcresDesc }}
                             )
                         @endif
                     </span>
@@ -309,7 +309,7 @@
             @elseif($vendas->tipo_acres_desc == 'Valor')
                 <div class="summary-row">
                     <span>Valor Desconto/Acréscimo:</span>
-                    <span>R$ {{ number_format($vendas->valor_acres_desc, 2, ',', '.') }}</span>
+                    <span>R$ {{ $vendas->valor_acres_desc}}</span>
                 </div>
             @endif
             @if (!empty($vendas->valor_total))

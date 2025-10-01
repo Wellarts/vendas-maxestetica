@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "de68e7823762affedf5731edc0eb4df7",
+    "content-hash": "7ac8041da22311e2fdbe7849ae9f05c0",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3548,16 +3548,16 @@
         },
         {
             "name": "league/csv",
-            "version": "9.25.0",
+            "version": "9.26.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/csv.git",
-                "reference": "f856f532866369fb1debe4e7c5a1db185f40ef86"
+                "reference": "7fce732754d043f3938899e5183e2d0f3d31b571"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/csv/zipball/f856f532866369fb1debe4e7c5a1db185f40ef86",
-                "reference": "f856f532866369fb1debe4e7c5a1db185f40ef86",
+                "url": "https://api.github.com/repos/thephpleague/csv/zipball/7fce732754d043f3938899e5183e2d0f3d31b571",
+                "reference": "7fce732754d043f3938899e5183e2d0f3d31b571",
                 "shasum": ""
             },
             "require": {
@@ -3635,7 +3635,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-11T08:29:08+00:00"
+            "time": "2025-10-01T11:24:54+00:00"
         },
         {
             "name": "league/flysystem",
@@ -4063,80 +4063,6 @@
                 }
             ],
             "time": "2024-12-08T08:18:47+00:00"
-        },
-        {
-            "name": "leandrocfe/filament-ptbr-form-fields",
-            "version": "3.0.8",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/leandrocfe/filament-ptbr-form-fields.git",
-                "reference": "244ba03aa2c22060ff7aaa2d5ea6053424f45ed4"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/leandrocfe/filament-ptbr-form-fields/zipball/244ba03aa2c22060ff7aaa2d5ea6053424f45ed4",
-                "reference": "244ba03aa2c22060ff7aaa2d5ea6053424f45ed4",
-                "shasum": ""
-            },
-            "require": {
-                "filament/filament": "^3.0",
-                "illuminate/contracts": "^10.0 || ^11.0",
-                "laravellegends/pt-br-validator": "^10.0 || ^11.0",
-                "php": "^8.1 || ^8.2",
-                "spatie/laravel-package-tools": "^1.14.0"
-            },
-            "require-dev": {
-                "larastan/larastan": "^2.9.2",
-                "laravel/pint": "^1.0",
-                "nunomaduro/collision": "^7.9",
-                "orchestra/testbench": "^8.0",
-                "pestphp/pest": "^2.0",
-                "pestphp/pest-plugin-arch": "^2.0",
-                "pestphp/pest-plugin-laravel": "^2.0",
-                "phpstan/extension-installer": "^1.1",
-                "phpstan/phpstan-deprecation-rules": "^1.0",
-                "phpstan/phpstan-phpunit": "^1.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "aliases": {
-                        "FilamentPtbrFormFields": "Leandrocfe\\FilamentPtbrFormFields\\Facades\\FilamentPtbrFormFields"
-                    },
-                    "providers": [
-                        "Leandrocfe\\FilamentPtbrFormFields\\FilamentPtbrFormFieldsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Leandrocfe\\FilamentPtbrFormFields\\": "src/",
-                    "Leandrocfe\\FilamentPtbrFormFields\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Leandro Costa Ferreira",
-                    "email": "leandrocfe@gmail.com",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Brazilian pt-BR form fields.",
-            "homepage": "https://github.com/leandrocfe/filament-ptbr-form-fields",
-            "keywords": [
-                "filament-ptbr-form-fields",
-                "laravel",
-                "leandrocfe"
-            ],
-            "support": {
-                "issues": "https://github.com/leandrocfe/filament-ptbr-form-fields/issues",
-                "source": "https://github.com/leandrocfe/filament-ptbr-form-fields/tree/3.0.8"
-            },
-            "time": "2024-04-22T20:59:35+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -13394,12 +13320,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
