@@ -89,7 +89,23 @@ class FluxoCaixaResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from')
+                            ->label('Data Inicial')
+                            ->default(now()->toDateString()),
+                        Forms\Components\DatePicker::make('created_until')
+                            ->label('Data Final')
+                            ->default(now()->toDateString()),
+                    ])
+                    ->query(function ($query, $data) {
+                        if ($data['created_from']) {
+                            $query->whereDate('created_at', '>=', $data['created_from']);
+                        }
+                        if ($data['created_until']) {
+                            $query->whereDate('created_at', '<=', $data['created_until']);
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
