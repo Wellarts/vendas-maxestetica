@@ -113,7 +113,7 @@ class VendaPDVResource extends Resource
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
                                             $novoValor = $valorTotal + $valorAcresDesc;
                                         }
-                                        $set('valor_total_desconto', $novoValor);
+                                        $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
                                     }),
                                 Forms\Components\TextInput::make('valor_acres_desc')
                                     ->label('Desc/Acres')
@@ -135,10 +135,11 @@ class VendaPDVResource extends Resource
                                         } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
                                             $novoValor = $valorTotal + $valorAcresDesc;
                                         }
-                                        $set('valor_total_desconto', $novoValor);
+                                        $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
                                     }),
                                 Forms\Components\TextInput::make('valor_total')
                                     ->label('Valor Total')
+                                    ->readOnly()
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #9f0d03ff; text-align: right;'])
                                     ->numeric(),
                                 

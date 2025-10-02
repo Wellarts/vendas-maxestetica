@@ -80,14 +80,17 @@ class PDV extends Page implements HasForms, HasTable
     public function mount(): void
     {
         // Otimização: buscar IDs em lote e deletar apenas se necessário
-        $vendaPDVIds = VendaPDV::pluck('id');
-        if ($vendaPDVIds->isNotEmpty()) {
-            PDVs::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
-        }
+        // $vendaPDVIds = VendaPDV::pluck('id');
+        // if ($vendaPDVIds->isNotEmpty()) {
+        //     PDVs::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
+        // }
         // Gera o próximo número de venda
         $this->form->fill();
         $lastVenda = VendaPDV::orderBy('id', 'desc')->first();
         $this->venda = $lastVenda ? $lastVenda->id + 1 : 1;
+
+        $this->form->fill();
+        $this->venda = random_int(00000001, 99999999);
     }
 
     public function form(Form $form): Form
@@ -427,7 +430,7 @@ class PDV extends Page implements HasForms, HasTable
                                             } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
                                                 $novoValor = $valorTotal + $valorAcresDesc;
                                             }
-                                            $set('valor_total_desconto', $novoValor);
+                                           $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
                                         }),
                                     TextInput::make('valor_acres_desc')
                                         ->label('Valor Desconto/Acréscimo')
@@ -449,7 +452,7 @@ class PDV extends Page implements HasForms, HasTable
                                             } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
                                                 $novoValor = $valorTotal + $valorAcresDesc;
                                             }
-                                            $set('valor_total_desconto', $novoValor);
+                                            $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
                                         }),
                                 ]),
                             Radio::make('financeiro')

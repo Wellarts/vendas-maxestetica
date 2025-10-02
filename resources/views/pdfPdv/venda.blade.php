@@ -12,99 +12,91 @@
             background: #f5f6fa;
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 5px;
         }
 
         .comprovante {
             max-width: 850px;
             margin: auto;
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-            padding: 30px 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            padding: 10px 12px;
         }
 
-        /* Cabeçalho */
         .header {
             display: flex;
-            justify-content: space-between; 
+            justify-content: space-between;
             align-items: center;
-          /*  border-bottom: 2px solid #eee; */
-            padding-bottom: 18px;
-            margin-bottom: 22px;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
         }
 
         .header img {
-            height: 60px;
+            height: 40px;
         }
 
-        .header-info {
-            text-align: right;
-        }
-
-        .header-info h1 {
-            font-size: 1.6rem;
+        .header-info h1,
+        .header-info h2 {
+            font-size: 1rem;
             margin: 0;
             color: #2c3e50;
             font-weight: 700;
         }
 
         .header-info p {
-            margin: 2px 0;
-            font-size: 0.9rem;
+            margin: 1px 0;
+            font-size: 0.8rem;
             color: #666;
         }
 
-        /* Título */
         .section-title {
             text-align: center;
             color: #6d6d6d;
-            font-size: 1.2rem;
+            font-size: 1rem;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 2px;
         }
 
         .badge {
             display: inline-block;
             background: #777f1a;
             color: #fff;
-            padding: 6px 14px;
-            border-radius: 18px;
-            font-size: 0.9rem;
+            padding: 3px 8px;
+            border-radius: 14px;
+            font-size: 0.8rem;
             font-weight: 500;
         }
 
-        /* Linha de dados principais */
         .info-line {
             display: flex;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 15px;
-            font-size: 0.95rem;
-            margin: 20px 0;
-            padding: 12px 16px;
+            gap: 8px;
+            font-size: 0.85rem;
+            margin: 10px 0;
+            padding: 6px 8px;
             background: #f9fafc;
             border: 1px solid #eee;
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
         .info-item strong {
             color: #2c3e50;
             font-weight: 600;
-            margin-right: 6px;
+            margin-right: 4px;
         }
 
-        /* Tabelas */
         table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.8rem;
+            margin: 10px 0;
+            font-size: 0.75rem;
         }
 
         th,
         td {
-            padding: 10px 12px;
+            padding: 5px 6px;
             text-align: left;
         }
 
@@ -123,20 +115,20 @@
             text-align: center;
         }
 
-        /* Resumo */
         .summary {
-            margin-top: 20px;
-            font-size: 0.85rem;
-            padding: 15px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+            padding: 8px;
             background: #f9fafc;
             border: 1px solid #eee;
-            border-radius: 10px;
+            border-radius: 8px;
+            text-align: right;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .summary-row strong {
@@ -144,24 +136,22 @@
             font-weight: 600;
         }
 
-        /* Assinatura */
         .signature {
             text-align: center;
-            margin-top: 40px;
+            margin-top: 20px;
         }
 
         .signature hr {
-            width: 60%;
-            margin: 20px auto 10px;
+            width: 50%;
+            margin: 10px auto 5px;
             border: 0;
             border-top: 1px solid #bbb;
         }
 
-        /* Rodapé */
         .footer {
             text-align: center;
-            margin-top: 30px;
-            font-size: 0.75rem;
+            margin-top: 12px;
+            font-size: 0.7rem;
             color: #888;
         }
     </style>
@@ -178,7 +168,9 @@
                     </td>
                     <td style="text-align: right;">
                         <div class="header-info">
-                            <h2 style="font-size: 1.1rem; margin: 0; color: #777f1a; font-weight: 700; line-height: 1.1;">Max Estética</h2>
+                            <h2
+                                style="font-size: 1.1rem; margin: 0; color: #777f1a; font-weight: 700; line-height: 1.1;">
+                                Max Estética</h2>
                             <p style="font-size: 9px; color: #aaa; margin: 1px 0; line-height: 1.1;">
                                 MAXSAUDE DISTRIBUIDORA DE PRODUTOS ODONTOLOGICOS E HOSPITALARES LTDA<br>
                                 CNPJ: 53.322.401/0001-24<br>
@@ -194,20 +186,24 @@
                     </td>
                 </tr>
             </table>
+            <h2 class="section-title" style="margin-bottom: 0; border: none;">
+                {{ $vendas->tipo_registro == 'orcamento' ? 'Comprovante de Orçamento' : 'Comprovante de Venda' }}
+            </h2>
+            <div style="text-align: center; margin-bottom:8px;">
+                <span class="badge">
+                    {{ $vendas->tipo_registro == 'orcamento' ? 'Orçamento Nº ' : 'Venda Nº ' }}{{ $vendas->id }}
+                </span>
+            </div>
         </header>
 
         <!-- Identificação -->
-        <div class="text-center" style="margin: 6px 0 4px 0;">
-            <h2 class="section-title" style="margin-bottom: 2px; border: none;">
-                {{ $vendas->tipo_registro == 'orcamento' ? 'Comprovante de Orçamento' : 'Comprovante de Venda' }}
-            </h2>
-            <span class="badge">
-                {{ $vendas->tipo_registro == 'orcamento' ? 'Orçamento Nº ' : 'Venda Nº ' }}{{ $vendas->id }}
-            </span>
-        </div>
+
+
+
         <!-- Dados completos do Cliente -->
         <section style="margin: 18px 0 10px 0;">
-            <table style="width:100%; border-radius:10px; overflow:hidden; background: #f9fafc; border: 1px solid #eee; font-size: 0.80rem; table-layout: fixed;">
+            <table
+                style="width:100%; border-radius:10px; overflow:hidden; background: #f9fafc; border: 1px solid #eee; font-size: 0.80rem; table-layout: fixed;">
                 <tr>
                     <td colspan="4" style="padding: 6px 8px; background: #e8ebf0;">
                         <strong>Dados do Cliente</strong>
@@ -235,8 +231,8 @@
                     <td style="width: 18%; padding: 6px 8px;"><strong>Nº Conselho:</strong></td>
                     <td style="width: 32%; padding: 6px 8px;">{{ $vendas->cliente->numero_conselho ?? '-' }}</td>
                 </tr>
-                
-                
+
+
             </table>
         </section>
 
@@ -244,7 +240,7 @@
         <section>
             <table class="info-table" style="width:100%; margin: 18px 0 10px 0; border-radius:10px; overflow:hidden;">
                 <thead>
-                    <tr style="background:#f4f6f9;">                       
+                    <tr style="background:#f4f6f9;">
                         <th>Vendedor</th>
                         <th>Data</th>
                         <th>Pagamento</th>
@@ -309,7 +305,7 @@
             @elseif($vendas->tipo_acres_desc == 'Valor')
                 <div class="summary-row">
                     <span>Valor Desconto/Acréscimo:</span>
-                    <span>R$ {{ $vendas->valor_acres_desc}}</span>
+                    <span>R$ {{ $vendas->valor_acres_desc }}</span>
                 </div>
             @endif
             @if (!empty($vendas->valor_total))

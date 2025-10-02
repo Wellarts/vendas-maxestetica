@@ -51,10 +51,10 @@ class Dashboard extends \Filament\Pages\Dashboard
 
 
         // Otimização: buscar IDs em lote e deletar apenas se necessário
-        $vendaPDVIds = VendaPDV::pluck('id');
-        if ($vendaPDVIds->isNotEmpty()) {
-            PDV::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
-        }
+        // $vendaPDVIds = VendaPDV::pluck('id');
+        // if ($vendaPDVIds->isNotEmpty()) {
+        //     PDV::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
+        // }
 
         //***********NOTIFICAÇÃO DE CONTAS A RECEBER*************
 
