@@ -71,22 +71,20 @@ class Dashboard extends \Filament\Pages\Dashboard
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento próximo.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
-                    ->success()
-                    ->persistent(false)
+                    ->success()    
                     ->send();
             } elseif ($qtd_dias == 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento para hoje.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->warning()
-                    ->persistent(false)
+    
                     ->send();
             } elseif ($qtd_dias < 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber vencida.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
-                    ->danger()
-                    ->persistent(false)
+                    ->danger()    
                     ->send();
             }
         }
@@ -105,21 +103,21 @@ class Dashboard extends \Filament\Pages\Dashboard
                     ->title('ATENÇÃO: Conta a pagar com vencimento próximo.')
                     ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->success()
-                    ->persistent(false)
+                   // ->persistent()
                     ->send();
             } elseif ($qtd_dias == 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar com vencimento para hoje.')
                     ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->warning()
-                    ->persistent()
+                    //->persistent()
                     ->send();
             } elseif ($qtd_dias < 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a pagar vencida.')
                     ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->danger()
-                    ->persistent(false)
+    
                     ->send();
             }
         }
