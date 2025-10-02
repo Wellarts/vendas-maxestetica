@@ -72,21 +72,21 @@ class Dashboard extends \Filament\Pages\Dashboard
                     ->title('ATENÇÃO: Conta a receber com vencimento próximo.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->success()
-                    ->persistent()
+                    ->persistent(false)
                     ->send();
             } elseif ($qtd_dias == 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber com vencimento para hoje.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->warning()
-                    ->persistent()
+                    ->persistent(false)
                     ->send();
             } elseif ($qtd_dias < 0) {
                 Notification::make()
                     ->title('ATENÇÃO: Conta a receber vencida.')
                     ->body("Do cliente <b>{$clienteNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->danger()
-                    ->persistent()
+                    ->persistent(false)
                     ->send();
             }
         }
@@ -105,7 +105,7 @@ class Dashboard extends \Filament\Pages\Dashboard
                     ->title('ATENÇÃO: Conta a pagar com vencimento próximo.')
                     ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->success()
-                    ->persistent()
+                    ->persistent(false)
                     ->send();
             } elseif ($qtd_dias == 0) {
                 Notification::make()
@@ -119,7 +119,7 @@ class Dashboard extends \Filament\Pages\Dashboard
                     ->title('ATENÇÃO: Conta a pagar vencida.')
                     ->body("Do fornecedor <b>{$fornecedorNome}</b> no valor de R$ <b>{$valorParcela}</b> com vencimento em <b>{$dataFormatada}</b>.")
                     ->danger()
-                    ->persistent()
+                    ->persistent(false)
                     ->send();
             }
         }
