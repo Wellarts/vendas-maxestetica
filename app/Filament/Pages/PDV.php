@@ -85,9 +85,9 @@ class PDV extends Page implements HasForms, HasTable
         //     PDVs::whereNotIn('venda_p_d_v_id', $vendaPDVIds)->delete();
         // }
         // Gera o próximo número de venda
-        $this->form->fill();
-        $lastVenda = VendaPDV::orderBy('id', 'desc')->first();
-        $this->venda = $lastVenda ? $lastVenda->id + 1 : 1;
+        // $this->form->fill();
+        // $lastVenda = VendaPDV::orderBy('id', 'desc')->first();
+        // $this->venda = $lastVenda ? $lastVenda->id + 1 : 1;
 
         $this->form->fill();
         $this->venda = random_int(00000001, 99999999);
