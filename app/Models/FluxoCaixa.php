@@ -17,6 +17,7 @@ class FluxoCaixa extends Model
             'id_lancamento',
             'tipo',
             'obs',
+            'created_at',
 
     ];
 

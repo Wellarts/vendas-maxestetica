@@ -50,6 +50,11 @@ class FluxoCaixaResource extends Resource
                                 '2xl' => 2,
                             ])
                             ->required(),
+                        Forms\Components\DateTimePicker::make('created_at')
+                            ->label('Data/Hora')
+                            ->default(now())
+                            ->required(),
+                        
                     ]),
 
             ]);
