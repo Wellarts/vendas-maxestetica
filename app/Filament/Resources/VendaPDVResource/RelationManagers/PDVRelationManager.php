@@ -78,8 +78,10 @@ class PDVRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('qtd')
                     ->summarize(Sum::make()->label('Qtd de Produtos')),
                 Tables\Columns\TextColumn::make('valor_venda')
+                    ->money('BRL')
                     ->label('Valor Unit.'),
                 Tables\Columns\TextColumn::make('sub_total')
+                    ->money('BRL')
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->label('Sub-Total'),
             ])
