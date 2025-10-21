@@ -21,45 +21,45 @@ class PDVRelationManager extends RelationManager
     {
         return $form
             ->schema([
-            Forms\Components\Select::make('produto_id')
-                ->label('Produto')
-                ->options(Produto::all()->pluck('nome', 'id'))
-                ->searchable()
-                ->required()
-                ->live(onBlur: true)
-                ->afterStateUpdated(function ($state, callable $set) {
-                    if ($state) {
-                        $produto = Produto::find($state);
-                        if ($produto) {
-                            $set('valor_venda', $produto->valor_venda);
+                Forms\Components\Select::make('produto_id')
+                    ->label('Produto')
+                    ->options(Produto::all()->pluck('nome', 'id'))
+                    ->searchable()
+                    ->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        if ($state) {
+                            $produto = Produto::find($state);
+                            if ($produto) {
+                                $set('valor_venda', $produto->valor_venda);
+                            }
+                        } else {
+                            $set('valor_venda', null);
                         }
-                    } else {
-                        $set('valor_venda', null);
-                    }
-                }),
-            Forms\Components\TextInput::make('qtd')
-                ->label('Quantidade')
-                ->numeric()
-                ->required()
-                ->live(onBlur: true)
-                ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                    $valorVenda = $get('valor_venda') ?? 0;
-                    $set('sub_total', (float)$state * (float)$valorVenda);
-                }),
-            Forms\Components\TextInput::make('valor_venda')
-                ->label('Valor Unitário')
-                ->numeric()
-                ->required()
-                ->live(onBlur: true)
-                ->afterStateUpdated(function ($state, callable $set, callable $get) {
-                    $qtd = $get('qtd') ?? 0;
-                    $set('sub_total', (float)$qtd * (float)$state);
-                }),
-            Forms\Components\TextInput::make('sub_total')
-                ->label('Sub-Total')
-                ->numeric()
-                ->required()
-                ->readonly(),
+                    }),
+                Forms\Components\TextInput::make('qtd')
+                    ->label('Quantidade')
+                    ->numeric()
+                    ->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $valorVenda = $get('valor_venda') ?? 0;
+                        $set('sub_total', (float)$state * (float)$valorVenda);
+                    }),
+                Forms\Components\TextInput::make('valor_venda')
+                    ->label('Valor Unitário')
+                    ->numeric()
+                    ->required()
+                    ->live(onBlur: true)
+                    ->afterStateUpdated(function ($state, callable $set, callable $get) {
+                        $qtd = $get('qtd') ?? 0;
+                        $set('sub_total', (float)$qtd * (float)$state);
+                    }),
+                Forms\Components\TextInput::make('sub_total')
+                    ->label('Sub-Total')
+                    ->numeric()
+                    ->required()
+                    ->readonly(),
 
 
             ]);
@@ -112,7 +112,7 @@ class PDVRelationManager extends RelationManager
                     ->label('Adicionar Item')
                     ->icon('heroicon-o-plus')
                     ->modalHeading('Adicionar Item à Venda')
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
+                    ->visible(fn($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
                     ->after(function ($data, $record, $livewire) {
                         $venda = VendaPDV::find($record->venda_p_d_v_id);
                         // Soma todos os sub_totals dos itens da venda
@@ -131,7 +131,7 @@ class PDVRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->visible(fn ($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
+                    ->visible(fn($livewire) => $livewire->ownerRecord->tipo_registro == 'orcamento')
                     ->after(function ($data, $record, $livewire) {
                         $venda = VendaPDV::find($record->venda_p_d_v_id);
                         // Soma todos os sub_totals dos itens da venda
@@ -147,33 +147,36 @@ class PDVRelationManager extends RelationManager
                         $venda->save();
                         return redirect(request()->header('Referer'));
                     }),
-                   
+
                 Tables\Actions\DeleteAction::make()
-                ->before(function ($data, $record) {
-                    $produto = Produto::find($record->produto_id);
-                    $venda   = VendaPDV::find($record->venda_p_d_v_id);
-                    $venda->valor_total -= $record->sub_total;
-                    $produto->estoque += ($record->qtd);
-                    $venda->save();
-                    $produto->save();
-                })
-                ->after(function () {
-                    return redirect(request()->header('Referer'));
-                }),
+                    ->before(function ($data, $record, $livewire) {                        
+                        if ($livewire->ownerRecord->tipo_registro == 'venda') {                           
+                            $produto = Produto::find($record->produto_id);
+                            $venda   = VendaPDV::find($record->venda_p_d_v_id);
+                            $venda->valor_total -= $record->sub_total;
+                            $produto->estoque += ($record->qtd);
+                            $venda->save();
+                            $produto->save();
+                        }
+                    })
+                    ->after(function () {
+                        return redirect(request()->header('Referer'));
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->before(function ($records) {
-                            foreach ($records as $record) {
-                                $produto = Produto::find($record->produto_id);
-                                $venda   = VendaPDV::find($record->venda_p_d_v_id);
-                                $venda->valor_total -= $record->sub_total;
-                                $produto->estoque += ($record->qtd);
-                                $venda->save();
-                                $produto->save();
+                        ->before(function ($records, $livewire) {
+                            foreach ($records as $record) {                                
+                                if ($livewire->ownerRecord->tipo_registro == 'venda') {
+                                    $produto = Produto::find($record->produto_id);
+                                    $venda   = VendaPDV::find($record->venda_p_d_v_id);
+                                    $venda->valor_total -= $record->sub_total;
+                                    $produto->estoque += ($record->qtd);
+                                    $venda->save();
+                                    $produto->save();
+                                }
                             }
-
                         })
                         ->after(function () {
                             return redirect(request()->header('Referer'));
