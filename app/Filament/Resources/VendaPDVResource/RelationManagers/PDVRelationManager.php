@@ -60,8 +60,6 @@ class PDVRelationManager extends RelationManager
                     ->numeric()
                     ->required()
                     ->readonly(),
-
-
             ]);
     }
 
@@ -118,12 +116,9 @@ class PDVRelationManager extends RelationManager
                         // Soma todos os sub_totals dos itens da venda
                         $novoValorTotal = $venda->PDV()->sum('sub_total');
                         $venda->valor_total = $novoValorTotal;
-                        $venda->valor_total_desconto = $novoValorTotal;
-
-                        // Remove todos os descontos aplicados
-                        $venda->tipo_acres_desc = null;
-                        $venda->valor_acres_desc = null;
-                        $venda->percent_acres_desc = null;
+                        
+                        // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                        $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $novoValorTotal);
 
                         $venda->save();
                         return redirect(request()->header('Referer'));
@@ -137,12 +132,9 @@ class PDVRelationManager extends RelationManager
                         // Soma todos os sub_totals dos itens da venda
                         $novoValorTotal = $venda->PDV()->sum('sub_total');
                         $venda->valor_total = $novoValorTotal;
-                        $venda->valor_total_desconto = $novoValorTotal;
-
-                        // Remove todos os descontos aplicados
-                        $venda->tipo_acres_desc = null;
-                        $venda->valor_acres_desc = null;
-                        $venda->percent_acres_desc = null;
+                        
+                        // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                        $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $novoValorTotal);
 
                         $venda->save();
                         return redirect(request()->header('Referer'));
@@ -152,14 +144,29 @@ class PDVRelationManager extends RelationManager
                     ->before(function ($data, $record, $livewire) {                        
                         if ($livewire->ownerRecord->tipo_registro == 'venda') {                           
                             $produto = Produto::find($record->produto_id);
-                            $venda   = VendaPDV::find($record->venda_p_d_v_id);
+                            $venda = VendaPDV::find($record->venda_p_d_v_id);
                             $venda->valor_total -= $record->sub_total;
+                            
+                            // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                            $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $venda->valor_total);
+                            
                             $produto->estoque += ($record->qtd);
                             $venda->save();
                             $produto->save();
                         }
                     })
-                    ->after(function () {
+                    ->after(function ($record, $livewire) {
+                        // Para orçamentos, recalculamos após a exclusão
+                        if ($livewire->ownerRecord->tipo_registro == 'orcamento') {
+                            $venda = VendaPDV::find($livewire->ownerRecord->id);
+                            $novoValorTotal = $venda->PDV()->sum('sub_total');
+                            $venda->valor_total = $novoValorTotal;
+                            
+                            // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                            $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $novoValorTotal);
+                            
+                            $venda->save();
+                        }
                         return redirect(request()->header('Referer'));
                     }),
             ])
@@ -170,19 +177,53 @@ class PDVRelationManager extends RelationManager
                             foreach ($records as $record) {                                
                                 if ($livewire->ownerRecord->tipo_registro == 'venda') {
                                     $produto = Produto::find($record->produto_id);
-                                    $venda   = VendaPDV::find($record->venda_p_d_v_id);
+                                    $venda = VendaPDV::find($record->venda_p_d_v_id);
                                     $venda->valor_total -= $record->sub_total;
+                                    
+                                    // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                                    $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $venda->valor_total);
+                                    
                                     $produto->estoque += ($record->qtd);
                                     $venda->save();
                                     $produto->save();
                                 }
                             }
                         })
-                        ->after(function () {
+                        ->after(function ($records, $livewire) {
+                            // Para orçamentos, recalculamos após a exclusão em massa
+                            if ($livewire->ownerRecord->tipo_registro == 'orcamento') {
+                                $venda = VendaPDV::find($livewire->ownerRecord->id);
+                                $novoValorTotal = $venda->PDV()->sum('sub_total');
+                                $venda->valor_total = $novoValorTotal;
+                                
+                                // Recalcular valor_total_desconto considerando descontos/acréscimos existentes
+                                $venda->valor_total_desconto = $this->calcularValorComDesconto($venda, $novoValorTotal);
+                                
+                                $venda->save();
+                            }
                             return redirect(request()->header('Referer'));
                         }),
-
                 ]),
             ]);
+    }
+
+    /**
+     * Calcula o valor total com desconto/acréscimo baseado nas configurações da venda
+     */
+    private function calcularValorComDesconto(VendaPDV $venda, float $valorTotal): float
+    {
+        $tipo = $venda->tipo_acres_desc;
+        $percentual = $venda->percent_acres_desc;
+        $valorAcresDesc = $venda->valor_acres_desc;
+
+        $valorComDesconto = $valorTotal;
+
+        if ($tipo === 'Porcentagem' && $percentual) {
+            $valorComDesconto = $valorTotal + ($valorTotal * ($percentual / 100));
+        } elseif ($tipo === 'Valor' && $valorAcresDesc) {
+            $valorComDesconto = $valorTotal + $valorAcresDesc;
+        }
+
+        return $valorComDesconto;
     }
 }
