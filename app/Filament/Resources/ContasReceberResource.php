@@ -145,8 +145,8 @@ class ContasReceberResource extends Resource
                             ),
                         Forms\Components\DatePicker::make('data_pagamento')
                             ->label('Data do Recebimento')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
+                            ->hidden(function ($context, Get $get) {
+                                if ($context == 'edit' or $get('status') == 1){
                                     return false;
                                 } else {
                                     return true;
@@ -156,8 +156,8 @@ class ContasReceberResource extends Resource
                         Forms\Components\TextInput::make('valor_recebido')
                             ->numeric()
                             ->prefix('R$')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
+                            ->hidden(function ($context, Get $get) {
+                                if ($context == 'edit' or $get('status') == 1){
                                     return false;
                                 } else {
                                     return true;
@@ -281,9 +281,20 @@ class ContasReceberResource extends Resource
                                 ->send();
                         }
 
+                        // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
+
                         $addFluxoCaixa = [
                             'id_lancamento' => $record->id,
                             'valor' => ($record->valor_recebido),
+                            'created_at' => $created_at_combinado,
+                            'updated_at' => $created_at_combinado,
                             'tipo'  => 'CREDITO',
                             'obs'   => 'Recebido ' . $record->obs . '',
                         ];

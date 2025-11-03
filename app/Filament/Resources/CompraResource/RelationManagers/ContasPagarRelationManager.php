@@ -200,7 +200,7 @@ class ContasPagarRelationManager extends RelationManager
                                         'valor_total'     => $data['valor_total'],
                                         'parcelas'        => $data['parcelas'],
                                         'ordem_parcela'   => $cont + 1,
-                                        'data_vencimento' => $dataVencimentos,
+                                        'data_vencimento' => $dataVencimentos,                                       
                                         'valor_pago'      => 0.00,
                                         'status'          => 0,
                                         'obs'             => $data['obs'],
@@ -208,10 +208,22 @@ class ContasPagarRelationManager extends RelationManager
                                     ];
                                     contasPagar::create($parcelas);
                                 }
-                            } else {
+                            } elseif($record->status == 1) {
+
+                                  // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
+
                                 $addFluxoCaixa = [
                                     'valor' => ($record->valor_total * -1),
                                     'tipo'  => 'DEBITO',
+                                    'created_at' => $created_at_combinado,
+                                    'updated_at' => $created_at_combinado,
                                     'obs'   => 'Pagamento da compra nº: ' . $record->compra_id . '',
                                 ];
 
@@ -230,9 +242,20 @@ class ContasPagarRelationManager extends RelationManager
                     ->after(function ($data, $record) {
 
                         if ($record->status = 1) {
+                                  // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
+
                             $addFluxoCaixa = [
                                 'valor' => ($record->valor_parcela * -1),
                                 'tipo'  => 'DEBITO',
+                                'created_at' => $created_at_combinado,
+                                'updated_at' => $created_at_combinado,
                                 'obs'   => 'Pagamento da compra nº: ' . $record->compra_id . '',
                             ];
 

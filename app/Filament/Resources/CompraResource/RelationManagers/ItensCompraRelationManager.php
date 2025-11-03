@@ -148,13 +148,23 @@ class ItensCompraRelationManager extends RelationManager
                     ->color('success')
                     ->action(function ($livewire) {
                         if ($livewire->ownerRecord->valor_total > 0) {
+                              // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($livewire->ownerRecord->data_compra));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
                             $addFluxoCaixa = [
                                 'valor' => ($livewire->ownerRecord->valor_total * -1),
                                 'tipo'  => 'DEBITO',
+                                'created_at' => $created_at_combinado,
+                                'updated_at' => $created_at_combinado,
                                 'id_lancamento' => $livewire->ownerRecord->id,
                                 'obs'   => 'Pagamento de Compra nº: ' . $livewire->ownerRecord->id . '',
                             ];
-                            $compra               = Compra::find($livewire->ownerRecord->id);
+                            $compra = Compra::find($livewire->ownerRecord->id);
                             $compra->status_caixa = 1;
                             $compra->save();
 
@@ -194,7 +204,7 @@ class ItensCompraRelationManager extends RelationManager
                         $compra->valor_total += ($data['sub_total'] - $idItemCompra->sub_total);
                         // dd($data['sub_total'], $idItemCompra->sub_total,  $compra->valor_total);
                         $compra->save();
-                        $produto->save();                       
+                        $produto->save();
 
                         $prodFornecedor = [
                             'compra_id'  => $record->compra_id,
@@ -202,13 +212,12 @@ class ItensCompraRelationManager extends RelationManager
                             'qtd'        => $data['qtd'],
                             'valor'      => $data['valor_compra'],
 
-                        ];                        
+                        ];
                         ProdutoFornecedor::where('compra_id', $record->compra_id)
                             ->where('produto_id', $produto->id)
                             ->update($prodFornecedor);
 
-                     return $data;
-
+                        return $data;
                     }),
                 Tables\Actions\DeleteAction::make()
                     ->after(function ($data, $record) {
@@ -218,8 +227,6 @@ class ItensCompraRelationManager extends RelationManager
                         $produto->estoque    -= ($record->qtd);
                         $produto->save();
                         $compra->save();
-
-                        
                     })
                     ->before(function ($data, $record) {
                         $prodFornecedor = [
@@ -228,12 +235,12 @@ class ItensCompraRelationManager extends RelationManager
 
 
                         ];
-                        ProdutoFornecedor::destroy($prodFornecedor);                        ProdutoFornecedor::where('compra_id', $record->compra_id)
+                        ProdutoFornecedor::destroy($prodFornecedor);
+                        ProdutoFornecedor::where('compra_id', $record->compra_id)
                             ->where('produto_id', $record->produto_id)
                             ->delete();
-                            
                     }),
-                        
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

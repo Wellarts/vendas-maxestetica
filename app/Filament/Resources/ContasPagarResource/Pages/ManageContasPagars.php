@@ -43,9 +43,19 @@ class ManageContasPagars extends ManageRecords
                             }
                         } else {
                             if (($data['status'] == 1)) {
+                                  // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
                                 $addFluxoCaixa = [
                                     'id_lancamento' => $record->id,
                                     'valor' => ($record->valor_total * -1),
+                                    'created_at' => $created_at_combinado,
+                                    'updated_at' => $created_at_combinado,
                                     'tipo'  => 'DEBITO',
                                     'obs'   => 'Pagamento da conta: ' . $record->fornecedor->nome . '',
                                 ];

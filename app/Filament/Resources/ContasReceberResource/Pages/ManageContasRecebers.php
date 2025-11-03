@@ -43,12 +43,22 @@ class ManageContasRecebers extends ManageRecords
                             }
                         } else {
                             if (($data['status'] == 1)) {
+                                // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                                $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                                // 2. Pegue a hora atual
+                                $hora_apenas = date('H:i:s');
+
+                                // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                                $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
                                 $addFluxoCaixa = [
                                     'id_lancamento' => $record->id,
                                     'valor' => ($record->valor_total),
                                     'tipo'  => 'CREDITO',
+                                    'created_at' => $created_at_combinado,
+                                    'updated_at' => $created_at_combinado,
                                     'obs'   => 'Recebimento de conta: ' . $record->cliente->nome . '',
-                                ];                      
+                                ];
                                 FluxoCaixa::create($addFluxoCaixa);
                             }
                         }
@@ -82,7 +92,7 @@ class ManageContasRecebers extends ManageRecords
                     }
 
                     // Remove apenas valores nulos ou string vazia, mas mantém 0
-                    $query = http_build_query(array_filter($data, function($v) {
+                    $query = http_build_query(array_filter($data, function ($v) {
                         return $v !== null && $v !== '';
                     }));
                     $url = route('relatorio.contas.receber.pdf') . '?' . $query;

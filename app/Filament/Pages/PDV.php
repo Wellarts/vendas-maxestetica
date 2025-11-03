@@ -131,7 +131,7 @@ class PDV extends Page implements HasForms, HasTable
                                         return [$product->id => "[{$product->codbar}] {$product->nome}"];
                                     });
                             })
-                            ->getOptionLabelUsing(fn ($value): ?string => Produto::where('id', $value)->first()?->nome)
+                            ->getOptionLabelUsing(fn($value): ?string => Produto::where('id', $value)->first()?->nome)
                             ->autofocus()
                             ->extraInputAttributes(['tabindex' => 1])
                             ->live(debounce: 900)
@@ -142,8 +142,8 @@ class PDV extends Page implements HasForms, HasTable
 
 
 
-            ]),
-        ]);
+                    ]),
+            ]);
     }
 
     public function updated($name, $value): void
@@ -274,7 +274,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ]),
                             Select::make('funcionario_id')
                                 ->label('Vendedor')
-                               // ->default('1')
+                                // ->default('1')
                                 ->searchable()
                                 ->required()
                                 ->columnSpan([
@@ -345,7 +345,7 @@ class PDV extends Page implements HasForms, HasTable
                                                 ->maxLength(255),
                                         ]),
                                 ]),
-                            
+
                             Select::make('forma_pgmto_id')
                                 ->label('Forma de Pagamento')
                                 ->default('1')
@@ -412,7 +412,7 @@ class PDV extends Page implements HasForms, HasTable
                                         }),
                                     TextInput::make('percent_acres_desc')
                                         ->label('Percentual')
-                                        ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
+                                        ->visible(fn(callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
                                         // ->numeric()
                                         ->hint('Para desconto use um valor negativo Ex. -10')
                                         ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
@@ -430,12 +430,12 @@ class PDV extends Page implements HasForms, HasTable
                                             } elseif ($tipo === 'Valor' && $valorAcresDesc != 0) {
                                                 $novoValor = $valorTotal + $valorAcresDesc;
                                             }
-                                           $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
+                                            $set('valor_total_desconto', number_format($novoValor, 2, '.', ''));
                                         }),
                                     TextInput::make('valor_acres_desc')
                                         ->label('Valor Desconto/Acréscimo')
                                         ->hint('Para desconto use um valor negativo Ex. -10')
-                                        ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
+                                        ->hidden(fn(callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                         ->numeric()
                                         ->prefix('R$')
                                         ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
@@ -457,7 +457,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ]),
                             Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
-                                ->visible(fn (callable $get) => $get('tipo_registro') === 'venda')
+                                ->visible(fn(callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
@@ -473,7 +473,7 @@ class PDV extends Page implements HasForms, HasTable
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->hidden(fn (Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento')
+                                ->hidden(fn(Get $get): bool => $get('financeiro') != '2' or $get('tipo_registro') === 'orcamento')
                                 ->columnSpan([
                                     'default' => 1,
                                     'md' => 1,
@@ -521,10 +521,21 @@ class PDV extends Page implements HasForms, HasTable
                     if ($data['tipo_registro'] === 'venda') {
                         if ($data['financeiro'] == 1) {
 
+                            // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_venda));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
+
                             $addFluxoCaixa = [
                                 'valor' => ($data['valor_total_desconto']),
                                 'tipo'  => 'CREDITO',
                                 'id_lancamento' => $record->id,
+                                'created_at' => $created_at_combinado,
+                                'updated_at' => $created_at_combinado,
                                 'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
                             ];
                             Notification::make()
@@ -558,19 +569,12 @@ class PDV extends Page implements HasForms, HasTable
                                 ->success()
                                 ->duration(20000)
                                 ->send();
-
                         } // <-- Adicione esta chave de fechamento aqui
 
                         return route('filament.admin.resources.venda-p-d-vs.index');
                     }
 
                     return route('filament.admin.resources.venda-p-d-vs.index');
-
-
-
-
-
-
                 }),
 
         ];

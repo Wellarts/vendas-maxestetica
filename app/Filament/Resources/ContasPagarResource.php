@@ -147,8 +147,8 @@ class ContasPagarResource extends Resource
                             ),
                         Forms\Components\DatePicker::make('data_pagamento')
                             ->label('Data do Pagamento')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
+                            ->hidden(function ($context, Get $get) {
+                                if ($context == 'edit' or $get('status') == 1) {
                                     return false;
                                 } else {
                                     return true;
@@ -158,8 +158,8 @@ class ContasPagarResource extends Resource
                         Forms\Components\TextInput::make('valor_pago')
                             ->numeric()
                             ->prefix('R$')
-                            ->hidden(function ($context) {
-                                if ($context == 'edit') {
+                            ->hidden(function ($context, Get $get) {
+                                if ($context == 'edit' or $get('status') == 1) {
                                     return false;
                                 } else {
                                     return true;
@@ -285,10 +285,21 @@ class ContasPagarResource extends Resource
                                 ->send();
                         }
 
+                        // 1. Pegue a data da variável (formato esperado: 'YYYY-MM-DD')
+                            $data_apenas = date('Y-m-d', strtotime($record->data_pagamento));
+
+                            // 2. Pegue a hora atual
+                            $hora_apenas = date('H:i:s');
+
+                            // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
+                            $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
+
                         $addFluxoCaixa = [
                             'id_lancamento' => $record->id,
                             'valor' => ($record->valor_pago * -1),
                             'tipo'  => 'DEBITO',
+                            'created_at' => $created_at_combinado,
+                            'updated_at' => $created_at_combinado,
                             'obs'   => 'Pagamento ' . $record->obs . '',
                         ];
 
