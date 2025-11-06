@@ -110,7 +110,7 @@
                 <td colspan="2">Totais</td>
                 <td>R$ {{ number_format($totalCredito, 2, ',', '.') }}</td>
                 <td>R$ {{ number_format($totalDebito, 2, ',', '.') }}</td>
-                <td>R$ {{ number_format($totalCredito - $totalDebito, 2, ',', '.') }}</td>
+                <td>R$ {{ number_format($totalCredito -+ $totalDebito, 2, ',', '.') }}</td>
             </tr>
         </tbody>
     </table>
