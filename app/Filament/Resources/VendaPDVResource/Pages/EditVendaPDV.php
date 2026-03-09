@@ -73,7 +73,8 @@ class EditVendaPDV extends EditRecord
                             $addFluxoCaixa = [
                                 'valor' => $valor_total_desconto,
                                 'tipo'  => 'CREDITO',
-                                'obs'   => 'Recebido da venda nº: ' . $record->id,
+                                'id_lancamento' => $record->id,
+                                'obs'   => 'Venda nº: ' . ($record->id ?? '') . ' - Cliente: ' . ($record->cliente->nome ?? '') . ' - Forma de Pgto: ' . ($record->formaPgmto->nome ?? ''),
                             ];
 
                             \Filament\Notifications\Notification::make()
