@@ -536,7 +536,7 @@ class PDV extends Page implements HasForms, HasTable
                                 'id_lancamento' => $record->id,
                                 'created_at' => $created_at_combinado,
                                 'updated_at' => $created_at_combinado,
-                                'obs'   => 'Recebido da venda nº: ' . $this->venda . '',
+                                'obs'   => 'Recebido da venda nº: ' . $this->venda . ' - Cliente: ' . ($record->cliente?->nome ?? ''),
                             ];
                             Notification::make()
                                 ->title('Valor lançado no fluxo de caixa!')

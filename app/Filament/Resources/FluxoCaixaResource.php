@@ -74,7 +74,7 @@ class FluxoCaixaResource extends Resource
 
                         return 'danger';
                     })
-                    ->sortable(),
+                    ->sortable(),               
                 Tables\Columns\TextColumn::make('valor')
                     ->summarize(Sum::make()->money('BRL')->label('Total'))
                     ->alignCenter()

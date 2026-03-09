@@ -296,7 +296,7 @@ class ContasReceberResource extends Resource
                             'created_at' => $created_at_combinado,
                             'updated_at' => $created_at_combinado,
                             'tipo'  => 'CREDITO',
-                            'obs'   => 'Recebido ' . $record->obs . '',
+                            'obs'   => 'Recebido ' . $record->obs . ' - Cliente: ' . ($record->cliente?->nome ?? ''),
                         ];
 
                         FluxoCaixa::create($addFluxoCaixa);
