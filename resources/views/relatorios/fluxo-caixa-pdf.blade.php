@@ -90,7 +90,7 @@
                     <td>{{ \Carbon\Carbon::parse($lancamento->created_at)->format('d/m/Y H:i') }}</td>
                     <td>{{ $lancamento->tipo }}</td>
                     <td>R$ {{ number_format($lancamento->valor, 2, ',', '.') }}</td>
-                    <td>{{ $lancamento->obs }}</td>
+                    <td>{!! str_replace('-', '<br>', $lancamento->obs) !!}</td>
                 </tr>
             @endforeach
         </tbody>

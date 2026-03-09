@@ -529,19 +529,19 @@ class PDV extends Page implements HasForms, HasTable
 
                             // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
                             $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
-
+                           // dd($record->cliente->nome);
                             $addFluxoCaixa = [
                                 'valor' => ($data['valor_total_desconto']),
                                 'tipo'  => 'CREDITO',
                                 'id_lancamento' => $record->id,
                                 'created_at' => $created_at_combinado,
                                 'updated_at' => $created_at_combinado,
-                                'obs'   => 'Recebido da venda nº: ' . $this->venda . ' - Cliente: ' . ($record->cliente?->nome ?? ''),
+                                'obs'   => 'Venda nº: ' . ($this->venda ?? '') . ' - Cliente: ' . ($record->cliente->nome ?? '') . ' - Forma de Pgto: ' . ($record->formaPgmto->nome ?? ''),
                             ];
                             Notification::make()
-                                ->title('Valor lançado no fluxo de caixa!')
+                                ->title('Valor lançado no fluxo de caixa! do cliente <b>' . ($record->cliente?->nome ?? '') . '</b>')
                                 ->body('R$ ' . number_format($data['valor_total_desconto'], 2, ',', '.') . '')
-                                ->success()
+                                ->success()                               
                                 ->send();
                             FluxoCaixa::create($addFluxoCaixa);
                         } else {
