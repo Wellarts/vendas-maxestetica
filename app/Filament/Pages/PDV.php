@@ -151,27 +151,37 @@ class PDV extends Page implements HasForms, HasTable
         if ($name === 'produto_id') {
             $produto = Produto::where('id', '=', $value)->first();
             if ($produto !== null) {
-                Notification::make()
-                    ->title('Produto selecionado:')
-                    ->body('<b>Produto: </b> ' . $produto->nome . '<br> <b>Estoque Atual: </b> ' . $produto->estoque . ' <br> <b>Imagem: </b> <img src="' . (is_array($produto->foto) ? asset('storage/' . ($produto->foto[0] ?? '')) : asset('storage/' . $produto->foto)) . '" alt="' . $produto->nome . '" style="max-width:100px;max-height:100px;">')
-                    ->success()
-                    ->duration(5000)
-                    ->send();
-                $addProduto = [
-                    'produto_id'        => $produto->id,
-                    'venda_p_d_v_id'    => $this->venda,
-                    'valor_venda'       => $produto->valor_venda,
-                    'pdv_id'            => '',
-                    'acres_desc'        => 0,
-                    'qtd'               => 1,
-                    'sub_total'         => $produto->valor_venda * 1,
-                    'valor_custo_atual' => $produto->valor_compra,
-                    'total_custo_atual' => $produto->valor_compra,
-                ];
-                PDVs::create($addProduto);
-                $this->produto_id   = '';
-                $this->qtd          = '';
-                $this->produto_nome = '';
+                if ($produto->estoque <= 0) {
+                    Notification::make()
+                        ->title('Produto sem estoque!')
+                        ->body('<b>Produto: </b> ' . $produto->nome . '<br> <b>Estoque Atual: </b> ' . $produto->estoque . ' <br> <b>Imagem: </b> <img src="' . (is_array($produto->foto) ? asset('storage/' . ($produto->foto[0] ?? '')) : asset('storage/' . $produto->foto)) . '" alt="' . $produto->nome . '" style="max-width:100px;max-height:100px;">')
+                        ->danger()
+                        ->duration(10000)
+                        ->send();
+                    return;
+                } else {
+                    Notification::make()
+                        ->title('Produto selecionado:')
+                        ->body('<b>Produto: </b> ' . $produto->nome . '<br> <b>Estoque Atual: </b> ' . $produto->estoque . ' <br> <b>Imagem: </b> <img src="' . (is_array($produto->foto) ? asset('storage/' . ($produto->foto[0] ?? '')) : asset('storage/' . $produto->foto)) . '" alt="' . $produto->nome . '" style="max-width:100px;max-height:100px;">')
+                        ->success()
+                        ->duration(5000)
+                        ->send();
+                    $addProduto = [
+                        'produto_id'        => $produto->id,
+                        'venda_p_d_v_id'    => $this->venda,
+                        'valor_venda'       => $produto->valor_venda,
+                        'pdv_id'            => '',
+                        'acres_desc'        => 0,
+                        'qtd'               => 1,
+                        'sub_total'         => $produto->valor_venda * 1,
+                        'valor_custo_atual' => $produto->valor_compra,
+                        'total_custo_atual' => $produto->valor_compra,
+                    ];
+                    PDVs::create($addProduto);
+                    $this->produto_id   = '';
+                    $this->qtd          = '';
+                    $this->produto_nome = '';
+                }
             } else {
                 Notification::make()
                     ->title('Produto não cadastrado')
@@ -198,7 +208,16 @@ class PDV extends Page implements HasForms, HasTable
                     $record->sub_total         = ($state * $record->valor_venda);
                     $record->qtd               = $state;
                     $record->total_custo_atual = ($record->valor_custo_atual * $state);
-                    $record->save();
+                    if ($record->produto->estoque < $state) {
+                        Notification::make()
+                            ->title('Quantidade excede o estoque disponível!')
+                            ->body('Estoque atual do produto <b>' . $record->produto->nome . '</b>: ' . $record->produto->estoque)
+                            ->danger()
+                            ->duration(10000)
+                            ->send();
+                    } else {
+                        $record->save();
+                    }
                 })
 
                 ->label('Quantidade'),
@@ -529,7 +548,7 @@ class PDV extends Page implements HasForms, HasTable
 
                             // 3. Combine a data e a hora (resulta em: 'YYYY-MM-DD H:i:s')
                             $created_at_combinado = $data_apenas . ' ' . $hora_apenas;
-                           // dd($record->cliente->nome);
+                            // dd($record->cliente->nome);
                             $addFluxoCaixa = [
                                 'valor' => ($data['valor_total_desconto']),
                                 'tipo'  => 'CREDITO',
@@ -541,7 +560,7 @@ class PDV extends Page implements HasForms, HasTable
                             Notification::make()
                                 ->title('Valor lançado no fluxo de caixa! do cliente <b>' . ($record->cliente?->nome ?? '') . '</b>')
                                 ->body('R$ ' . number_format($data['valor_total_desconto'], 2, ',', '.') . '')
-                                ->success()                               
+                                ->success()
                                 ->send();
                             FluxoCaixa::create($addFluxoCaixa);
                         } else {
