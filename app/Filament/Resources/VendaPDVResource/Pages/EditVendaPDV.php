@@ -89,6 +89,20 @@ class EditVendaPDV extends EditRecord
                 ->modalDescription('Caso tenha feito alterações no formulário é necesssário salvar para depois converter em venda. Tem certeza que deseja converter este orçamento em venda?')
                 ->visible(fn($record) => $record->tipo_registro === 'orcamento')
                 ->action(function ($record) {
+                    // Verifica se algum item do estoque é menor que a quantidade vendida
+                    foreach ($record->pdv as $item) {
+                        $produto = $item->Produto;
+                        if ($produto && $produto->estoque < $item->qtd) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('CONVERÇÃO NÃO REALIZADA - Estoque insuficiente!')
+                                ->body('O produto <b>' . ($produto->nome ?? '') . '</b> tem estoque insuficiente para a quantidade vendida. Estoque atual: ' . $produto->estoque . ' - Quantidade vendida: ' . $item->qtd)
+                                ->danger()
+                                ->send();
+                            return;
+                        }
+                    }
+
+                    // Converte o orçamento em venda    
                     $record->tipo_registro = 'venda';
                     $record->data_venda    = now();
                     $record->save();
