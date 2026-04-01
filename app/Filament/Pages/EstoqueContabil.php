@@ -141,7 +141,7 @@ class EstoqueContabil extends Page implements HasForms, HasTable
                ->form([ 
              Select::make('produto_id')
                  ->label('Produto')
-                 ->options(\App\Models\Produto::where('tipo', 1)->pluck('nome', 'id'))
+                 ->options(\App\Models\Produto::pluck('nome', 'id'))
                  ->searchable()
                  ->preload()
                  ->required(false),
