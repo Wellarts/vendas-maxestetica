@@ -105,6 +105,7 @@ class ProdutoResource extends Resource
                             ->downloadable()
                             ->directory('fotos-produtos')
                             ->maxSize(1024)
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/jpg'])
                             ->maxFiles(1)
                             ->hidden(function (Get $get) {
                                 if ($get('tipo') == 1) {
