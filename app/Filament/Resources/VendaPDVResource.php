@@ -178,6 +178,7 @@ class VendaPDVResource extends Resource
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            ->poll('15s')
             ->columns([
                 Tables\Columns\TextColumn::make('tipo_registro')
                     ->label('Tipo')
