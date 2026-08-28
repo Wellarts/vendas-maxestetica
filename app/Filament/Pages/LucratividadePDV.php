@@ -57,6 +57,7 @@ class LucratividadePDV extends Page implements HasTable
             ->query(
                 VendaPDV::query()
                     ->where('tipo_registro', 'venda')
+                    ->with(['cliente:id,nome', 'funcionario:id,nome', 'formaPgmto:id,nome'])
                     ->withSum('itensVenda as total_custo_produtos', 'total_custo_atual')
             )
             // ->defaultGroup('data_venda','year')
@@ -102,11 +103,18 @@ class LucratividadePDV extends Page implements HasTable
                 TextColumn::make('lucro_venda')
                     ->summarize(new class extends \Filament\Tables\Columns\Summarizers\Summarizer {
                         public function summarize(\Illuminate\Database\Query\Builder $query, string $attribute): mixed {
-                            $records = $query->get();
-                            $total = $records->sum(function ($record) {
-                                return ($record->valor_total_desconto - ($record->total_custo_produtos ?? 0));
-                            });
-                            return 'R$ ' . number_format($total, 2, ',', '.');
+                            // Antes: $query->get() trazia TODAS as linhas filtradas (sem paginação)
+                            // para o PHP a cada render da tabela, somando em memória.
+                            // Isso escala mal (todo o histórico de vendas) e é a causa
+                            // mais provável do 504: a query de origem já tem um subselect
+                            // (withSum) por linha, então "get() sem limite" multiplica o custo.
+                            // Agora a soma é feita no próprio banco, sem trafegar linhas.
+                            $total = \Illuminate\Support\Facades\DB::query()
+                                ->fromSub((clone $query)->reorder(), 'sub')
+                                ->selectRaw('SUM(sub.valor_total_desconto - COALESCE(sub.total_custo_produtos, 0)) as total')
+                                ->value('total');
+
+                            return 'R$ ' . number_format($total ?? 0, 2, ',', '.');
                         }
                     })
                     ->badge()
@@ -124,16 +132,18 @@ class LucratividadePDV extends Page implements HasTable
             ->filters([
                 // Filtro por cliente
                 SelectFilter::make('cliente')
-                    ->relationship('cliente', 'nome')
+                    ->relationship('cliente', 'nome', fn ($query) => $query->select('id', 'nome'))
+                    ->searchable()
                     ->label('Cliente'),
 
                 // Filtro por funcionário
                 SelectFilter::make('funcionario')
-                    ->relationship('funcionario', 'nome')
+                    ->relationship('funcionario', 'nome', fn ($query) => $query->select('id', 'nome'))
+                    ->searchable()
                     ->label('Funcionário'),
                 // Filtro por forma de pagamento
                 SelectFilter::make('forma_pgmto_id')
-                    ->relationship('formaPgmto', 'nome')
+                    ->relationship('formaPgmto', 'nome', fn ($query) => $query->select('id', 'nome'))
                     ->label('Forma de Pagamento'),
 
                 // Filtro por data
@@ -168,13 +178,23 @@ class LucratividadePDV extends Page implements HasTable
                 ->form([
                     \Filament\Forms\Components\Select::make('cliente_id')
                         ->label('Cliente')
-                        ->options(\App\Models\Cliente::orderBy('nome')->pluck('nome', 'id')->toArray())
                         ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => \App\Models\Cliente::query()
+                            ->where('nome', 'like', "%{$search}%")
+                            ->orderBy('nome')
+                            ->limit(50)
+                            ->pluck('nome', 'id'))
+                        ->getOptionLabelUsing(fn ($value) => \App\Models\Cliente::find($value)?->nome)
                         ->placeholder('Todos'),
                     \Filament\Forms\Components\Select::make('funcionario_id')
                         ->label('Funcionário')
-                        ->options(\App\Models\Funcionario::orderBy('nome')->pluck('nome', 'id')->toArray())
                         ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => \App\Models\Funcionario::query()
+                            ->where('nome', 'like', "%{$search}%")
+                            ->orderBy('nome')
+                            ->limit(50)
+                            ->pluck('nome', 'id'))
+                        ->getOptionLabelUsing(fn ($value) => \App\Models\Funcionario::find($value)?->nome)
                         ->placeholder('Todos'),
                     \Filament\Forms\Components\Select::make('forma_pgmto_id')
                         ->label('Forma de Pagamento')
