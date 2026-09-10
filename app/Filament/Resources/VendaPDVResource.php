@@ -55,6 +55,7 @@ class VendaPDVResource extends Resource
                         Forms\Components\Select::make('cliente_id')
                             ->label('Cliente')
                             ->native(false)
+                            ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                             ->searchable()
                             ->relationship('cliente', 'nome')
                             ->required(),
@@ -62,13 +63,17 @@ class VendaPDVResource extends Resource
                             ->label('Vendedor')
                             ->native(false)
                             ->searchable()
+                            ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                             ->relationship('funcionario', 'nome')
                             ->required(),
                         Forms\Components\DatePicker::make('data_venda')
-                           ->required(),
+                            ->label('Data da Venda')
+                            ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
+                            ->required(),
                         Forms\Components\Select::make('forma_pgmto_id')
                             ->label('Forma de Pagamento')
                             ->native(false)
+                            ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                             ->searchable()
                             ->relationship('formaPgmto', 'nome')
                             ->required(),
@@ -81,6 +86,7 @@ class VendaPDVResource extends Resource
                             ->schema([
                                 Forms\Components\Radio::make('tipo_acres_desc')
                                     ->label('Forma')
+                                    ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                                   //  ->hint('Porcentagem ou Valor')
                                     ->live()
                                     ->options([
@@ -97,6 +103,7 @@ class VendaPDVResource extends Resource
                                     ->label('Percentual')
                                     ->visible(fn (callable $get) => $get('tipo_acres_desc') === 'Porcentagem')
                                     // ->numeric()
+                                    ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->suffix('%')
                                     ->required(false)
@@ -119,6 +126,7 @@ class VendaPDVResource extends Resource
                                     ->label('Desc/Acres')
                                     ->hidden(fn (callable $get) => $get('tipo_acres_desc') !== 'Valor')
                                     ->numeric()
+                                    ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                                     ->prefix('R$')
                                     ->extraInputAttributes(['style' => 'font-weight: bolder; font-size: 1.3rem; color: #a39b07ff;'])
                                     ->required(false)
@@ -154,6 +162,7 @@ class VendaPDVResource extends Resource
                        
                          Forms\Components\Radio::make('financeiro')
                                 ->label('Lançamento Financeiro')
+                                ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                                 ->live()
                                 ->options([
                                     '1' => 'Direto no Caixa',
@@ -163,12 +172,14 @@ class VendaPDVResource extends Resource
                                 ->numeric()
                                 ->required()
                                 ->label('Qtd de Parcelas')
-                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2),
+                                ->visible(fn (\Filament\Forms\Get $get): bool => $get('financeiro') == 2)
+                                ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda'),
                                
                          
 
                         Forms\Components\Textarea::make('obs')
                             ->columnSpanFull()
+                            ->disabled(fn(callable $get) => $get('tipo_registro') === 'venda')
                             ->label('Observações'),
                     ]),
             ]);
