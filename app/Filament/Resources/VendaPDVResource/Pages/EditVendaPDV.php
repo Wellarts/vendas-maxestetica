@@ -14,11 +14,34 @@ class EditVendaPDV extends EditRecord
 
     protected static ?string $title = 'Venda PDV';
 
+    protected function resolveRecord(int|string $key): \Illuminate\Database\Eloquent\Model
+    {
+        $record = static::getResource()::getModel()::find($key);
+
+        if (! $record) {
+            \Filament\Notifications\Notification::make()
+                ->title('Venda não encontrada')
+                ->body('Esta venda foi excluída por outro usuário.')
+                ->danger()
+                ->persistent()
+                ->send();
+
+            throw new \Illuminate\Http\Exceptions\HttpResponseException(
+                new \Illuminate\Http\RedirectResponse(static::getResource()::getUrl('index'))
+            );
+        }
+
+        return $record;
+    }
+
     protected function getHeaderActions(): array
     {
         return [
             Actions\DeleteAction::make()
-                ->disabled(fn($record) => PDV::where('venda_p_d_v_id', $record->id)->count())
+                ->disabled(function () {
+                    $record = $this->getRecord();
+                    return PDV::where('venda_p_d_v_id', $record->id)->count() > 0;
+                })
                 ->after(function ($record) {
                     if ($record->financeiro == 1) {
                         // Excluir do fluxo de caixa
@@ -46,6 +69,18 @@ class EditVendaPDV extends EditRecord
                 ->color('danger')
                 ->requiresConfirmation()
                 ->action(function ($record) {
+                    try {
+                        $record->refresh();
+                    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Venda não encontrada')
+                            ->body('Esta venda foi excluída por outro usuário. Atualize a página.')
+                            ->danger()
+                            ->persistent()
+                            ->send();
+                        return;
+                    }
+
                     $record->valor_total = $record->pdv->sum('sub_total');
                     $record->valor_total_desconto = $record->valor_total;
                     if ($record->tipo_acres_desc == 'Valor') {
@@ -87,8 +122,20 @@ class EditVendaPDV extends EditRecord
                 ->requiresConfirmation()
                 ->modalHeading('Converter em Venda')
                 ->modalDescription('Caso tenha feito alterações no formulário é necesssário salvar para depois converter em venda. Tem certeza que deseja converter este orçamento em venda?')
-                ->visible(fn($record) => $record->tipo_registro === 'orcamento')
+                ->visible(fn() => $this->getRecord()->tipo_registro === 'orcamento')
                 ->action(function ($record) {
+                    try {
+                        $record->refresh();
+                    } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+                        \Filament\Notifications\Notification::make()
+                            ->title('Venda não encontrada')
+                            ->body('Esta venda foi excluída por outro usuário. Atualize a página.')
+                            ->danger()
+                            ->persistent()
+                            ->send();
+                        return;
+                    }
+
                     // Verifica se algum item do estoque é menor que a quantidade vendida
                     foreach ($record->pdv as $item) {
                         $produto = $item->Produto;

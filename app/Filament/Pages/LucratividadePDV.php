@@ -51,6 +51,7 @@ class LucratividadePDV extends Page implements HasTable
             ->query(
                 VendaPDV::query()
                     ->where('tipo_registro', 'venda')
+                    ->with(['cliente:id,nome', 'funcionario:id,nome', 'formaPgmto:id,nome'])
                     ->withSum('itensVenda as total_custo_produtos', 'total_custo_atual')
             )
             ->columns([
@@ -93,16 +94,15 @@ class LucratividadePDV extends Page implements HasTable
                     ->money('BRL')
                     ->color('warning'),
                 TextColumn::make('lucro_venda')
-                    ->summarize(
-                        Summarizer::make()
-                            ->label('Total')
-                            ->money('BRL')
-                            // Soma feita no banco, sem carregar todos os registros no PHP
-                            ->using(fn (QueryBuilder $query) => DB::query()
-                                ->fromSub($query->clone()->reorder(), 'v')
-                                ->selectRaw('SUM(COALESCE(valor_total_desconto, 0) - COALESCE(total_custo_produtos, 0)) as lucro')
-                                ->value('lucro'))
-                    )
+                    ->summarize(new class extends \Filament\Tables\Columns\Summarizers\Summarizer {
+                        public function summarize(\Illuminate\Database\Query\Builder $query, string $attribute): mixed {
+                            $records = $query->get();
+                            $total = $records->sum(function ($record) {
+                                return ($record->valor_total_desconto - ($record->total_custo_produtos ?? 0));
+                            });
+                            return 'R$ ' . number_format($total, 2, ',', '.');
+                        }
+                    })
                     ->badge()
                     ->alignCenter()
                     ->label('Lucro por Venda')
@@ -117,18 +117,16 @@ class LucratividadePDV extends Page implements HasTable
                 // Filtro por cliente
                 SelectFilter::make('cliente')
                     ->relationship('cliente', 'nome')
-                    ->searchable()
                     ->label('Cliente'),
 
                 // Filtro por funcionário
                 SelectFilter::make('funcionario')
                     ->relationship('funcionario', 'nome')
-                    ->searchable()
                     ->label('Funcionário'),
 
                 // Filtro por forma de pagamento
                 SelectFilter::make('forma_pgmto_id')
-                    ->relationship('formaPgmto', 'nome')
+                    ->relationship('formaPgmto', 'nome', fn ($query) => $query->select('id', 'nome'))
                     ->label('Forma de Pagamento'),
 
                 // Filtro por data (padrão: mês atual, para não somar o histórico inteiro ao abrir)
@@ -167,13 +165,25 @@ class LucratividadePDV extends Page implements HasTable
                     // Closures: as consultas só rodam ao abrir o modal, não a cada render da página
                     \Filament\Forms\Components\Select::make('cliente_id')
                         ->label('Cliente')
-                        ->options(fn () => \App\Models\Cliente::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->options(\App\Models\Cliente::orderBy('nome')->pluck('nome', 'id')->toArray())
                         ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => \App\Models\Cliente::query()
+                            ->where('nome', 'like', "%{$search}%")
+                            ->orderBy('nome')
+                            ->limit(50)
+                            ->pluck('nome', 'id'))
+                        ->getOptionLabelUsing(fn ($value) => \App\Models\Cliente::find($value)?->nome)
                         ->placeholder('Todos'),
                     \Filament\Forms\Components\Select::make('funcionario_id')
                         ->label('Funcionário')
-                        ->options(fn () => \App\Models\Funcionario::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->options(\App\Models\Funcionario::orderBy('nome')->pluck('nome', 'id')->toArray())
                         ->searchable()
+                        ->getSearchResultsUsing(fn (string $search) => \App\Models\Funcionario::query()
+                            ->where('nome', 'like', "%{$search}%")
+                            ->orderBy('nome')
+                            ->limit(50)
+                            ->pluck('nome', 'id'))
+                        ->getOptionLabelUsing(fn ($value) => \App\Models\Funcionario::find($value)?->nome)
                         ->placeholder('Todos'),
                     \Filament\Forms\Components\Select::make('forma_pgmto_id')
                         ->label('Forma de Pagamento')
