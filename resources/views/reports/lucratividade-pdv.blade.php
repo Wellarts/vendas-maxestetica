@@ -31,82 +31,67 @@
             font-size: 0.95em;
         }
 
-        fieldset.venda {
-            border: 1px solid #bbb;
-            margin-bottom: 10px;
-            padding: 6px 10px 8px 10px;
+        tr.venda td {
+            background-color: #e9edf2;
+            font-weight: bold;
         }
 
-        legend.venda {
-            font-size: 1em;
-            font-weight: bold;
-            padding: 0 8px;
+        tr.itens-cab td {
+            background-color: #f7f7f7;
+            color: #666;
+            font-size: 0.85em;
         }
     </style>
-    @foreach ($vendas as $venda)
-        <fieldset class="venda">
-            <legend class="venda">Venda #{{ $venda->id }} - {{ $venda->cliente->nome ?? '-' }}</legend>
-            <table width="100%" border="1" cellspacing="0" cellpadding="0" class="reduzida">
-                <tr>
-                    <th style="width:16%">Cliente</th>
-                    <th style="width:10%">Data</th>
-                    <th style="width:16%">Vendedor</th>
-                    <th style="width:14%">Forma Pgto</th>
-                    <th style="width:10%">Valor Total</th>
-                    <th style="width:10%">Asc/Desc Valor</th>
-                    <th style="width:8%">Asc/Desc % </th>
-                    <th style="width:8%">Total</th>
-                    <th style="width:12%">Total c/ Desc/Acres</th>
-                    <th style="width:12%">Lucratividade</th>
-                </tr>
-                <tr>
+
+    {{-- Uma única tabela para todas as vendas: bem mais leve para o dompdf do que fieldset + 2 tabelas por venda --}}
+    <table width="100%" border="1" cellspacing="0" cellpadding="0" class="reduzida">
+        <thead>
+            <tr>
+                <th style="width:6%">Venda</th>
+                <th style="width:16%">Cliente</th>
+                <th style="width:9%">Data</th>
+                <th style="width:14%">Vendedor</th>
+                <th style="width:12%">Forma Pgto</th>
+                <th style="width:10%">Valor Total</th>
+                <th style="width:9%">Asc/Desc Valor</th>
+                <th style="width:6%">Asc/Desc %</th>
+                <th style="width:10%">Total c/ Desc/Acres</th>
+                <th style="width:8%">Lucratividade</th>
+            </tr>
+        </thead>
+        @foreach ($vendas as $venda)
+            <tbody>
+                <tr class="venda">
+                    <td style="text-align:center;">#{{ $venda->id }}</td>
                     <td>{{ $venda->cliente->nome ?? '-' }}</td>
                     <td>{{ \Carbon\Carbon::parse($venda->data_venda)->format('d/m/Y') }}</td>
                     <td>{{ $venda->funcionario->nome ?? '-' }}</td>
                     <td>{{ $venda->formaPgmto->nome ?? '-' }}</td>
                     <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
-                    <td>R$ {{$venda->valor_acres_desc }}</td>
-                    <td>{{ $venda->percent_acres_desc ? $venda->percent_acres_desc . '%' : '-' }}
-                    </td>
-                    <td>R$ {{ number_format($venda->valor_total, 2, ',', '.') }}</td>
+                    <td>R$ {{ $venda->valor_acres_desc }}</td>
+                    <td>{{ $venda->percent_acres_desc ? $venda->percent_acres_desc . '%' : '-' }}</td>
                     <td>R$ {{ number_format($venda->valor_total_desconto, 2, ',', '.') }}</td>
-                    <td>
-                        @php
-                            $custoProdutos = $venda->itensVenda->sum(function ($item) {
-                                return $item->valor_custo_atual * $item->qtd;
-                            });
-                            $lucroVenda = $venda->valor_total_desconto - $custoProdutos;
-                        @endphp
-                        R$ {{ number_format($lucroVenda, 2, ',', '.') }}
-                    </td>
+                    <td>R$ {{ number_format($venda->valor_total_desconto - ($venda->total_custo_produtos ?? 0), 2, ',', '.') }}</td>
                 </tr>
-            </table>
-            <div style="margin-top:2px;">
-                <b>Produtos da Venda:</b>
-                <table width="100%" border="1" cellspacing="0" cellpadding="0" class="reduzida">
-                    <thead>
-                        <tr>
-                            <th>Produto</th>
-                            <th>Qtd</th>
-                            <th>Preço Unitário</th>
-                            <th>Subtotal</th>
-
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($venda->itensVenda as $item)
-                            <tr>
-                                <td>{{ $item->produto->nome ?? '-' }}</td>
-                                <td style="text-align: center;">{{ $item->qtd }}</td>
-                                <td>R$ {{ number_format($item->valor_venda, 2, ',', '.') }}</td>
-                                <td>R$ {{ number_format($item->sub_total, 2, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </fieldset>
-    @endforeach
+                <tr class="itens-cab">
+                    <td></td>
+                    <td colspan="4">Produto</td>
+                    <td style="text-align:center;">Qtd</td>
+                    <td colspan="2">Preço Unitário</td>
+                    <td colspan="2">Subtotal</td>
+                </tr>
+                @foreach ($venda->itensVenda as $item)
+                    <tr>
+                        <td></td>
+                        <td colspan="4">{{ $item->produto->nome ?? '-' }}</td>
+                        <td style="text-align: center;">{{ $item->qtd }}</td>
+                        <td colspan="2">R$ {{ number_format($item->valor_venda, 2, ',', '.') }}</td>
+                        <td colspan="2">R$ {{ number_format($item->sub_total, 2, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        @endforeach
+    </table>
     <br>
     <h4>Somatórios</h4>
     <table width="100%" border="1" cellspacing="0" cellpadding="2" class="reduzida" style="font-size:1.1em;">

@@ -10,6 +10,8 @@ class LucratividadePDVPdfController extends Controller
 {
     public function gerarRelatorio(Request $request)
     {
+        set_time_limit(0);
+        ini_set('memory_limit', '1024M');
 
         $query = VendaPDV::with(['cliente', 'funcionario', 'formaPgmto', 'itensVenda.produto'])
             ->where('tipo_registro', 'venda')
@@ -25,11 +27,12 @@ class LucratividadePDVPdfController extends Controller
         if ($request->filled('forma_pgmto_id')) {
             $query->where('forma_pgmto_id', $request->forma_pgmto_id);
         }
+        // Sem whereDate(): comparar direto a coluna permite usar índice
         if ($request->filled('data_de')) {
-            $query->whereDate('data_venda', '>=', $request->data_de);
+            $query->where('data_venda', '>=', $request->data_de);
         }
         if ($request->filled('data_ate')) {
-            $query->whereDate('data_venda', '<=', $request->data_ate);
+            $query->where('data_venda', '<=', $request->data_ate . ' 23:59:59');
         }
 
         $vendas = $query->get();
@@ -38,7 +41,7 @@ class LucratividadePDVPdfController extends Controller
         $somaCustoProdutos = $vendas->sum('total_custo_produtos');
         $somaValorTotal = $vendas->sum('valor_total');
         $somaValorTotalDesconto = $vendas->sum('valor_total_desconto');
-        $somaLucro = $vendas->sum(function($venda) {
+        $somaLucro = $vendas->sum(function ($venda) {
             return $venda->valor_total_desconto - ($venda->total_custo_produtos ?? 0);
         });
 
