@@ -41,3 +41,4 @@ Route::get('/relatorio-vendas-por-cliente', [VwTotalVendasPorClienteReportContro
 Route::get('/relatorio-contas-pagar-pdf', [ContasPagarReportController::class, 'pdf'])->name('relatorio.contas.pagar.pdf'); 
 Route::get('/relatorio-contas-receber-pdf', [ContasReceberReportController::class, 'pdf'])->name('relatorio.contas.receber.pdf');
 Route::get('/relatorio-fluxo-caixa-pdf', [FluxoCaixaReportController::class, 'pdf'])->name('relatorio.fluxo.caixa.pdf');
+Route::get('relatorio/lucratividade-pdv/csv', [\App\Http\Controllers\LucratividadePDVCsvController::class, 'exportar'])->name('relatorio.lucratividade.pdv.csv');

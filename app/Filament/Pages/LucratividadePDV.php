@@ -184,6 +184,10 @@ class LucratividadePDV extends Page implements HasTable
                         ->label('Data de'),
                     \Filament\Forms\Components\DatePicker::make('data_ate')
                         ->label('Data até'),
+                    \Filament\Forms\Components\Toggle::make('detalhado')
+                        ->label('Incluir produtos de cada venda')
+                        ->helperText('Deixe desligado para períodos longos: o relatório fica bem mais leve.')
+                        ->default(false),
                 ])
                 ->requiresConfirmation()
                 ->action(function (array $data, $livewire) {
@@ -193,8 +197,50 @@ class LucratividadePDV extends Page implements HasTable
                     if (!empty($data['forma_pgmto_id'])) $params['forma_pgmto_id'] = $data['forma_pgmto_id'];
                     if (!empty($data['data_de'])) $params['data_de'] = $data['data_de'];
                     if (!empty($data['data_ate'])) $params['data_ate'] = $data['data_ate'];
+                    if (!empty($data['detalhado'])) $params['detalhado'] = 1;
                     $queryString = http_build_query($params);
                     $url = route('relatorio.lucratividade.pdv') . ($queryString ? ('?' . $queryString) : '');
+                    $livewire->js("window.open('{$url}', '_blank')");
+                }),
+
+            \Filament\Actions\Action::make('exportar_csv')
+                ->label('Exportar Excel (CSV)')
+                ->icon('heroicon-o-table-cells')
+                ->color('info')
+                ->form([
+                    \Filament\Forms\Components\Select::make('cliente_id')
+                        ->label('Cliente')
+                        ->options(fn () => \App\Models\Cliente::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todos'),
+                    \Filament\Forms\Components\Select::make('funcionario_id')
+                        ->label('Funcionário')
+                        ->options(fn () => \App\Models\Funcionario::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todos'),
+                    \Filament\Forms\Components\Select::make('forma_pgmto_id')
+                        ->label('Forma de Pagamento')
+                        ->options(fn () => \App\Models\FormaPgmto::orderBy('nome')->pluck('nome', 'id')->toArray())
+                        ->searchable()
+                        ->placeholder('Todas'),
+                    \Filament\Forms\Components\DatePicker::make('data_de')
+                        ->label('Data de'),
+                    \Filament\Forms\Components\DatePicker::make('data_ate')
+                        ->label('Data até'),
+                    \Filament\Forms\Components\Toggle::make('detalhado')
+                        ->label('Incluir produtos de cada venda')
+                        ->default(false),
+                ])
+                ->action(function (array $data, $livewire) {
+                    $params = array_filter([
+                        'cliente_id' => $data['cliente_id'] ?? null,
+                        'funcionario_id' => $data['funcionario_id'] ?? null,
+                        'forma_pgmto_id' => $data['forma_pgmto_id'] ?? null,
+                        'data_de' => $data['data_de'] ?? null,
+                        'data_ate' => $data['data_ate'] ?? null,
+                        'detalhado' => !empty($data['detalhado']) ? 1 : null,
+                    ]);
+                    $url = route('relatorio.lucratividade.pdv.csv') . ($params ? ('?' . http_build_query($params)) : '');
                     $livewire->js("window.open('{$url}', '_blank')");
                 }),
         ];
